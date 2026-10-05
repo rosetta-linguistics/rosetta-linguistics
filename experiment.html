@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rosetta — AI Experiment</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+    <!-- =========================
+         HEADER
+         ========================= -->
+
+    <header class="site-header">
+
+        <div class="header-inner">
+
+            <a href="index.html" class="logo">
+                Rosetta
+            </a>
+
+            <div class="progress">
+                <span id="step-number">1</span>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         MAIN
+         ========================= -->
+
+    <main class="container">
+
+
+        <!-- =========================
+             STEP 1 — PUZZLE + CHAT
+             ========================= -->
+
+        <section id="activity" class="experiment-step active">
+
+            <div class="intro">
+
+                <p class="eyebrow">
+                    STEP 1
+                </p>
+
+                <h1>
+                    Discover the pattern
+                </h1>
+
+                <p class="lead">
+                    Here, you are given 3 Swahili words, as well as their English meaning. Try to work out how the words are constructed.
+                    Use the available help when you get stuck, and focus on explaining your reasoning.
+                </p>
+
+            </div>
+
+
+            <!-- =========================
+                 EXAMPLES
+                 ========================= -->
+
+            <div class="examples">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Word</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <!--
+                            REPLACE THESE WITH YOUR
+                            ACTUAL LINGUISTICS PUZZLE
+                        -->
+
+                        <tr>
+                            <td>word 1</td>
+                            <td>meaning 1</td>
+                        </tr>
+
+                        <tr>
+                            <td>word 2</td>
+                            <td>meaning 2</td>
+                        </tr>
+
+                        <tr>
+                            <td>word 3</td>
+                            <td>meaning 3</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- =========================
+                 STATIC HINTS (NON-AI CONDITION)
+                 ========================= -->
+
+            <div id="static-help" class="chat" style="display: none;">
+                <div class="chat-header"><div><strong>Static hints</strong><span class="status"> ● Open one at a time</span></div></div>
+                <p>Try to identify the pattern yourself. Open the next hint only when you need more help.</p>
+                <div id="hint-1" class="info-box"><strong>Hint 1</strong><p>Replace this placeholder with your first hint.</p></div>
+                <div id="hint-2" class="info-box" style="display:none"><strong>Hint 2</strong><p>Replace this placeholder with your second hint.</p></div>
+                <div id="hint-3" class="info-box" style="display:none"><strong>Hint 3</strong><p>Replace this placeholder with your third hint.</p></div>
+                <div id="hint-4" class="info-box" style="display:none"><strong>Hint 4</strong><p>Replace this placeholder with your fourth hint.</p></div>
+                <button id="next-hint-button" type="button" onclick="showNextHint()">Open next hint →</button>
+                <div class="final-question" style="margin-top:2rem">
+                    <h3>Explain the rule in your own words</h3>
+                    <p>Write your explanation before revealing the correct rule.</p>
+                    <textarea id="rule-explanation" placeholder="Explain the pattern and your reasoning..." rows="5"></textarea>
+                    <button id="reveal-rule-button" type="button" onclick="revealRule()">Show the correct rule</button>
+                    <div id="correct-rule" class="info-box" style="display:none; margin-top:1rem"><strong>Correct rule</strong><p>Replace this placeholder with the correct rule for this puzzle.</p></div>
+                </div>
+            </div>
+
+            <!-- =========================
+                 AI CHAT
+                 ========================= -->
+
+            <div class="chat">
+
+                <div class="chat-header">
+
+                    <div>
+                        <strong>AI Tutor</strong>
+
+                        <span class="status">
+                            ● Ready to help
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <!-- Messages appear here -->
+
+                <div
+                    id="messages"
+                    class="messages">
+
+                    <!-- Initial tutor message -->
+
+                    <div class="message tutor">
+
+                        <div class="message-label">
+                            Tutor
+                        </div>
+
+                        <div class="bubble">
+
+                            -- AI Question examples --:
+    
+                            Look at the above examples. Are there any noticeable patterns?
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Input -->
+
+                <div class="chat-input">
+
+                    <textarea
+                        id="user-input"
+                        placeholder="Write your answer or ask the tutor a question..."
+                        rows="2">
+                    </textarea>
+
+                    <button
+                        onclick="sendMessage()">
+
+                        Send
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Continue -->
+
+            <div class="navigation">
+
+                <button
+                    class="primary-button"
+                    onclick="showFinalTask()">
+
+                    Continue →
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             STEP 2 — FINAL TASK
+             ========================= -->
+
+        <section
+            id="final"
+            class="experiment-step">
+
+            <div class="intro">
+
+                <p class="eyebrow">
+                    STEP 2
+                </p>
+
+                <h1>
+                    Now try it yourself
+                </h1>
+
+                <p class="lead">
+                    Use what you learned to analyse this new set
+                    of words.
+                </p>
+
+                <p>
+                    This time, try to solve the problem without
+                    asking the tutor for help.
+                </p>
+
+            </div>
+
+
+            <!-- =========================
+                 FINAL QUESTION
+                 ========================= -->
+
+            <div class="final-question">
+
+                <h3>
+                    Your final problem
+                </h3>
+
+                <p>
+                    -- This is the final morphology question ! --
+                </p>
+
+                <textarea
+                    id="final-answer"
+                    placeholder="Write your answer and explain your reasoning..."
+                    rows="7">
+                </textarea>
+
+                <!-- Correct answer, initially hidden -->
+                <div
+                    id="final-correct-answer"
+                    class="info-box"
+                    style="display: none; margin-top: 1.5rem;">
+
+                    <strong>
+                        Correct answer
+                    </strong>
+
+                    <p>
+                        -- this is the correct answer ! --
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="navigation">
+
+                <button
+                    class="primary-button"
+                    onclick="finishActivity()">
+
+                    Finish activity
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             STEP 3 — COMPLETION
+             ========================= -->
+
+        <section
+            id="complete"
+            class="experiment-step">
+
+            <div class="intro completion">
+
+                <p class="eyebrow">
+                    COMPLETE
+                </p>
+
+                <h1>
+                    Thank you!
+                </h1>
+
+                <p class="lead">
+                    You have completed the experiment.
+                </p>
+
+                <p>
+                    Your responses have been recorded.
+                </p>
+
+                <a
+                    href="index.html"
+                    class="primary-button">
+
+                    Return to homepage
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =========================
+         JAVASCRIPT
+         ========================= -->
+
+    <script src="script.js"></script>
+    <script>
+        // The home page selects the condition through ?mode=ai or ?mode=non-ai.
+        // If someone opens experiment.html directly, default to the AI condition.
+        document.addEventListener("DOMContentLoaded", function () {
+            const params = new URLSearchParams(window.location.search);
+            const mode = params.get("mode") === "non-ai" ? "non-ai" : "ai";
+            document.body.dataset.experimentMode = mode;
+            const aiChat = document.querySelector(".chat:not(#static-help)");
+            const staticHelp = document.getElementById("static-help");
+            if (mode === "non-ai") {
+                if (aiChat) aiChat.style.display = "none";
+                if (staticHelp) staticHelp.style.display = "block";
+                const lead = document.querySelector("#activity .lead");
+                if (lead) lead.textContent = "Study the examples and use the four static hints when you need help. Explain the rule in your own words before revealing the correct rule.";
+                const heading = document.querySelector("#activity h1");
+                if (heading) heading.textContent = "Discover the pattern with hints";
+            } else {
+                if (aiChat) aiChat.style.display = "block";
+                if (staticHelp) staticHelp.style.display = "none";
+            }
+        });
+    </script>
+
+</body>
+
+</html>
