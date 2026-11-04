@@ -1,5 +1,6 @@
+
 /* =========================================================
-   ROSETTA EXPERIMENT
+   ROSETTA EXPERIMENT — UNIT 1
    Main JavaScript
    ========================================================= */
 
@@ -9,757 +10,1142 @@
    ========================================================= */
 
 let experimentMode = "ai";
-let currentHint = 1;
+let currentScreen = 0;
+
+let participantId = null;
+let experimentData = {};
+
+let preTimerInterval = null;
+let postTimerInterval = null;
+let hintTimerInterval = null;
+
+let preTimeRemaining = 15 * 60;
+let postTimeRemaining = 15 * 60;
+let hintTimeRemaining = 5 * 60;
+
+let hintOpened = [false, false, false];
+let hintPanelClosed = false;
 
 
 /* =========================================================
-   INITIALISE EXPERIMENT
+   INITIALISATION
    ========================================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    /*
-     * The homepage sends the participant to:
-     *
-     * experiment.html?mode=ai
-     *
-     * or:
-     *
-     * experiment.html?mode=non-ai
-     */
-
     const params = new URLSearchParams(window.location.search);
 
-    const requestedMode = params.get("mode");
+    experimentMode =
+        params.get("mode") === "non-ai" ? "non-ai" : "ai";
 
-    if (requestedMode === "non-ai") {
-        experimentMode = "non-ai";
-    } else {
-        experimentMode = "ai";
-    }
-
-
-    /*
-     * Store the mode on the body so that it is easy
-     * to inspect elsewhere in the experiment.
-     */
+    participantId = getOrCreateParticipantId();
 
     document.body.dataset.experimentMode = experimentMode;
 
+    experimentData = {
+        participant_id: participantId,
+        experiment_mode: experimentMode,
+        unit: 1,
+        started_at: new Date().toISOString(),
+        completed_at: null,
+        responses: {},
+        events: [],
+        scores: {}
+    };
 
-    /*
-     * Only perform experiment-specific setup if
-     * we are actually on experiment.html.
-     */
+    recordEvent("experiment_started", {
+        mode: experimentMode
+    });
 
-    if (document.getElementById("activity")) {
-        initialiseExperiment();
-    }
+    initialiseNavigation();
+    initialiseForms();
+    initialiseHints();
+    initialiseDownload();
 
+    showScreen(0);
+
+    startTimer("pre-timer", 15 * 60, "pre");
 });
 
 
 /* =========================================================
-   SET UP AI / NON-AI CONDITION
+   PARTICIPANT ID
    ========================================================= */
 
-function initialiseExperiment() {
+function getOrCreateParticipantId() {
 
-    const activity = document.getElementById("activity");
-    const staticHelp = document.getElementById("static-help");
+    let id = localStorage.getItem("rosetta_participant_id");
 
-    /*
-     * On the experiment page, the AI chat is the .chat
-     * element that is NOT #static-help.
-     */
+    if (!id) {
 
-    const chats = document.querySelectorAll(".chat");
+        id =
+            "P-" +
+            Date.now().toString(36).toUpperCase() +
+            "-" +
+            Math.random().toString(36).substring(2, 8).toUpperCase();
 
-    let aiChat = null;
+        localStorage.setItem("rosetta_participant_id", id);
+    }
 
-    chats.forEach(function (chat) {
+    return id;
+}
 
-        if (chat.id !== "static-help") {
-            aiChat = chat;
-        }
+
+/* =========================================================
+   EVENT LOGGING
+   ========================================================= */
+
+function recordEvent(eventName, details = {}) {
+
+    if (!experimentData.events) {
+        experimentData.events = [];
+    }
+
+    experimentData.events.push({
+        event: eventName,
+        timestamp: new Date().toISOString(),
+        details: details
+    });
+
+    saveDataLocally();
+}
+
+
+/* =========================================================
+   LOCAL STORAGE
+   ========================================================= */
+
+function saveDataLocally() {
+
+    try {
+
+        localStorage.setItem(
+            "rosetta_unit1_" + participantId,
+            JSON.stringify(experimentData)
+        );
+
+    } catch (error) {
+
+        console.error("Could not save experiment data:", error);
+
+    }
+}
+
+
+/* =========================================================
+   SCREEN NAVIGATION
+   ========================================================= */
+
+function initialiseNavigation() {
+
+    document.querySelectorAll("[data-next]").forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const nextScreen = Number(button.dataset.next);
+
+            if (nextScreen === 5 && !experimentData.responses.swahili_rule) {
+
+                alert("Please submit your rule before continuing.");
+                return;
+            }
+
+            showScreen(nextScreen);
+        });
 
     });
 
+    const unit2Button = document.getElementById("unit-2-button");
 
-    /* -----------------------------------------
-       NON-AI CONDITION
-       ----------------------------------------- */
+    if (unit2Button) {
 
-    if (experimentMode === "non-ai") {
+        unit2Button.addEventListener("click", function () {
 
-        if (aiChat) {
-            aiChat.style.display = "none";
-        }
-
-        if (staticHelp) {
-            staticHelp.style.display = "block";
-        }
-
-
-        /*
-         * Change the explanatory text so that the
-         * participant knows they are using static hints.
-         */
-
-        const lead =
-            document.querySelector("#activity .lead");
-
-        if (lead) {
-
-            lead.textContent =
-                "Here, you are given 3 Swahili words, as well as their English meaning. " +
-                "Try to work out how the words are constructed. " +
-                "Use the four hints when you get stuck, and explain your reasoning in your own words.";
-
-        }
-
-
-        /*
-         * Change the heading slightly.
-         */
-
-        const heading =
-            document.querySelector("#activity h1");
-
-        if (heading) {
-            heading.textContent = "Discover the pattern with hints";
-        }
-
-    }
-
-
-    /* -----------------------------------------
-       AI CONDITION
-       ----------------------------------------- */
-
-    else {
-
-        if (aiChat) {
-            aiChat.style.display = "block";
-        }
-
-        if (staticHelp) {
-            staticHelp.style.display = "none";
-        }
-
-    }
-
-
-    /*
-     * Make sure Step 1 is visible.
-     */
-
-    if (activity) {
-        activity.classList.add("active");
-    }
-
-
-    /*
-     * Make sure Step 2 and Step 3 are hidden.
-     */
-
-    const finalStep = document.getElementById("final");
-    const completeStep = document.getElementById("complete");
-
-    if (finalStep) {
-        finalStep.classList.remove("active");
-    }
-
-    if (completeStep) {
-        completeStep.classList.remove("active");
-    }
-
-
-    /*
-     * Set progress indicator.
-     */
-
-    const stepNumber =
-        document.getElementById("step-number");
-
-    if (stepNumber) {
-        stepNumber.textContent = "1";
-    }
-
-
-    /*
-     * Reset static hints.
-     */
-
-    resetHints();
-}
-
-
-/* =========================================================
-   RESET STATIC HINTS
-   ========================================================= */
-
-function resetHints() {
-
-    currentHint = 1;
-
-
-    /*
-     * Hint 1 should be visible.
-     */
-
-    const hint1 =
-        document.getElementById("hint-1");
-
-    if (hint1) {
-        hint1.style.display = "block";
-    }
-
-
-    /*
-     * Hints 2–4 should initially be hidden.
-     */
-
-    for (let i = 2; i <= 4; i++) {
-
-        const hint =
-            document.getElementById("hint-" + i);
-
-        if (hint) {
-            hint.style.display = "none";
-        }
-
-    }
-
-
-    /*
-     * Reset the hint button.
-     */
-
-    const button =
-        document.getElementById("next-hint-button");
-
-    if (button) {
-
-        button.textContent =
-            "Open next hint";
-
-        button.disabled = false;
-    }
-
-}
-
-
-/* =========================================================
-   STATIC HINTS
-   ========================================================= */
-
-function showNextHint() {
-
-    const nextHint = currentHint + 1;
-
-
-    /*
-     * Show the next hint.
-     */
-
-    if (nextHint <= 4) {
-
-        const hint =
-            document.getElementById(
-                "hint-" + nextHint
-            );
-
-        if (hint) {
-
-            hint.style.display = "block";
-
-            currentHint = nextHint;
-        }
-
-    }
-
-
-    /*
-     * Once all four hints have been opened,
-     * disable the button.
-     */
-
-    if (currentHint >= 4) {
-
-        const button =
-            document.getElementById(
-                "next-hint-button"
-            );
-
-        if (button) {
-
-            button.textContent =
-                "All four hints opened";
-
-            button.disabled = true;
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   REVEAL CORRECT RULE
-   ========================================================= */
-
-function revealRule() {
-
-    const explanation =
-        document.getElementById(
-            "rule-explanation"
-        );
-
-
-    /*
-     * The participant must first write
-     * their own explanation.
-     */
-
-    if (
-        !explanation ||
-        !explanation.value.trim()
-    ) {
-
-        alert(
-            "Please explain the rule in your own words before revealing the correct rule."
-        );
-
-        return;
-    }
-
-
-    /*
-     * Reveal the correct rule.
-     */
-
-    const correctRule =
-        document.getElementById(
-            "correct-rule"
-        );
-
-    if (correctRule) {
-        correctRule.style.display = "block";
-    }
-
-
-    /*
-     * Disable the reveal button.
-     */
-
-    const button =
-        document.getElementById(
-            "reveal-rule-button"
-        );
-
-    if (button) {
-        button.disabled = true;
-    }
-
-}
-
-
-/* =========================================================
-   STEP 1 → STEP 2
-   ========================================================= */
-
-function showFinalTask() {
-
-    /*
-     * In the non-AI condition, the participant must
-     * explain the rule and reveal the correct rule
-     * before continuing.
-     */
-
-    if (experimentMode === "non-ai") {
-
-        const explanation =
-            document.getElementById(
-                "rule-explanation"
-            );
-
-        const correctRule =
-            document.getElementById(
-                "correct-rule"
-            );
-
-
-        const explanationMissing =
-            !explanation ||
-            !explanation.value.trim();
-
-
-        const ruleStillHidden =
-            !correctRule ||
-            correctRule.style.display === "none";
-
-
-        if (
-            explanationMissing ||
-            ruleStillHidden
-        ) {
+            recordEvent("unit_2_requested");
 
             alert(
-                "Please write your explanation and reveal the correct rule before continuing."
+                "Unit 2 is not available yet. Thank you for completing Unit 1!"
             );
 
-            return;
-        }
+        });
 
     }
+}
 
 
-    /*
-     * Hide Step 1.
-     */
+function showScreen(screenNumber) {
 
-    const activity =
-        document.getElementById(
-            "activity"
-        );
+    document.querySelectorAll(".experiment-step").forEach(function (screen) {
 
-    if (activity) {
-        activity.classList.remove("active");
+        screen.classList.remove("active");
+
+    });
+
+    const target = document.getElementById("screen-" + screenNumber);
+
+    if (!target) {
+        return;
     }
 
+    target.classList.add("active");
 
-    /*
-     * Show Step 2.
-     */
+    currentScreen = screenNumber;
 
-    const finalStep =
-        document.getElementById(
-            "final"
-        );
-
-    if (finalStep) {
-        finalStep.classList.add("active");
-    }
-
-
-    /*
-     * Update progress.
-     */
-
-    const stepNumber =
-        document.getElementById(
-            "step-number"
-        );
+    const stepNumber = document.getElementById("step-number");
 
     if (stepNumber) {
-        stepNumber.textContent = "2";
+        stepNumber.textContent = screenNumber;
     }
 
-
-    /*
-     * Scroll to the top.
-     */
+    recordEvent("screen_opened", {
+        screen: screenNumber
+    });
 
     window.scrollTo({
         top: 0,
         behavior: "smooth"
     });
 
+    if (screenNumber === 1) {
+        recordEvent("discover_screen_opened");
+    }
+
+    if (screenNumber === 2) {
+        recordEvent("worked_example_opened");
+    }
+
+    if (screenNumber === 3) {
+        recordEvent("swahili_screen_opened");
+    }
+
+    if (screenNumber === 4) {
+        recordEvent("rule_screen_opened");
+    }
+
+    if (screenNumber === 5) {
+
+        if (!postTimerInterval) {
+            startTimer("post-timer", postTimeRemaining, "post");
+        }
+    }
+
 }
 
 
 /* =========================================================
-   STEP 2 → STEP 3
+   FORM INITIALISATION
    ========================================================= */
 
-function finishActivity() {
+function initialiseForms() {
 
-    const answer =
-        document.getElementById("final-answer");
+    const pretestForm = document.getElementById("pretest-form");
 
-    const correctAnswer =
-        document.getElementById("final-correct-answer");
+    if (pretestForm) {
 
+        pretestForm.addEventListener("submit", function (event) {
 
-    /*
-     * Make sure the participant has submitted
-     * an answer before showing the solution.
-     */
+            event.preventDefault();
 
-    if (!answer || !answer.value.trim()) {
+            const answers = getFormAnswers(pretestForm);
 
-        alert(
-            "Please write your answer before submitting."
-        );
+            experimentData.responses.pretest = answers;
 
-        return;
+            experimentData.scores.pretest = gradePretest(answers);
+
+            recordEvent("pretest_submitted", {
+                score: experimentData.scores.pretest.total
+            });
+
+            stopTimer("pre");
+
+            saveDataLocally();
+
+            showScreen(1);
+
+        });
     }
 
 
-    /*
-     * Show the correct answer.
-     */
+    const discoverForm = document.getElementById("discover-form");
 
-    if (correctAnswer) {
+    if (discoverForm) {
 
-        correctAnswer.style.display = "block";
+        discoverForm.addEventListener("submit", function (event) {
 
+            event.preventDefault();
+
+            const answers = getFormAnswers(discoverForm);
+
+            experimentData.responses.discover = answers;
+
+            recordEvent("discover_response_saved");
+
+            saveDataLocally();
+
+            showScreen(2);
+
+        });
     }
 
 
-    /*
-     * Change the button so the participant knows
-     * the answer has been submitted.
-     */
+    const swahiliForm = document.getElementById("swahili-form");
 
-    const button =
-        document.querySelector(
-            "#final .navigation .primary-button"
-        );
+    if (swahiliForm) {
 
-    if (button) {
+        swahiliForm.addEventListener("submit", function (event) {
 
-        /*
-         * First click:
-         * show the answer.
-         */
+            event.preventDefault();
 
-        if (button.dataset.answerShown !== "true") {
+            const answers = getFormAnswers(swahiliForm);
 
-            button.dataset.answerShown = "true";
+            experimentData.responses.swahili = answers;
 
-            button.textContent =
-                "Continue →";
+            const results = gradeSwahili(answers);
 
-            return;
+            experimentData.scores.swahili = results;
+
+            displaySwahiliFeedback(results);
+
+            recordEvent("swahili_answers_submitted", {
+                score: results.total
+            });
+
+            saveDataLocally();
+
+            const button = swahiliForm.querySelector("button[type='submit']");
+
+            if (button) {
+
+                button.disabled = true;
+                button.textContent = "Answers submitted";
+
+            }
+
+            swahiliForm.querySelectorAll("input").forEach(function (input) {
+                input.disabled = true;
+            });
+
+            // Move to the rule-writing screen.
+            setTimeout(function () {
+                showScreen(4);
+            }, 1800);
+
+        });
+    }
+
+
+    const ruleForm = document.getElementById("rule-form");
+
+    if (ruleForm) {
+
+        const ruleInput = document.getElementById("swahili-rule");
+
+        if (ruleInput) {
+
+            ruleInput.addEventListener("input", function () {
+
+                if (!experimentData.responses.swahili_rule_revisions) {
+                    experimentData.responses.swahili_rule_revisions = [];
+                }
+
+                experimentData.responses.swahili_rule_revisions.push({
+                    text: ruleInput.value,
+                    timestamp: new Date().toISOString()
+                });
+
+                experimentData.responses.swahili_rule = ruleInput.value;
+
+                saveDataLocally();
+
+            });
+
         }
 
-        /*
-         * Second click:
-         * go to completion.
-         */
 
+        ruleForm.addEventListener("submit", function (event) {
+
+            event.preventDefault();
+
+            const answer = ruleInput.value.trim();
+
+            if (!answer) {
+                alert("Please write your rule before continuing.");
+                return;
+            }
+
+            experimentData.responses.swahili_rule = answer;
+
+            recordEvent("swahili_rule_submitted");
+
+            saveDataLocally();
+
+            openHintPanel();
+
+        });
     }
 
 
-    /*
-     * Hide Step 2.
-     */
+    const posttestForm = document.getElementById("posttest-form");
 
-    const finalStep =
-        document.getElementById("final");
+    if (posttestForm) {
 
-    if (finalStep) {
-        finalStep.classList.remove("active");
+        posttestForm.addEventListener("submit", function (event) {
+
+            event.preventDefault();
+
+            const answers = getFormAnswers(posttestForm);
+
+            experimentData.responses.posttest = answers;
+
+            experimentData.scores.posttest = gradePosttest(answers);
+
+            recordEvent("posttest_submitted", {
+                score: experimentData.scores.posttest.total
+            });
+
+            stopTimer("post");
+
+            experimentData.completed_at = new Date().toISOString();
+
+            saveDataLocally();
+
+            showScreen(6);
+
+        });
     }
 
-
-    /*
-     * Show completion screen.
-     */
-
-    const completeStep =
-        document.getElementById("complete");
-
-    if (completeStep) {
-        completeStep.classList.add("active");
-    }
+}
 
 
-    /*
-     * Update progress.
-     */
+/* =========================================================
+   GET FORM ANSWERS
+   ========================================================= */
 
-    const stepNumber =
-        document.getElementById("step-number");
+function getFormAnswers(form) {
 
-    if (stepNumber) {
-        stepNumber.textContent = "3";
-    }
+    const answers = {};
+
+    const formData = new FormData(form);
+
+    formData.forEach(function (value, key) {
+
+        answers[key] = value.trim();
+
+    });
+
+    return answers;
+}
 
 
-    /*
-     * Scroll to the top.
-     */
+/* =========================================================
+   ANSWER NORMALISATION
+   ========================================================= */
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+function normalise(text) {
+
+    return String(text || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[.,!?;:]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+
+function answerMatches(answer, acceptedAnswers) {
+
+    const cleaned = normalise(answer);
+
+    return acceptedAnswers.some(function (accepted) {
+        return cleaned === normalise(accepted);
     });
 
 }
 
 
 /* =========================================================
-   AI CHAT
+   PRE-TEST GRADING
+   Answers are stored and scored, but no feedback is shown.
    ========================================================= */
 
-function sendMessage() {
+function gradePretest(a) {
 
-    const input =
-        document.getElementById(
-            "user-input"
-        );
+    const matchKeys = [
+        ["we will fight", "we'll fight"],
+        ["they will curse me", "they'll curse me"],
+        ["you will fall in love with me", "you (sg) will fall in love with me"],
+        ["we will argue"]
+    ];
+
+    let matchCorrect = 0;
+
+    for (let i = 1; i <= 4; i++) {
+
+        if (answerMatches(a["pre_match_" + i], matchKeys[i - 1])) {
+            matchCorrect++;
+        }
+
+    }
+
+    // Rubric: all four matches = 2 points; three = 1 point.
+    const matchScore =
+        matchCorrect === 4 ? 2 :
+        matchCorrect === 3 ? 1 : 0;
 
 
-    /*
-     * Safety check in case the AI chat
-     * is not present.
-     */
+    const segmentationKeys = [
+        ["di-cha-kadha-na", "di cha kadha na"],
+        ["bhi-cha-ni-rasha", "bhi cha ni rasha"]
+    ];
 
-    if (!input) {
-        return;
+    let segmentationScore = 0;
+
+    for (let i = 1; i <= 2; i++) {
+
+        if (answerMatches(a["pre_seg_" + i], segmentationKeys[i - 1])) {
+            segmentationScore++;
+        }
+
     }
 
 
-    const text =
-        input.value.trim();
+    const applyKeys = [
+        ["nichakukadha"],
+        ["bhichakundana"],
+        ["mucharashana"]
+    ];
 
+    let applyScore = 0;
 
-    /*
-     * Do nothing if the participant
-     * submitted an empty message.
-     */
+    for (let i = 1; i <= 3; i++) {
 
-    if (!text) {
-        return;
+        if (answerMatches(a["pre_apply_" + i], applyKeys[i - 1])) {
+            applyScore++;
+        }
+
     }
 
 
-    /*
-     * Display the participant's message.
-     */
+    const transferKeys = [
+        ["kuchabhirasha"],
+        ["dichamukunda"]
+    ];
 
-    addMessage(
-        "user",
-        text
-    );
+    let transferScore = 0;
+
+    for (let i = 1; i <= 2; i++) {
+
+        if (answerMatches(a["pre_transfer_" + i], transferKeys[i - 1])) {
+            transferScore++;
+        }
+
+    }
 
 
-    /*
-     * Clear the input box.
-     */
+    const ruleScore = gradeDabidaRule(a.pre_rule);
 
-    input.value = "";
+    return {
+        matches_correct: matchCorrect,
+        match_score: matchScore,
+        segmentation_score: segmentationScore,
+        apply_score: applyScore,
+        transfer_score: transferScore,
+        rule_score: ruleScore,
+        total: matchScore + segmentationScore + applyScore + transferScore + ruleScore
+    };
+
+}
 
 
-    /*
-     * TEMPORARY AI RESPONSE
-     *
-     * Replace this section later with
-     * your actual AI API call.
-     */
+function gradeDabidaRule(text) {
 
-    setTimeout(function () {
+    const rule = normalise(text);
 
-        addMessage(
-            "tutor",
-            "-- the AI message will be appended here --"
+    if (!rule) {
+        return 0;
+    }
+
+    let score = 0;
+
+    if (
+        rule.includes("prefix") ||
+        rule.includes("beginning") ||
+        rule.includes("start")
+    ) {
+        score++;
+    }
+
+    if (
+        rule.includes("subject") ||
+        rule.includes("person") ||
+        rule.includes("who")
+    ) {
+        score++;
+    }
+
+    if (
+        rule.includes("object") ||
+        rule.includes("verb") ||
+        rule.includes("future") ||
+        rule.includes("order")
+    ) {
+        score++;
+    }
+
+    return Math.min(score, 3);
+}
+
+
+/* =========================================================
+   SWAHILI GRADING
+   ========================================================= */
+
+function gradeSwahili(a) {
+
+    const keys = [
+        ["aliwaona"],
+        ["nitakawuona"],
+        ["aliniona"]
+    ];
+
+    const correct = [];
+
+    for (let i = 1; i <= 3; i++) {
+
+        correct.push(
+            answerMatches(a["swahili_" + i], keys[i - 1])
         );
 
-    }, 600);
+    }
+
+    return {
+        correct: correct,
+        total: correct.filter(Boolean).length,
+        maximum: 3
+    };
+
+}
+
+
+function displaySwahiliFeedback(results) {
+
+    for (let i = 1; i <= 3; i++) {
+
+        const feedback = document.getElementById(
+            "swahili-feedback-" + i
+        );
+
+        if (!feedback) {
+            continue;
+        }
+
+        if (results.correct[i - 1]) {
+
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback correct";
+
+        } else {
+
+            feedback.textContent = "Incorrect.";
+            feedback.className = "feedback incorrect";
+
+        }
+
+    }
 
 }
 
 
 /* =========================================================
-   ADD MESSAGE TO CHAT
+   POST-TEST GRADING
+   Answers are stored and scored, but no feedback is shown.
    ========================================================= */
 
-function addMessage(sender, text) {
+function gradePosttest(a) {
 
-    const messages =
-        document.getElementById(
-            "messages"
-        );
+    const matchKeys = [
+        ["oak"],
+        ["of the oak"],
+        ["of the doctor"],
+        ["of the doctors"]
+    ];
+
+    let matchCorrect = 0;
+
+    for (let i = 1; i <= 4; i++) {
+
+        if (answerMatches(a["post_match_" + i], matchKeys[i - 1])) {
+            matchCorrect++;
+        }
+
+    }
+
+    const matchScore =
+        matchCorrect === 4 ? 2 :
+        matchCorrect === 3 ? 1 : 0;
 
 
-    /*
-     * Safety check.
-     */
+    const segmentationKeys = [
+        ["ozol-a", "ozol a"],
+        ["ārst-u", "arst-u", "arst u", "ārst u"]
+    ];
 
-    if (!messages) {
-        return;
+    let segmentationScore = 0;
+
+    for (let i = 1; i <= 2; i++) {
+
+        if (answerMatches(a["post_seg_" + i], segmentationKeys[i - 1])) {
+            segmentationScore++;
+        }
+
     }
 
 
-    /*
-     * Create message container.
-     */
+    const applyKeys = [
+        ["ābola", "abola"],
+        ["bērna", "berna"],
+        ["galda"]
+    ];
 
-    const message =
-        document.createElement(
-            "div"
-        );
+    let applyScore = 0;
 
+    for (let i = 1; i <= 3; i++) {
 
-    message.className =
-        "message " + sender;
+        if (answerMatches(a["post_apply_" + i], applyKeys[i - 1])) {
+            applyScore++;
+        }
 
-
-    /*
-     * Determine label.
-     */
-
-    const label =
-        sender === "user"
-            ? "You"
-            : "Tutor";
+    }
 
 
-    /*
-     * Add message HTML.
-     *
-     * escapeHTML() is used so that participant
-     * input cannot be interpreted as HTML.
-     */
+    const transferKeys = [
+        ["autora"],
+        ["institūtu", "institutu"]
+    ];
 
-    message.innerHTML = `
-        <div class="message-label">
-            ${label}
-        </div>
+    let transferScore = 0;
 
-        <div class="bubble">
-            ${escapeHTML(text)}
-        </div>
-    `;
+    for (let i = 1; i <= 2; i++) {
+
+        if (answerMatches(a["post_transfer_" + i], transferKeys[i - 1])) {
+            transferScore++;
+        }
+
+    }
 
 
-    /*
-     * Add message to chat.
-     */
+    const ruleScore = gradeLatvianRule(a.post_rule);
 
-    messages.appendChild(
-        message
-    );
+    return {
+        matches_correct: matchCorrect,
+        match_score: matchScore,
+        segmentation_score: segmentationScore,
+        apply_score: applyScore,
+        transfer_score: transferScore,
+        rule_score: ruleScore,
+        total: matchScore + segmentationScore + applyScore + transferScore + ruleScore
+    };
+
+}
 
 
-    /*
-     * Scroll to newest message.
-     */
+function gradeLatvianRule(text) {
 
-    messages.scrollTop =
-        messages.scrollHeight;
+    const rule = normalise(text);
+
+    if (!rule) {
+        return 0;
+    }
+
+    let score = 0;
+
+    if (rule.includes("s")) {
+        score++;
+    }
+
+    if (
+        rule.includes("a") &&
+        (rule.includes("singular") || rule.includes("one"))
+    ) {
+        score++;
+    }
+
+    if (
+        rule.includes("u") &&
+        (rule.includes("plural") || rule.includes("several") || rule.includes("many"))
+    ) {
+        score++;
+    }
+
+    return Math.min(score, 3);
+}
+
+
+/* =========================================================
+   COUNTDOWN TIMERS
+   ========================================================= */
+
+function startTimer(elementId, seconds, timerType) {
+
+    const element = document.getElementById(elementId);
+
+    if (!element) {
+        return;
+    }
+
+    if (timerType === "pre" && preTimerInterval) {
+        return;
+    }
+
+    if (timerType === "post" && postTimerInterval) {
+        return;
+    }
+
+    function updateDisplay() {
+
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+
+        element.textContent =
+            String(minutes).padStart(2, "0") +
+            ":" +
+            String(remainingSeconds).padStart(2, "0");
+
+    }
+
+    updateDisplay();
+
+    const interval = setInterval(function () {
+
+        seconds--;
+
+        if (timerType === "pre") {
+            preTimeRemaining = seconds;
+        } else if (timerType === "post") {
+            postTimeRemaining = seconds;
+        }
+
+        updateDisplay();
+
+        if (seconds <= 0) {
+
+            clearInterval(interval);
+
+            if (timerType === "pre") {
+                preTimerInterval = null;
+                autoSubmitAssessment("pretest-form", 0);
+            }
+
+            if (timerType === "post") {
+                postTimerInterval = null;
+                autoSubmitAssessment("posttest-form", 6);
+            }
+
+        }
+
+    }, 1000);
+
+    if (timerType === "pre") {
+        preTimerInterval = interval;
+    } else {
+        postTimerInterval = interval;
+    }
+
+}
+
+
+function stopTimer(timerType) {
+
+    if (timerType === "pre" && preTimerInterval) {
+
+        clearInterval(preTimerInterval);
+        preTimerInterval = null;
+
+    }
+
+    if (timerType === "post" && postTimerInterval) {
+
+        clearInterval(postTimerInterval);
+        postTimerInterval = null;
+
+    }
+
+}
+
+
+function autoSubmitAssessment(formId, nextScreen) {
+
+    const form = document.getElementById(formId);
+
+    if (!form) {
+        return;
+    }
+
+    const answers = getFormAnswers(form);
+
+    if (formId === "pretest-form") {
+
+        experimentData.responses.pretest = answers;
+        experimentData.scores.pretest = gradePretest(answers);
+
+        recordEvent("pretest_time_expired");
+
+    } else {
+
+        experimentData.responses.posttest = answers;
+        experimentData.scores.posttest = gradePosttest(answers);
+
+        experimentData.completed_at = new Date().toISOString();
+
+        recordEvent("posttest_time_expired");
+
+    }
+
+    saveDataLocally();
+
+    form.querySelectorAll("input, textarea, button").forEach(function (element) {
+        element.disabled = true;
+    });
+
+    alert("Time is up. Your answers have been saved.");
+
+    showScreen(nextScreen);
 
 }
 
 
 /* =========================================================
-   SECURITY
+   HINT PANEL
    ========================================================= */
 
-function escapeHTML(text) {
+function initialiseHints() {
 
-    const div =
-        document.createElement(
-            "div"
-        );
+    document.querySelectorAll(".hint-toggle").forEach(function (button) {
 
+        button.addEventListener("click", function () {
 
-    div.textContent =
-        text;
+            const hintIndex = Number(button.dataset.hint);
 
+            openHint(hintIndex);
 
-    return div.innerHTML;
+        });
+
+    });
+
 }
+
+
+function openHintPanel() {
+
+    const panel = document.getElementById("hint-panel");
+
+    if (!panel) {
+        return;
+    }
+
+    panel.hidden = false;
+
+    hintPanelClosed = false;
+
+    hintTimeRemaining = 5 * 60;
+
+    recordEvent("hint_panel_opened");
+
+    startHintTimer();
+
+}
+
+
+function openHint(index) {
+
+    if (hintPanelClosed || index < 0 || index > 2) {
+        return;
+    }
+
+    const content = document.getElementById("hint-content-" + index);
+
+    if (!content || content.hidden === false) {
+        return;
+    }
+
+    // Close all other hints: only one can be open at a time.
+    document.querySelectorAll(".hint-content").forEach(function (item) {
+        item.hidden = true;
+    });
+
+    document.querySelectorAll(".hint-toggle").forEach(function (button) {
+
+        button.setAttribute("aria-expanded", "false");
+
+        const symbol = button.querySelector("span");
+
+        if (symbol) {
+            symbol.textContent = "+";
+        }
+
+    });
+
+
+    // Open the selected hint.
+    content.hidden = false;
+
+    const selectedButton = document.querySelector(
+        '.hint-toggle[data-hint="' + index + '"]'
+    );
+
+    if (selectedButton) {
+
+        selectedButton.setAttribute("aria-expanded", "true");
+
+        const symbol = selectedButton.querySelector("span");
+
+        if (symbol) {
+            symbol.textContent = "−";
+        }
+
+    }
+
+
+    if (!hintOpened[index]) {
+
+        hintOpened[index] = true;
+
+        recordEvent("hint_opened", {
+            hint_number: index + 1
+        });
+
+    }
+
+}
+
+
+function startHintTimer() {
+
+    const timer = document.getElementById("hint-timer");
+
+    if (!timer) {
+        return;
+    }
+
+    updateHintTimerDisplay();
+
+    if (hintTimerInterval) {
+        clearInterval(hintTimerInterval);
+    }
+
+    hintTimerInterval = setInterval(function () {
+
+        hintTimeRemaining--;
+
+        updateHintTimerDisplay();
+
+        if (hintTimeRemaining <= 0) {
+
+            clearInterval(hintTimerInterval);
+            hintTimerInterval = null;
+
+            closeHintPanel();
+
+        }
+
+    }, 1000);
+
+}
+
+
+function updateHintTimerDisplay() {
+
+    const timer = document.getElementById("hint-timer");
+
+    if (!timer) {
+        return;
+    }
+
+    const minutes = Math.floor(hintTimeRemaining / 60);
+    const seconds = hintTimeRemaining % 60;
+
+    timer.textContent =
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(seconds).padStart(2, "0");
+
+}
+
+
+function closeHintPanel() {
+
+    const panel = document.getElementById("hint-panel");
+
+    if (!panel) {
+        return;
+    }
+
+    panel.hidden = true;
+
+    hintPanelClosed = true;
+
+    document.querySelectorAll(".hint-content").forEach(function (item) {
+        item.hidden = true;
+    });
+
+    recordEvent("hint_panel_closed");
+
+}
+
+
+/* =========================================================
+   DOWNLOAD RESPONSE DATA
+   ========================================================= */
+
+function initialiseDownload() {
+
+    const button = document.getElementById("download-data");
+
+    if (!button) {
+        return;
+    }
+
+    button.addEventListener("click", downloadResponses);
+
+}
+
+
+function downloadResponses() {
+
+    experimentData.exported_at = new Date().toISOString();
+
+    saveDataLocally();
+
+    const json = JSON.stringify(experimentData, null, 2);
+
+    const blob = new Blob(
+        [json],
+        { type: "application/json" }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+
+    link.download =
+        "rosetta_unit1_" + participantId + ".json";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+    recordEvent("responses_downloaded");
+
+}
+
+
+/* =========================================================
+   END OF SCRIPT
+   ========================================================= */

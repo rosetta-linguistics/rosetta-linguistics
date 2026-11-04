@@ -1,3 +1,4 @@
+
 /* =========================================================
    MORPHOLOGY LAB
    Main stylesheet
@@ -18,7 +19,6 @@ html {
 
 body {
     margin: 0;
-
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -30,23 +30,22 @@ body {
 
     color: #172033;
     background: #f7f8fa;
-
     line-height: 1.6;
 }
-
-
-/* Links */
 
 a {
     color: inherit;
 }
 
-
-/* Buttons */
-
 button {
     font-family: inherit;
     cursor: pointer;
+}
+
+input,
+textarea,
+select {
+    font-family: inherit;
 }
 
 
@@ -56,39 +55,26 @@ button {
 
 .site-header {
     background: white;
-
     border-bottom: 1px solid #e5e7eb;
-
     position: relative;
     z-index: 10;
 }
 
 .header-inner {
     max-width: 960px;
-
     margin: 0 auto;
-
     padding: 18px 24px;
 
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
 }
 
-
-/* Logo */
-
 .logo {
     color: #253b80;
-
     text-decoration: none;
-
     font-size: 14px;
-
     font-weight: 700;
-
     letter-spacing: 0.08em;
 }
 
@@ -96,16 +82,10 @@ button {
     text-decoration: underline;
 }
 
-
-/* Navigation */
-
 .nav-link {
     color: #253b80;
-
     text-decoration: none;
-
     font-size: 14px;
-
     font-weight: 600;
 }
 
@@ -113,12 +93,8 @@ button {
     text-decoration: underline;
 }
 
-
-/* Progress indicator */
-
 .progress {
     font-size: 14px;
-
     color: #6b7280;
 }
 
@@ -129,9 +105,7 @@ button {
 
 .container {
     max-width: 900px;
-
     margin: 0 auto;
-
     padding: 60px 24px;
 }
 
@@ -142,23 +116,16 @@ button {
 
 .eyebrow {
     margin: 0 0 8px;
-
     font-size: 12px;
-
     font-weight: 700;
-
     letter-spacing: 0.12em;
-
     color: #5267a8;
 }
 
 h1 {
     margin: 8px 0 20px;
-
     font-size: 38px;
-
     line-height: 1.2;
-
     letter-spacing: -0.02em;
 }
 
@@ -174,12 +141,8 @@ p {
     line-height: 1.7;
 }
 
-
-/* Larger introductory text */
-
 .lead {
     font-size: 19px;
-
     color: #4b5563;
 }
 
@@ -190,25 +153,18 @@ p {
 
 .primary-button {
     display: inline-block;
-
     margin-top: 24px;
-
     padding: 12px 20px;
 
     border: none;
-
     border-radius: 7px;
 
     background: #253b80;
-
     color: white;
-
     text-decoration: none;
 
     font-size: 15px;
-
     font-weight: 600;
-
     line-height: 1.4;
 
     transition:
@@ -218,8 +174,13 @@ p {
 
 .primary-button:hover {
     background: #1e3069;
-
     transform: translateY(-1px);
+}
+
+.primary-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
 }
 
 
@@ -229,38 +190,35 @@ p {
 
 .hero {
     background: white;
-
     padding: 90px 24px 100px;
 }
 
 .hero-content {
     max-width: 760px;
-
     margin: 0 auto;
 }
 
 .hero h1 {
     margin-top: 10px;
-
     margin-bottom: 24px;
-
     font-size: 46px;
-
     line-height: 1.15;
-
     letter-spacing: -0.02em;
 }
 
 .hero-text {
     max-width: 680px;
-
     margin-bottom: 30px;
 
     font-size: 19px;
-
     line-height: 1.7;
-
     color: #4b5563;
+}
+
+.hero-content .primary-button {
+    display: block;
+    width: fit-content;
+    margin: 30px auto 0;
 }
 
 
@@ -270,7 +228,6 @@ p {
 
 .content-section {
     padding: 75px 24px;
-
     background: white;
 }
 
@@ -280,29 +237,21 @@ p {
 
 .section-content {
     max-width: 900px;
-
     margin: 0 auto;
 }
 
 .section-content h2 {
     margin-top: 8px;
-
     margin-bottom: 24px;
-
     font-size: 32px;
-
     line-height: 1.25;
 }
 
 .section-content > p {
     max-width: 720px;
-
     margin-bottom: 18px;
-
     font-size: 16px;
-
     line-height: 1.7;
-
     color: #4b5563;
 }
 
@@ -313,85 +262,62 @@ p {
 
 .steps {
     display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
-
     margin-top: 40px;
 }
 
 .step {
     padding: 26px;
-
     background: white;
-
     border: 1px solid #e5e7eb;
-
     border-radius: 8px;
 }
 
 .step-number {
     margin-bottom: 15px;
-
     font-size: 13px;
-
     font-weight: 700;
-
     color: #5267a8;
 }
 
 .step h3 {
     margin: 0 0 12px;
-
     font-size: 18px;
 }
 
 .step p {
     margin: 0;
-
     font-size: 14px;
-
     line-height: 1.65;
-
     color: #6b7280;
 }
 
 
 /* =========================================================
-   9. HOMEPAGE — INFORMATION BOX
+   9. INFORMATION BOX
    ========================================================= */
 
 .info-box {
     max-width: 720px;
-
     margin-top: 30px;
-
     padding: 22px 24px;
 
     background: #f1f3f7;
-
     border-left: 4px solid #253b80;
-
     border-radius: 6px;
 }
 
 .info-box strong {
     display: block;
-
     margin-bottom: 6px;
-
     color: #172033;
 }
 
 .info-box p {
     margin: 0;
-
     font-size: 14px;
-
     line-height: 1.6;
-
     color: #5b6472;
 }
 
@@ -402,34 +328,24 @@ p {
 
 .cta {
     padding: 75px 24px;
-
     text-align: center;
-
     background: #253b80;
-
     color: white;
 }
 
 .cta h2 {
     margin: 0 0 12px;
-
     font-size: 32px;
 }
 
 .cta p {
     max-width: 600px;
-
     margin: 0 auto 25px;
-
     color: #e0e5f5;
 }
 
-
-/* White button on blue background */
-
 .cta .primary-button {
     background: white;
-
     color: #253b80;
 }
 
@@ -444,15 +360,10 @@ p {
 
 footer {
     padding: 25px;
-
     text-align: center;
-
     font-size: 13px;
-
     color: #6b7280;
-
     background: white;
-
     border-top: 1px solid #e5e7eb;
 }
 
@@ -463,13 +374,28 @@ footer {
 
 .intro {
     max-width: 680px;
-
     margin: 40px auto;
+}
+
+.unit-label {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 5px 10px;
+
+    background: #eef1fa;
+    color: #5267a8;
+
+    border-radius: 5px;
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 
 /* =========================================================
-   13. EXPERIMENT — STEPS
+   13. EXPERIMENT — SCREENS
    ========================================================= */
 
 .experiment-step {
@@ -487,36 +413,27 @@ footer {
 
 .examples {
     margin: 30px 0;
-
     background: white;
-
     border: 1px solid #e5e7eb;
-
     border-radius: 8px;
-
     overflow: hidden;
 }
 
 table {
     width: 100%;
-
     border-collapse: collapse;
 }
 
 th,
 td {
     padding: 14px 18px;
-
     text-align: left;
-
     border-bottom: 1px solid #e5e7eb;
 }
 
 th {
     background: #f9fafb;
-
     font-size: 13px;
-
     color: #4b5563;
 }
 
@@ -530,29 +447,292 @@ tr:last-child td {
 
 
 /* =========================================================
-   15. EXPERIMENT — CHAT
+   15. EXPERIMENT — ASSESSMENT FORMS
+   ========================================================= */
+
+.assessment-form {
+    margin-top: 28px;
+}
+
+.assessment-form fieldset {
+    min-width: 0;
+    margin: 0 0 28px;
+    padding: 22px;
+
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.assessment-form legend {
+    padding: 0 8px;
+    font-weight: 700;
+    color: #253b80;
+}
+
+.assessment-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.assessment-form input[type="text"],
+.assessment-form input[type="number"],
+.assessment-form textarea,
+.assessment-form select {
+    width: 100%;
+    padding: 11px 12px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+
+    background: white;
+    color: #172033;
+
+    font-size: 15px;
+    line-height: 1.5;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.assessment-form input:focus,
+.assessment-form textarea:focus,
+.assessment-form select:focus {
+    outline: none;
+    border-color: #5267a8;
+    box-shadow: 0 0 0 3px rgba(82, 103, 168, 0.12);
+}
+
+.assessment-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.assessment-form .primary-button {
+    margin-top: 10px;
+}
+
+.field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.field-group {
+    min-width: 0;
+    margin-bottom: 20px;
+}
+
+.field-group:last-child {
+    margin-bottom: 0;
+}
+
+.field-grid .field-group {
+    margin-bottom: 0;
+}
+
+.field-hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.assessment-note {
+    margin: 15px 0;
+    padding: 14px 16px;
+
+    background: #f1f3f7;
+    border-radius: 6px;
+
+    color: #5b6472;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   16. EXPERIMENT — TIMERS
+   ========================================================= */
+
+.timer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    margin: 20px 0;
+    padding: 14px 18px;
+
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.timer-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.timer-value {
+    font-size: 20px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #253b80;
+}
+
+
+/* =========================================================
+   17. EXPERIMENT — FEEDBACK
+   ========================================================= */
+
+.feedback {
+    display: block;
+    margin-top: 7px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.feedback.correct {
+    color: #287344;
+}
+
+.feedback.incorrect {
+    color: #b42318;
+}
+
+
+/* =========================================================
+   18. EXPERIMENT — LESSON TEXT
+   ========================================================= */
+
+.lesson-text {
+    margin: 25px 0;
+    padding: 24px;
+
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.lesson-text h3 {
+    margin-top: 0;
+    color: #253b80;
+}
+
+.lesson-text p:last-child {
+    margin-bottom: 0;
+}
+
+.lesson-text ul {
+    padding-left: 22px;
+}
+
+.lesson-text li {
+    margin-bottom: 8px;
+}
+
+
+/* =========================================================
+   19. EXPERIMENT — HINT PANEL
+   ========================================================= */
+
+.hint-panel {
+    margin-top: 25px;
+    padding: 22px;
+
+    background: #f1f3f7;
+    border: 1px solid #dfe3ed;
+    border-radius: 8px;
+}
+
+.hint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.hint-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #253b80;
+}
+
+.hint-timer {
+    padding: 5px 9px;
+    background: white;
+    border-radius: 5px;
+
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.hint-toggle {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 13px 15px;
+
+    text-align: left;
+
+    background: white;
+    border: 1px solid #dfe3ed;
+    border-radius: 6px;
+
+    color: #253b80;
+    font-size: 14px;
+    font-weight: 600;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.hint-toggle:hover {
+    background: #f9fafc;
+    border-color: #5267a8;
+}
+
+.hint-content {
+    margin-top: 8px;
+    padding: 15px;
+
+    background: white;
+    border-left: 3px solid #5267a8;
+    border-radius: 4px;
+
+    font-size: 14px;
+    color: #374151;
+}
+
+.hint-content p {
+    margin: 0;
+}
+
+
+/* =========================================================
+   20. EXPERIMENT — CHAT
    ========================================================= */
 
 .chat {
     margin-top: 35px;
-
     background: white;
-
     border: 1px solid #e1e4e8;
-
     border-radius: 10px;
-
     overflow: hidden;
 }
 
-
-/* Chat header */
-
 .chat-header {
     padding: 16px 20px;
-
     border-bottom: 1px solid #e5e7eb;
-
     background: #fafbfc;
 }
 
@@ -560,27 +740,16 @@ tr:last-child td {
     font-size: 15px;
 }
 
-
-/* Online status */
-
 .status {
     margin-left: 8px;
-
     font-size: 12px;
-
     color: #5c8a63;
 }
 
-
-/* Messages */
-
 .messages {
     padding: 24px;
-
     min-height: 280px;
-
     max-height: 500px;
-
     overflow-y: auto;
 }
 
@@ -594,33 +763,19 @@ tr:last-child td {
 
 .message-label {
     margin-bottom: 5px;
-
     font-size: 12px;
-
     font-weight: 700;
-
     color: #6b7280;
 }
 
-
-/* Message bubbles */
-
 .bubble {
     display: inline-block;
-
     max-width: 80%;
-
     padding: 12px 15px;
-
     border-radius: 8px;
-
     background: #f1f3f7;
-
     line-height: 1.5;
 }
-
-
-/* User message */
 
 .message.user {
     text-align: right;
@@ -628,67 +783,46 @@ tr:last-child td {
 
 .message.user .bubble {
     background: #253b80;
-
     color: white;
-
     text-align: left;
 }
 
 
 /* =========================================================
-   16. EXPERIMENT — CHAT INPUT
+   21. EXPERIMENT — CHAT INPUT
    ========================================================= */
 
 .chat-input {
     display: flex;
-
     gap: 10px;
-
     padding: 15px;
-
     border-top: 1px solid #e5e7eb;
 }
 
 .chat-input textarea {
     flex: 1;
-
     resize: none;
-
     padding: 11px;
-
     border: 1px solid #d1d5db;
-
     border-radius: 6px;
-
     font-family: inherit;
-
     font-size: 14px;
-
     line-height: 1.5;
 }
 
 .chat-input textarea:focus {
     outline: none;
-
     border-color: #5267a8;
-
-    box-shadow:
-        0 0 0 2px rgba(82, 103, 168, 0.12);
+    box-shadow: 0 0 0 2px rgba(82, 103, 168, 0.12);
 }
 
 .chat-input button {
     align-self: flex-end;
-
     padding: 10px 18px;
-
     border: none;
-
     border-radius: 6px;
-
     background: #253b80;
-
     color: white;
-
     font-weight: 600;
 }
 
@@ -698,37 +832,31 @@ tr:last-child td {
 
 
 /* =========================================================
-   17. EXPERIMENT — NAVIGATION
+   22. EXPERIMENT — NAVIGATION
    ========================================================= */
 
 .navigation {
     display: flex;
-
     justify-content: flex-end;
-
+    gap: 12px;
     margin-top: 25px;
 }
 
 
 /* =========================================================
-   18. EXPERIMENT — FINAL QUESTION
+   23. EXPERIMENT — FINAL QUESTION
    ========================================================= */
 
 .final-question {
     margin-top: 30px;
-
     padding: 25px;
-
     background: white;
-
     border: 1px solid #e5e7eb;
-
     border-radius: 8px;
 }
 
 .final-question h3 {
     margin-top: 0;
-
     margin-bottom: 12px;
 }
 
@@ -738,57 +866,58 @@ tr:last-child td {
 
 .final-question textarea {
     width: 100%;
-
     margin-top: 15px;
-
     padding: 12px;
-
     border: 1px solid #d1d5db;
-
     border-radius: 6px;
-
     font-family: inherit;
-
     font-size: 14px;
-
     line-height: 1.5;
-
     resize: vertical;
 }
 
 .final-question textarea:focus {
     outline: none;
-
     border-color: #5267a8;
-
-    box-shadow:
-        0 0 0 2px rgba(82, 103, 168, 0.12);
+    box-shadow: 0 0 0 2px rgba(82, 103, 168, 0.12);
 }
 
 
 /* =========================================================
-   19. EXPERIMENT — COMPLETION
+   24. EXPERIMENT — COMPLETION
    ========================================================= */
 
 .completion {
     text-align: center;
 }
 
+.completion .primary-button {
+    margin: 12px;
+}
+
 
 /* =========================================================
-   20. MOBILE
+   25. DISABLED ELEMENTS
+   ========================================================= */
+
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   26. MOBILE
    ========================================================= */
 
 @media (max-width: 700px) {
 
-    /* Header */
-
     .header-inner {
         padding: 15px 18px;
     }
-
-
-    /* Homepage hero */
 
     .hero {
         padding: 65px 24px 75px;
@@ -802,9 +931,6 @@ tr:last-child td {
         font-size: 17px;
     }
 
-
-    /* Homepage sections */
-
     .content-section {
         padding: 60px 24px;
     }
@@ -813,15 +939,9 @@ tr:last-child td {
         font-size: 28px;
     }
 
-
-    /* Steps */
-
     .steps {
         grid-template-columns: 1fr;
     }
-
-
-    /* Experiment */
 
     .container {
         padding: 40px 18px;
@@ -834,9 +954,6 @@ tr:last-child td {
     .lead {
         font-size: 17px;
     }
-
-
-    /* Chat */
 
     .messages {
         min-height: 220px;
@@ -854,34 +971,43 @@ tr:last-child td {
         max-width: 90%;
     }
 
-
-    /* Table */
-
     th,
     td {
         padding: 11px 12px;
-
         font-size: 14px;
     }
 
-
-    /* Navigation */
-
     .navigation {
         justify-content: stretch;
+        flex-direction: column;
     }
 
     .navigation .primary-button {
         width: 100%;
-
         text-align: center;
     }
 
-}
+    .field-grid {
+        grid-template-columns: 1fr;
+    }
 
-.hero-content .primary-button {
-    display: block;
-    width: fit-content;
-    margin: 30px auto 0;
-}
+    .assessment-form fieldset {
+        padding: 16px;
+    }
 
+    .timer-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .hint-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .completion .primary-button {
+        display: block;
+        width: 100%;
+        margin: 12px 0;
+    }
+}
