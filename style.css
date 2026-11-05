@@ -1,12 +1,46 @@
 
 /* =========================================================
-   MORPHOLOGY LAB
-   Main stylesheet
+   ROSETTA — MORPHOLOGY LEARNING PLATFORM
+   Consolidated stylesheet
    ========================================================= */
 
 
 /* =========================================================
-   1. GENERAL
+   1. DESIGN SYSTEM
+   ========================================================= */
+
+:root {
+    --navy: #172b4d;
+    --blue: #315b9a;
+    --blue-dark: #254879;
+    --blue-light: #edf3fb;
+
+    --text: #253247;
+    --muted: #687589;
+
+    --background: #f4f6f9;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+
+    --border: #e1e6ed;
+    --border-dark: #cbd4df;
+
+    --success: #26734d;
+    --success-bg: #edf7f1;
+
+    --error: #b33a3a;
+    --error-bg: #fff1f0;
+
+    --radius: 12px;
+    --radius-small: 8px;
+
+    --shadow: 0 3px 12px rgba(25, 42, 70, 0.045);
+    --shadow-card: 0 8px 28px rgba(25, 42, 70, 0.055);
+}
+
+
+/* =========================================================
+   2. GENERAL
    ========================================================= */
 
 * {
@@ -19,384 +53,123 @@ html {
 
 body {
     margin: 0;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Helvetica,
-        Arial,
-        sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: var(--background);
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+}
 
-    color: #172033;
-    background: #f7f8fa;
-    line-height: 1.6;
+[hidden] {
+    display: none !important;
 }
 
 a {
-    color: inherit;
+    color: var(--blue);
 }
 
-button {
-    font-family: inherit;
-    cursor: pointer;
-}
-
+button,
 input,
 textarea,
 select {
-    font-family: inherit;
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
 }
 
 
 /* =========================================================
-   2. HEADER
+   3. HEADER
    ========================================================= */
 
 .site-header {
-    background: white;
-    border-bottom: 1px solid #e5e7eb;
-    position: relative;
-    z-index: 10;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
 }
 
 .header-inner {
-    max-width: 960px;
+    max-width: 1100px;
+    min-height: 68px;
     margin: 0 auto;
-    padding: 18px 24px;
-
+    padding: 12px 28px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
 }
 
 .logo {
-    color: #253b80;
+    color: var(--navy);
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
 }
 
 .logo:hover {
-    text-decoration: underline;
+    color: var(--blue);
 }
 
 .nav-link {
-    color: #253b80;
+    color: var(--muted);
     text-decoration: none;
     font-size: 14px;
     font-weight: 600;
 }
 
 .nav-link:hover {
-    text-decoration: underline;
+    color: var(--blue);
 }
 
 .progress {
-    font-size: 14px;
-    color: #6b7280;
+    padding: 6px 13px;
+    color: var(--blue-dark);
+    background: var(--blue-light);
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 
 /* =========================================================
-   3. GENERAL PAGE CONTAINER
+   4. MAIN EXPERIMENT LAYOUT
    ========================================================= */
 
 .container {
+    width: 100%;
     max-width: 900px;
     margin: 0 auto;
-    padding: 60px 24px;
-}
-
-
-/* =========================================================
-   4. TYPOGRAPHY
-   ========================================================= */
-
-.eyebrow {
-    margin: 0 0 8px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: #5267a8;
-}
-
-h1 {
-    margin: 8px 0 20px;
-    font-size: 38px;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-}
-
-h2 {
-    line-height: 1.25;
-}
-
-h3 {
-    line-height: 1.3;
-}
-
-p {
-    line-height: 1.7;
-}
-
-.lead {
-    font-size: 19px;
-    color: #4b5563;
-}
-
-
-/* =========================================================
-   5. BUTTONS
-   ========================================================= */
-
-.primary-button {
-    display: inline-block;
-    margin-top: 24px;
-    padding: 12px 20px;
-
-    border: none;
-    border-radius: 7px;
-
-    background: #253b80;
-    color: white;
-    text-decoration: none;
-
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.4;
-
-    transition:
-        background 0.15s ease,
-        transform 0.15s ease;
-}
-
-.primary-button:hover {
-    background: #1e3069;
-    transform: translateY(-1px);
-}
-
-.primary-button:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    transform: none;
-}
-
-
-/* =========================================================
-   6. HOMEPAGE — HERO
-   ========================================================= */
-
-.hero {
-    background: white;
-    padding: 90px 24px 100px;
-}
-
-.hero-content {
-    max-width: 760px;
-    margin: 0 auto;
-}
-
-.hero h1 {
-    margin-top: 10px;
-    margin-bottom: 24px;
-    font-size: 46px;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-}
-
-.hero-text {
-    max-width: 680px;
-    margin-bottom: 30px;
-
-    font-size: 19px;
-    line-height: 1.7;
-    color: #4b5563;
-}
-
-.hero-content .primary-button {
-    display: block;
-    width: fit-content;
-    margin: 30px auto 0;
-}
-
-
-/* =========================================================
-   7. HOMEPAGE — CONTENT SECTIONS
-   ========================================================= */
-
-.content-section {
-    padding: 75px 24px;
-    background: white;
-}
-
-.content-section.light {
-    background: #f7f8fa;
-}
-
-.section-content {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.section-content h2 {
-    margin-top: 8px;
-    margin-bottom: 24px;
-    font-size: 32px;
-    line-height: 1.25;
-}
-
-.section-content > p {
-    max-width: 720px;
-    margin-bottom: 18px;
-    font-size: 16px;
-    line-height: 1.7;
-    color: #4b5563;
-}
-
-
-/* =========================================================
-   8. HOMEPAGE — HOW IT WORKS
-   ========================================================= */
-
-.steps {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-top: 40px;
-}
-
-.step {
-    padding: 26px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-}
-
-.step-number {
-    margin-bottom: 15px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #5267a8;
-}
-
-.step h3 {
-    margin: 0 0 12px;
-    font-size: 18px;
-}
-
-.step p {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.65;
-    color: #6b7280;
-}
-
-
-/* =========================================================
-   9. INFORMATION BOX
-   ========================================================= */
-
-.info-box {
-    max-width: 720px;
-    margin-top: 30px;
-    padding: 22px 24px;
-
-    background: #f1f3f7;
-    border-left: 4px solid #253b80;
-    border-radius: 6px;
-}
-
-.info-box strong {
-    display: block;
-    margin-bottom: 6px;
-    color: #172033;
-}
-
-.info-box p {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #5b6472;
-}
-
-
-/* =========================================================
-   10. HOMEPAGE — FINAL CALL TO ACTION
-   ========================================================= */
-
-.cta {
-    padding: 75px 24px;
-    text-align: center;
-    background: #253b80;
-    color: white;
-}
-
-.cta h2 {
-    margin: 0 0 12px;
-    font-size: 32px;
-}
-
-.cta p {
-    max-width: 600px;
-    margin: 0 auto 25px;
-    color: #e0e5f5;
-}
-
-.cta .primary-button {
-    background: white;
-    color: #253b80;
-}
-
-.cta .primary-button:hover {
-    background: #f1f3f7;
-}
-
-
-/* =========================================================
-   11. FOOTER
-   ========================================================= */
-
-footer {
-    padding: 25px;
-    text-align: center;
-    font-size: 13px;
-    color: #6b7280;
-    background: white;
-    border-top: 1px solid #e5e7eb;
-}
-
-
-/* =========================================================
-   12. EXPERIMENT — INTRO
-   ========================================================= */
-
-.intro {
-    max-width: 680px;
-    margin: 40px auto;
+    padding: 38px 24px 80px;
 }
 
 .unit-label {
-    display: inline-block;
-    margin-bottom: 12px;
-    padding: 5px 10px;
-
-    background: #eef1fa;
-    color: #5267a8;
-
-    border-radius: 5px;
-
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 6px 12px;
+    background: var(--blue-light);
+    color: var(--blue-dark);
+    border: 1px solid #dce6f4;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
 }
-
-
-/* =========================================================
-   13. EXPERIMENT — SCREENS
-   ========================================================= */
 
 .experiment-step {
     display: none;
@@ -404,224 +177,389 @@ footer {
 
 .experiment-step.active {
     display: block;
+    padding: 30px 34px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-card);
+    animation: screen-appear 0.25s ease-out;
+}
+
+@keyframes screen-appear {
+    from {
+        opacity: 0;
+        transform: translateY(7px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Two-column structure */
+
+.experiment-layout {
+    display: block;
+}
+
+.experiment-examples,
+.experiment-activities {
+    min-width: 0;
 }
 
 
 /* =========================================================
-   14. EXPERIMENT — EXAMPLES TABLE
+   5. TYPOGRAPHY
    ========================================================= */
 
-.examples {
-    margin: 30px 0;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    overflow: hidden;
+h1,
+h2,
+h3,
+p {
+    overflow-wrap: break-word;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+h1 {
+    margin: 8px 0 18px;
+    color: var(--navy);
+    font-size: clamp(30px, 4vw, 39px);
+    font-weight: 750;
+    line-height: 1.18;
+    letter-spacing: -0.04em;
 }
 
-th,
-td {
-    padding: 14px 18px;
-    text-align: left;
-    border-bottom: 1px solid #e5e7eb;
+h2 {
+    margin: 34px 0 12px;
+    color: var(--navy);
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
 }
 
-th {
-    background: #f9fafb;
-    font-size: 13px;
-    color: #4b5563;
+h3 {
+    color: var(--navy);
+    line-height: 1.35;
 }
 
-td {
-    font-size: 15px;
+p {
+    margin: 0 0 15px;
 }
 
-tr:last-child td {
-    border-bottom: none;
+strong {
+    color: var(--navy);
+    font-weight: 700;
+}
+
+.eyebrow {
+    margin: 0 0 9px;
+    color: var(--blue);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.lead {
+    margin-bottom: 18px;
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.65;
+}
+
+.intro {
+    max-width: 850px;
+    margin: 0 0 24px;
+}
+
+.intro > p:last-child {
+    margin-bottom: 0;
 }
 
 
 /* =========================================================
-   15. EXPERIMENT — ASSESSMENT FORMS
+   6. BUTTONS
+   ========================================================= */
+
+.primary-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+    min-height: 46px;
+    margin-top: 22px;
+    padding: 12px 21px;
+    border: 1px solid var(--blue);
+    border-radius: 8px;
+    background: var(--blue);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-decoration: none;
+    transition: background 0.18s ease, border-color 0.18s ease,
+        box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.primary-button:hover:not(:disabled) {
+    background: var(--blue-dark);
+    border-color: var(--blue-dark);
+    box-shadow: 0 4px 12px rgba(49, 91, 154, 0.18);
+    transform: translateY(-1px);
+}
+
+.primary-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.primary-button:focus-visible,
+.hint-toggle:focus-visible {
+    outline: 3px solid rgba(49, 91, 154, 0.25);
+    outline-offset: 3px;
+}
+
+.primary-button:disabled {
+    box-shadow: none;
+    transform: none;
+}
+
+
+/* =========================================================
+   7. INFO BOXES
+   ========================================================= */
+
+.info-box {
+    margin: 25px 0;
+    padding: 23px 25px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--blue);
+    border-radius: var(--radius);
+}
+
+.info-box p {
+    margin: 0;
+    color: #47566b;
+    font-size: 14px;
+    line-height: 1.85;
+}
+
+.info-box p + p {
+    margin-top: 9px;
+}
+
+
+/* =========================================================
+   8. TIMERS
+   ========================================================= */
+
+.timer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    margin: 12px 0 18px;
+    padding: 12px 16px;
+    background: #f7f9fc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.timer-row span {
+    color: #536176;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.timer-row strong {
+    color: var(--blue-dark);
+    font-size: 19px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+}
+
+.timer-pill {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 70px;
+    padding: 7px 12px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    color: var(--blue-dark);
+    font-size: 14px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================================
+   9. ASSESSMENT FORMS
    ========================================================= */
 
 .assessment-form {
-    margin-top: 28px;
+    margin-top: 12px;
 }
 
-.assessment-form fieldset {
-    min-width: 0;
-    margin: 0 0 28px;
-    padding: 22px;
-
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+.assessment-form h2 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--border);
 }
 
-.assessment-form legend {
-    padding: 0 8px;
-    font-weight: 700;
-    color: #253b80;
+.assessment-form h2:first-child {
+    margin-top: 0;
+}
+
+.assessment-form > p {
+    margin: 7px 0 12px;
+    color: var(--muted);
+    font-size: 13px;
 }
 
 .assessment-form label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #374151;
+    margin-bottom: 6px;
+    color: #35445a;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
 }
 
-.assessment-form input[type="text"],
-.assessment-form input[type="number"],
+.field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+    margin: 12px 0 17px;
+}
+
+.field-grid label {
+    min-width: 0;
+    margin: 0;
+}
+
+.assessment-form input,
 .assessment-form textarea,
 .assessment-form select {
+    display: block;
     width: 100%;
-    padding: 11px 12px;
-
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-
+    margin-top: 8px;
+    padding: 10px 12px;
     background: white;
-    color: #172033;
-
-    font-size: 15px;
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 400;
     line-height: 1.5;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
 
-    transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease;
+.assessment-form input {
+    min-height: 40px;
+}
+
+.assessment-form textarea {
+    min-height: 105px;
+    resize: vertical;
+}
+
+.assessment-form input::placeholder,
+.assessment-form textarea::placeholder {
+    color: #a0aaba;
 }
 
 .assessment-form input:focus,
 .assessment-form textarea:focus,
 .assessment-form select:focus {
     outline: none;
-    border-color: #5267a8;
-    box-shadow: 0 0 0 3px rgba(82, 103, 168, 0.12);
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(49, 91, 154, 0.11);
 }
 
-.assessment-form textarea {
-    min-height: 100px;
-    resize: vertical;
+.assessment-form input:disabled,
+.assessment-form textarea:disabled {
+    background: #f3f5f8;
+    color: #7a8595;
+}
+
+.block-label {
+    display: block;
+    margin-top: 14px;
+}
+
+.block-label textarea {
+    margin-top: 8px;
 }
 
 .assessment-form .primary-button {
-    margin-top: 10px;
-}
-
-.field-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-}
-
-.field-group {
-    min-width: 0;
-    margin-bottom: 20px;
-}
-
-.field-group:last-child {
-    margin-bottom: 0;
-}
-
-.field-grid .field-group {
-    margin-bottom: 0;
-}
-
-.field-hint {
-    display: block;
-    margin-top: 5px;
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.assessment-note {
-    margin: 15px 0;
-    padding: 14px 16px;
-
-    background: #f1f3f7;
-    border-radius: 6px;
-
-    color: #5b6472;
-    font-size: 14px;
+    margin-top: 12px;
 }
 
 
 /* =========================================================
-   16. EXPERIMENT — TIMERS
+   10. ASSESSMENT NOTES
    ========================================================= */
 
-.timer-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-
-    margin: 20px 0;
-    padding: 14px 18px;
-
-    background: white;
-    border: 1px solid #e5e7eb;
+.assessment-note {
+    margin: 13px 0 0;
+    padding: 11px 14px;
+    background: #f5f7fa;
+    border: 1px solid var(--border);
     border-radius: 8px;
-}
-
-.timer-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #4b5563;
-}
-
-.timer-value {
-    font-size: 20px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: #253b80;
+    color: #657287;
+    font-size: 12px;
+    line-height: 1.6;
 }
 
 
 /* =========================================================
-   17. EXPERIMENT — FEEDBACK
+   11. SWAHILI FEEDBACK
    ========================================================= */
 
 .feedback {
     display: block;
+    min-height: 20px;
     margin-top: 7px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .feedback.correct {
-    color: #287344;
+    color: var(--success);
 }
 
 .feedback.incorrect {
-    color: #b42318;
+    color: var(--error);
 }
 
 
 /* =========================================================
-   18. EXPERIMENT — LESSON TEXT
+   12. LESSON CONTENT
    ========================================================= */
 
 .lesson-text {
-    margin: 25px 0;
-    padding: 24px;
-
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    margin: 0;
+    padding: 19px 21px;
+    background: #f7f9fc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
 }
 
-.lesson-text h3 {
+.lesson-text h2 {
     margin-top: 0;
-    color: #253b80;
+    margin-bottom: 12px;
+    color: var(--navy);
+}
+
+.lesson-text p {
+    margin-bottom: 10px;
+    color: #4d5b70;
+    font-size: 13px;
+    line-height: 1.7;
 }
 
 .lesson-text p:last-child {
@@ -638,123 +576,377 @@ tr:last-child td {
 
 
 /* =========================================================
-   19. EXPERIMENT — HINT PANEL
+   13. HINT PANEL
    ========================================================= */
 
 .hint-panel {
-    margin-top: 25px;
-    padding: 22px;
-
-    background: #f1f3f7;
-    border: 1px solid #dfe3ed;
-    border-radius: 8px;
+    margin: 0;
+    padding: 18px;
+    background: #f4f7fc;
+    border: 1px solid #dce5f1;
+    border-radius: var(--radius);
 }
 
-.hint-header {
+.hint-panel-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 13px;
 }
 
-.hint-header h3 {
+.hint-panel-header h2 {
+    margin: 0 0 6px;
+}
+
+.hint-panel-header p {
     margin: 0;
-    font-size: 18px;
-    color: #253b80;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
 }
 
-.hint-timer {
-    padding: 5px 9px;
-    background: white;
-    border-radius: 5px;
-
-    font-size: 12px;
-    font-weight: 600;
-    color: #6b7280;
-    white-space: nowrap;
+.hint-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
 }
 
 .hint-toggle {
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
     width: 100%;
-    margin-top: 10px;
-    padding: 13px 15px;
-
-    text-align: left;
-
+    min-height: 43px;
+    margin: 0;
+    padding: 9px 13px;
     background: white;
-    border: 1px solid #dfe3ed;
-    border-radius: 6px;
-
-    color: #253b80;
-    font-size: 14px;
-    font-weight: 600;
-
-    transition:
-        background 0.15s ease,
-        border-color 0.15s ease;
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+    color: var(--navy);
+    text-align: left;
+    font-size: 13px;
+    font-weight: 700;
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.hint-toggle:hover {
-    background: #f9fafc;
-    border-color: #5267a8;
+.hint-toggle:hover:not(:disabled) {
+    background: #f8faff;
+    border-color: var(--blue);
+}
+
+.hint-toggle span {
+    color: var(--blue);
+    font-size: 19px;
+    font-weight: 500;
+}
+
+.hint-toggle:disabled {
+    background: #f1f3f6;
+    color: #8993a2;
+    border-color: var(--border);
+    opacity: 0.7;
 }
 
 .hint-content {
-    margin-top: 8px;
-    padding: 15px;
-
+    margin: -1px 0 5px;
+    padding: 12px 15px;
     background: white;
-    border-left: 3px solid #5267a8;
-    border-radius: 4px;
-
-    font-size: 14px;
-    color: #374151;
+    border: 1px solid #dce5f1;
+    border-left: 3px solid var(--blue);
+    border-radius: 0 0 8px 8px;
+    color: #45546a;
+    font-size: 13px;
+    line-height: 1.75;
 }
 
 .hint-content p {
     margin: 0;
 }
 
+.hint-panel .assessment-note {
+    background: white;
+}
+
 
 /* =========================================================
-   20. EXPERIMENT — CHAT
+   14. NAVIGATION
+   ========================================================= */
+
+.navigation {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+}
+
+.navigation .primary-button {
+    margin-top: 0;
+}
+
+#swahili-continue-button:disabled {
+    background: #aab6c7;
+    border-color: #aab6c7;
+}
+
+
+/* =========================================================
+   15. COMPLETION SCREEN
+   ========================================================= */
+
+.completion {
+    max-width: 650px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.completion::before {
+    content: "✓";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 24px;
+    background: var(--success-bg);
+    border: 1px solid #d5eadc;
+    border-radius: 50%;
+    color: var(--success);
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.completion h1 {
+    margin-bottom: 14px;
+}
+
+.completion .lead {
+    margin-bottom: 18px;
+}
+
+.completion > p:not(.eyebrow) {
+    color: var(--muted);
+}
+
+.completion .primary-button {
+    margin: 12px;
+}
+
+.completion .navigation {
+    justify-content: center;
+    border-top: none;
+}
+
+
+/* =========================================================
+   16. HOMEPAGE — HERO
+   ========================================================= */
+
+.hero {
+    padding: 100px 24px 110px;
+    background: white;
+}
+
+.hero-content {
+    max-width: 850px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.hero h1 {
+    max-width: 780px;
+    margin: 12px auto 22px;
+    color: var(--navy);
+    font-size: clamp(38px, 5vw, 54px);
+    line-height: 1.12;
+    letter-spacing: -0.045em;
+}
+
+.hero-text {
+    max-width: 690px;
+    margin: 0 auto 30px;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+.hero-content .primary-button {
+    margin-top: 15px;
+}
+
+
+/* =========================================================
+   17. HOMEPAGE — CONTENT SECTIONS
+   ========================================================= */
+
+.content-section {
+    padding: 78px 24px;
+    background: white;
+}
+
+.content-section.light {
+    background: var(--background);
+}
+
+.section-content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.section-content h2 {
+    margin: 8px 0 20px;
+    color: var(--navy);
+    font-size: 32px;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+}
+
+.section-content > p {
+    max-width: 760px;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   18. HOMEPAGE — HOW IT WORKS
+   ========================================================= */
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    margin-top: 38px;
+}
+
+.step {
+    padding: 27px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.step-number {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 34px;
+    height: 34px;
+    margin-bottom: 17px;
+    background: var(--blue-light);
+    border-radius: 9px;
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.step h3 {
+    margin: 0 0 10px;
+    font-size: 17px;
+}
+
+.step p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   19. HOMEPAGE — CALL TO ACTION
+   ========================================================= */
+
+.cta {
+    padding: 80px 24px;
+    background: var(--navy);
+    color: white;
+    text-align: center;
+}
+
+.cta h2 {
+    margin: 0 0 14px;
+    color: white;
+    font-size: 32px;
+    letter-spacing: -0.03em;
+}
+
+.cta p {
+    max-width: 620px;
+    margin: 0 auto 25px;
+    color: #d5dfed;
+}
+
+.cta .primary-button {
+    background: white;
+    border-color: white;
+    color: var(--navy);
+}
+
+.cta .primary-button:hover {
+    background: #edf2f8;
+    border-color: #edf2f8;
+}
+
+
+/* =========================================================
+   20. FOOTER
+   ========================================================= */
+
+footer {
+    padding: 25px;
+    background: white;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+
+/* =========================================================
+   21. OPTIONAL CHAT COMPONENTS
    ========================================================= */
 
 .chat {
-    margin-top: 35px;
+    margin-top: 30px;
     background: white;
-    border: 1px solid #e1e4e8;
-    border-radius: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     overflow: hidden;
 }
 
 .chat-header {
     padding: 16px 20px;
-    border-bottom: 1px solid #e5e7eb;
-    background: #fafbfc;
+    background: var(--surface-soft);
+    border-bottom: 1px solid var(--border);
 }
 
 .chat-header strong {
-    font-size: 15px;
+    color: var(--navy);
+    font-size: 14px;
 }
 
 .status {
     margin-left: 8px;
+    color: var(--success);
     font-size: 12px;
-    color: #5c8a63;
 }
 
 .messages {
-    padding: 24px;
-    min-height: 280px;
+    min-height: 260px;
     max-height: 500px;
+    padding: 22px;
     overflow-y: auto;
 }
 
 .message {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .message:last-child {
@@ -763,18 +955,19 @@ tr:last-child td {
 
 .message-label {
     margin-bottom: 5px;
-    font-size: 12px;
+    color: var(--muted);
+    font-size: 11px;
     font-weight: 700;
-    color: #6b7280;
 }
 
 .bubble {
     display: inline-block;
     max-width: 80%;
     padding: 12px 15px;
-    border-radius: 8px;
-    background: #f1f3f7;
-    line-height: 1.5;
+    background: #f0f3f8;
+    border-radius: 10px;
+    color: var(--text);
+    line-height: 1.6;
 }
 
 .message.user {
@@ -782,181 +975,606 @@ tr:last-child td {
 }
 
 .message.user .bubble {
-    background: #253b80;
+    background: var(--blue);
     color: white;
     text-align: left;
 }
-
-
-/* =========================================================
-   21. EXPERIMENT — CHAT INPUT
-   ========================================================= */
 
 .chat-input {
     display: flex;
     gap: 10px;
     padding: 15px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--border);
 }
 
 .chat-input textarea {
     flex: 1;
-    resize: none;
-    padding: 11px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 14px;
-    line-height: 1.5;
+    min-width: 0;
+    padding: 11px 13px;
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+    font: inherit;
 }
 
 .chat-input textarea:focus {
     outline: none;
-    border-color: #5267a8;
-    box-shadow: 0 0 0 2px rgba(82, 103, 168, 0.12);
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(49, 91, 154, 0.11);
 }
 
 .chat-input button {
     align-self: flex-end;
-    padding: 10px 18px;
+    padding: 11px 18px;
+    background: var(--blue);
     border: none;
-    border-radius: 6px;
-    background: #253b80;
+    border-radius: 8px;
     color: white;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .chat-input button:hover {
-    background: #1e3069;
+    background: var(--blue-dark);
 }
 
 
 /* =========================================================
-   22. EXPERIMENT — NAVIGATION
+   22. TABLES
    ========================================================= */
 
-.navigation {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 25px;
-}
-
-
-/* =========================================================
-   23. EXPERIMENT — FINAL QUESTION
-   ========================================================= */
-
-.final-question {
-    margin-top: 30px;
-    padding: 25px;
+.examples {
+    margin: 25px 0;
     background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow-x: auto;
 }
 
-.final-question h3 {
-    margin-top: 0;
-    margin-bottom: 12px;
-}
-
-.final-question p {
-    color: #4b5563;
-}
-
-.final-question textarea {
+table {
     width: 100%;
-    margin-top: 15px;
-    padding: 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-family: inherit;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 13px 17px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+th {
+    background: var(--surface-soft);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+td {
+    color: var(--text);
     font-size: 14px;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   23. LINGUISTIC EXAMPLES
+   ========================================================= */
+
+.example-panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 0;
+    box-shadow: 0 3px 12px rgba(20, 35, 60, 0.04);
+}
+
+.example-panel-header {
+    padding: 11px 15px;
+    background: #f5f7fb;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.example-panel-header strong {
+    color: #263750;
+    font-size: 0.95rem;
+}
+
+.example-panel-header span {
+    color: #78869a;
+    font-size: 0.78rem;
+}
+
+.example-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.example-row {
+    display: grid;
+    grid-template-columns: minmax(130px, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.example-row:last-child {
+    border-bottom: none;
+}
+
+.example-row:nth-child(even) {
+    background: #fafbfd;
+}
+
+.example-word {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #244c83;
+    overflow-wrap: anywhere;
+}
+
+.example-meaning {
+    color: #536174;
+    font-size: 0.93rem;
     line-height: 1.5;
-    resize: vertical;
 }
 
-.final-question textarea:focus {
-    outline: none;
-    border-color: #5267a8;
-    box-shadow: 0 0 0 2px rgba(82, 103, 168, 0.12);
+.example-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    padding: 0.75rem;
+}
+
+.example-word-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 9px 12px;
+    gap: 3px;
+    border-radius: 9px;
+}
+
+.example-word-card:nth-child(4n + 1),
+.example-word-card:nth-child(4n + 2) {
+    background: #f7f9fc;
+}
+
+.example-word-card .example-word {
+    color: var(--navy);
+    font-size: 0.98rem;
+}
+
+.example-word-card .example-meaning {
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.example-instruction {
+    margin: 0;
+    padding: 9px 13px;
+    background: #fafbfd;
+    color: #68768a;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    border-top: 1px solid #edf0f4;
 }
 
 
 /* =========================================================
-   24. EXPERIMENT — COMPLETION
+   24. TWO-COLUMN EXPERIMENT LAYOUT
    ========================================================= */
 
-.completion {
-    text-align: center;
-}
+@media (min-width: 900px) {
 
-.completion .primary-button {
-    margin: 12px;
+    .container {
+        max-width: 1320px;
+    }
+
+    .experiment-step.active {
+        display: block;
+        padding: 30px 34px;
+    }
+
+    .experiment-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+        gap: 30px;
+        align-items: start;
+    }
+
+    .experiment-examples {
+        min-width: 0;
+        position: sticky;
+        top: 88px;
+        align-self: start;
+    }
+
+    .experiment-activities {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .experiment-activities > * {
+        min-width: 0;
+    }
+
+    .experiment-examples .example-panel {
+        margin: 0;
+    }
+
+    .experiment-examples .example-grid {
+        grid-template-columns: 1fr;
+        gap: 3px;
+        padding: 7px;
+    }
+
+    .experiment-examples .example-word-card {
+        padding: 9px 12px;
+        gap: 3px;
+    }
+
+    .experiment-examples .example-word-card:nth-child(even) {
+        background: #f7f9fc;
+    }
+
+    .experiment-examples .example-word-card:nth-child(odd) {
+        background: white;
+    }
+
+    .experiment-examples .example-word-card .example-word {
+        font-size: 0.98rem;
+    }
+
+    .experiment-examples .example-word-card .example-meaning {
+        font-size: 0.82rem;
+    }
+
+    .experiment-activities .assessment-form {
+        margin-top: 0;
+    }
+
+    .experiment-activities .timer-row,
+    .experiment-activities .assessment-note,
+    .experiment-activities .lesson-text,
+    .experiment-activities .hint-panel {
+        margin: 0;
+    }
+
+    .experiment-activities .navigation {
+        margin-top: 8px;
+    }
+
+    /* Compact activity column */
+
+    .experiment-activities h2 {
+        margin-top: 14px;
+        margin-bottom: 7px;
+        font-size: 18px;
+    }
+
+    .experiment-activities .assessment-form h2:first-child {
+        margin-top: 0;
+    }
+
+    .experiment-activities .assessment-form > p {
+        margin: 5px 0 10px;
+        font-size: 13px;
+    }
+
+    .experiment-activities .field-grid {
+        gap: 12px 14px;
+        margin: 10px 0 14px;
+    }
+
+    .experiment-activities .assessment-form label {
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .experiment-activities .assessment-form input {
+        min-height: 38px;
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .experiment-activities .assessment-form textarea {
+        min-height: 95px;
+        padding: 9px 11px;
+        font-size: 14px;
+    }
+
+    .experiment-activities .block-label {
+        margin-top: 10px;
+    }
+
+    .experiment-activities .lesson-text {
+        padding: 17px 19px;
+    }
+
+    .experiment-activities .lesson-text h2 {
+        margin-top: 0;
+    }
+
+    .experiment-activities .lesson-text p {
+        font-size: 13px;
+        line-height: 1.65;
+        margin-bottom: 9px;
+    }
+
+    .experiment-activities .hint-panel {
+        padding: 17px;
+    }
+
+    .experiment-activities .hint-panel-header {
+        margin-bottom: 12px;
+    }
+
+    .experiment-activities .hint-panel-header h2 {
+        margin-top: 0;
+    }
+
+    .experiment-activities .hint-panel-header p {
+        font-size: 12px;
+    }
+
+    .experiment-activities .hint-toggle {
+        min-height: 40px;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .experiment-activities .hint-content {
+        padding: 11px 14px;
+        font-size: 13px;
+    }
+
+    .experiment-activities .timer-row {
+        padding: 9px 13px;
+    }
+
+    .experiment-activities .timer-row strong {
+        font-size: 18px;
+    }
+
+    .experiment-activities .primary-button {
+        min-height: 39px;
+        padding: 8px 16px;
+        margin-top: 10px;
+        font-size: 13px;
+    }
+
+    .experiment-activities .navigation .primary-button {
+        margin-top: 0;
+    }
+
+    .experiment-activities #pattern-stage,
+    .experiment-activities #lesson-text,
+    .experiment-activities #hint-panel {
+        margin: 0;
+    }
+
+    .experiment-activities #pattern-stage .assessment-form {
+        margin-top: 0;
+    }
+
+    .experiment-activities #lesson-text .assessment-form {
+        margin-top: 10px;
+    }
+
+    .experiment-activities #hint-panel .assessment-note {
+        margin-top: 12px;
+    }
 }
 
 
 /* =========================================================
-   25. DISABLED ELEMENTS
+   25. RESPONSIVE DESIGN
    ========================================================= */
 
-button:disabled,
-input:disabled,
-textarea:disabled,
-select:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-
-/* =========================================================
-   26. MOBILE
-   ========================================================= */
-
-@media (max-width: 700px) {
+@media (max-width: 899px) {
 
     .header-inner {
-        padding: 15px 18px;
+        min-height: 62px;
+        padding: 11px 19px;
     }
 
-    .hero {
-        padding: 65px 24px 75px;
+    .container {
+        max-width: 760px;
+        padding: 25px 16px 55px;
     }
 
-    .hero h1 {
-        font-size: 36px;
+    .experiment-step.active {
+        padding: 30px 24px;
+        border-radius: 12px;
     }
 
-    .hero-text {
-        font-size: 17px;
+    .experiment-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
     }
 
-    .content-section {
-        padding: 60px 24px;
+    .experiment-examples,
+    .experiment-activities {
+        width: 100%;
+        min-width: 0;
     }
 
-    .section-content h2 {
-        font-size: 28px;
+    .experiment-examples {
+        position: static;
+    }
+
+    .experiment-activities {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .experiment-examples .example-panel {
+        margin: 0;
+    }
+
+    .intro {
+        margin-bottom: 25px;
+    }
+
+    .field-grid {
+        grid-template-columns: 1fr;
+        gap: 17px;
     }
 
     .steps {
         grid-template-columns: 1fr;
     }
 
-    .container {
-        padding: 40px 18px;
+    .hero {
+        padding: 70px 22px 80px;
     }
 
-    h1 {
-        font-size: 32px;
+    .hero-text {
+        font-size: 16px;
     }
 
-    .lead {
+    .content-section {
+        padding: 60px 22px;
+    }
+
+    .section-content h2 {
+        font-size: 27px;
+    }
+
+    .hint-panel {
+        padding: 20px;
+    }
+
+    .hint-panel-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .navigation {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .navigation .primary-button {
+        width: 100%;
+    }
+
+    .completion .primary-button {
+        display: flex;
+        width: 100%;
+        margin: 12px 0;
+    }
+
+    .completion .navigation {
+        padding-top: 10px;
+    }
+
+    .example-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* =========================================================
+   26. SMALL MOBILE SCREENS
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .example-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.2rem;
+        padding: 0.8rem 1rem;
+    }
+
+    .example-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .example-panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .header-inner {
+        padding: 10px 15px;
+    }
+
+    .logo {
         font-size: 17px;
     }
 
-    .messages {
-        min-height: 220px;
+    .progress {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .container {
+        padding: 18px 11px 40px;
+    }
+
+    .experiment-step.active {
+        padding: 25px 18px;
+    }
+
+    h1 {
+        font-size: 29px;
+    }
+
+    h2 {
+        font-size: 19px;
+    }
+
+    .lead {
+        font-size: 15px;
+    }
+
+    .info-box {
+        padding: 18px;
+    }
+
+    .timer-row {
+        padding: 13px 15px;
+    }
+
+    .timer-row strong {
+        font-size: 19px;
+    }
+
+    .lesson-text {
+        padding: 20px;
+    }
+
+    .hint-panel {
+        padding: 16px;
+    }
+
+    .assessment-form input,
+    .assessment-form textarea {
+        font-size: 16px;
+    }
+
+    .primary-button {
+        width: 100%;
     }
 
     .chat-input {
@@ -964,50 +1582,133 @@ select:disabled {
     }
 
     .chat-input button {
-        align-self: stretch;
+        width: 100%;
     }
 
     .bubble {
-        max-width: 90%;
+        max-width: 92%;
     }
 
     th,
     td {
-        padding: 11px 12px;
-        font-size: 14px;
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
+
+/* =========================================================
+   27. ACCESSIBILITY
+   ========================================================= */
+
+:focus-visible {
+    outline: 3px solid rgba(49, 91, 154, 0.25);
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   28. REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+
+/* =========================================================
+   ROSETTA AI CHATBOT
+   ========================================================= */
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 320px;
+    min-height: 180px;
+    overflow-y: auto;
+    padding: 16px;
+    margin: 16px 0;
+    background: #f7f9fc;
+    border: 1px solid #e1e7f0;
+    border-radius: 12px;
+}
+
+.chat-message {
+    max-width: 88%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.chat-message p {
+    margin: 5px 0 0;
+}
+
+.chat-message strong {
+    font-size: 0.8rem;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.chat-message.assistant {
+    align-self: flex-start;
+    background: white;
+    border: 1px solid #e1e7f0;
+    color: #253247;
+}
+
+.chat-message.user {
+    align-self: flex-end;
+    background: #315b9a;
+    color: white;
+}
+
+.chat-message.user strong {
+    color: white;
+}
+
+.chat-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-form textarea {
+    width: 100%;
+    resize: vertical;
+}
+
+.chat-form button {
+    align-self: flex-start;
+}
+
+.chat-form button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.chat-typing {
+    color: #64748b;
+    font-style: italic;
+}
+
+@media (max-width: 600px) {
+    .chat-messages {
+        max-height: 280px;
+        padding: 12px;
     }
 
-    .navigation {
-        justify-content: stretch;
-        flex-direction: column;
-    }
-
-    .navigation .primary-button {
-        width: 100%;
-        text-align: center;
-    }
-
-    .field-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .assessment-form fieldset {
-        padding: 16px;
-    }
-
-    .timer-row {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .hint-header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .completion .primary-button {
-        display: block;
-        width: 100%;
-        margin: 12px 0;
+    .chat-message {
+        max-width: 95%;
     }
 }

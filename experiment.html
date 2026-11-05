@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,271 +7,875 @@
   <title>Rosetta — Unit 1</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
 <header class="site-header">
   <div class="header-inner">
     <a href="index.html" class="logo">Rosetta</a>
-    <div class="progress" aria-live="polite">Screen <span id="step-number">0</span> / 6</div>
+    <div class="progress" aria-live="polite">
+      Screen <span id="step-number">0</span> / 4
+    </div>
   </div>
 </header>
 
 <main class="container">
+
   <div class="unit-label">UNIT 1 · MORPHOLOGY</div>
 
-  <!-- SCREEN 0: PRE-TEST -->
+
+  <!-- =====================================================
+       SCREEN 0: PRE-TEST — DABIDA
+       ===================================================== -->
+
   <section id="screen-0" class="experiment-step active" data-screen="0">
+
     <div class="intro">
       <p class="eyebrow">SCREEN 0 · PRE-TEST</p>
       <h1>Test A: Dabida</h1>
-      <p class="lead">Source: Neacșu 6.2 (Gilyarova, TurLom 2006). δ is written dh; β is written bh.</p>
-      <p>Here are some verb forms in Dabida and their English translations.</p>
+
+      <p class="lead">
+        Source: Neacșu 6.2 (Gilyarova, TurLom 2006).
+        δ is written dh; β is written bh.
+      </p>
+
+      <p>
+        Here are some verb forms in Dabida and their English translations.
+      </p>
     </div>
-    <div class="info-box">
-      <p><strong>Examples</strong></p>
-      <p>dichakadhana = we will fight · bhichanirasha = they will curse me · kuchanikunda = you (sg) will fall in love with me · dichakurasha = we will curse you (sg) · dicharashana = we will argue · bhichamukunda = they will fall in love with you (pl) · muchadikadha = you (pl) will beat us · bhichakadhana = they will fight</p>
+
+    <div class="experiment-layout">
+
+      <div class="experiment-examples">
+
+        <div class="example-panel">
+
+          <div class="example-panel-header">
+            <strong>Dabida · Verb forms</strong>
+            <span>8 examples</span>
+          </div>
+
+          <div class="example-grid">
+
+            <div class="example-word-card">
+              <span class="example-word">dichakadhana</span>
+              <span class="example-meaning">We will fight</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">bhichanirasha</span>
+              <span class="example-meaning">They will curse me</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">kuchanikunda</span>
+              <span class="example-meaning">You (singular) will fall in love with me</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">dichakurasha</span>
+              <span class="example-meaning">We will curse you (singular)</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">dicharashana</span>
+              <span class="example-meaning">We will argue</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">bhichamukunda</span>
+              <span class="example-meaning">They will fall in love with you (plural)</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">muchadikadha</span>
+              <span class="example-meaning">You (plural) will beat us</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">bhichakadhana</span>
+              <span class="example-meaning">They will fight</span>
+            </div>
+
+          </div>
+
+          <p class="example-instruction">
+            Compare the Dabida words with their English translations.
+            Look for recurring parts and try to infer what each part means.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="experiment-activities">
+
+        <div class="timer-row">
+          <span>Time remaining</span>
+          <strong id="pre-timer">01:00</strong>
+        </div>
+
+        <form id="pretest-form" class="assessment-form">
+
+          <h2>Apply</h2>
+          <p>Write in Dabida:</p>
+
+          <div class="field-grid">
+
+            <label>
+              I will beat you (sg)
+              <input name="pre_apply_1" autocomplete="off">
+            </label>
+
+            <label>
+              They will fall in love
+              <input name="pre_apply_2" autocomplete="off">
+            </label>
+
+            <label>
+              You (pl) will argue
+              <input name="pre_apply_3" autocomplete="off">
+            </label>
+
+          </div>
+
+          <h2>Transfer</h2>
+          <p>Write in Dabida:</p>
+
+          <div class="field-grid">
+
+            <label>
+              You (sg) will curse them
+              <input name="pre_transfer_1" autocomplete="off">
+            </label>
+
+            <label>
+              We will fall in love with you (pl)
+              <input name="pre_transfer_2" autocomplete="off">
+            </label>
+
+          </div>
+
+          <h2>Formulate the rule</h2>
+
+          <p>
+            Based on the examples, explain how Dabida verbs are constructed.
+            What do the different parts of a verb represent, and in what order
+            do they appear?
+          </p>
+
+          <label class="block-label">
+            Your explanation
+
+            <textarea
+              name="pre_rule"
+              rows="5"
+              placeholder="Explain how Dabida verbs are built..."
+            ></textarea>
+          </label>
+
+          <button class="primary-button" type="submit">
+            Submit pre-test →
+          </button>
+
+        </form>
+
+        <p class="assessment-note">
+          The timer is visible. No answers or feedback are shown during this test.
+        </p>
+
+      </div>
+
     </div>
-    <div class="timer-row"><span>Time remaining</span><strong id="pre-timer">15:00</strong></div>
-    <form id="pretest-form" class="assessment-form">
-      <h2>Recognise</h2>
-      <p>Match the four Dabida forms with their translations. Then segment each word into its parts (for example, di-cha-kadha-na).</p>
-      <div class="field-grid">
-        <label>dichakadhana means
-          <input name="pre_match_1" autocomplete="off" placeholder="English translation">
-        </label>
-        <label>bhichanirasha means
-          <input name="pre_match_2" autocomplete="off" placeholder="English translation">
-        </label>
-        <label>kuchanikunda means
-          <input name="pre_match_3" autocomplete="off" placeholder="English translation">
-        </label>
-        <label>dicharashana means
-          <input name="pre_match_4" autocomplete="off" placeholder="English translation">
-        </label>
-      </div>
-      <p class="subprompt">Segment these forms:</p>
-      <div class="field-grid">
-        <label>dichakadhana
-          <input name="pre_seg_1" autocomplete="off" placeholder="e.g. di-cha-kadha-na">
-        </label>
-        <label>bhichanirasha
-          <input name="pre_seg_2" autocomplete="off" placeholder="Segment the word">
-        </label>
-      </div>
-      <h2>Apply</h2>
-      <p>Write in Dabida:</p>
-      <div class="field-grid">
-        <label>I will beat you (sg)
-          <input name="pre_apply_1" autocomplete="off">
-        </label>
-        <label>They will fall in love
-          <input name="pre_apply_2" autocomplete="off">
-        </label>
-        <label>You (pl) will argue
-          <input name="pre_apply_3" autocomplete="off">
-        </label>
-      </div>
-      <h2>Transfer</h2>
-      <p>Write in Dabida:</p>
-      <div class="field-grid">
-        <label>You (sg) will curse them
-          <input name="pre_transfer_1" autocomplete="off">
-        </label>
-        <label>We will fall in love with you (pl)
-          <input name="pre_transfer_2" autocomplete="off">
-        </label>
-      </div>
-      <label class="block-label">In your own words, write the rule for how a Dabida verb is built.
-        <textarea name="pre_rule" rows="5" placeholder="Describe the parts and their order..."></textarea>
-      </label>
-      <button class="primary-button" type="submit">Submit pre-test →</button>
-    </form>
-    <p class="assessment-note">The timer is visible. No answers or feedback are shown during this test.</p>
+
   </section>
 
-  <!-- SCREEN 1: DISCOVER -->
+
+  <!-- =====================================================
+       SCREEN 1: ZULU DISCOVERY + WORKED EXAMPLE
+       ===================================================== -->
+
   <section id="screen-1" class="experiment-step" data-screen="1">
+
     <div class="intro">
       <p class="eyebrow">SCREEN 1 · DISCOVER</p>
       <h1>What do you notice?</h1>
       <p class="lead">Source: Neacșu 5.1 (Zulu, original).</p>
     </div>
-    <div class="info-box">
-      <p>Here are some Zulu words. What do you notice about how they are built?</p>
-      <p><strong>umdwebi</strong> = painter · <strong>abadwebi</strong> = painters · <strong>abazingeli</strong> = hunters · <strong>zingela</strong> = to hunt · <strong>umbulali</strong> = killer · <strong>ababazi</strong> = carvers</p>
+
+    <div class="experiment-layout">
+
+      <div class="experiment-examples">
+
+        <div class="example-panel">
+
+          <div class="example-panel-header">
+            <strong>Zulu · Words and meanings</strong>
+            <span>6 examples</span>
+          </div>
+
+          <div class="example-grid">
+
+            <div class="example-word-card">
+              <span class="example-word">umdwebi</span>
+              <span class="example-meaning">Painter</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">abadwebi</span>
+              <span class="example-meaning">Painters</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">abazingeli</span>
+              <span class="example-meaning">Hunters</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">zingela</span>
+              <span class="example-meaning">To hunt</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">umbulali</span>
+              <span class="example-meaning">Killer</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">ababazi</span>
+              <span class="example-meaning">Carvers</span>
+            </div>
+
+          </div>
+
+          <p class="example-instruction">
+            Compare the words carefully. Which parts appear more than once?
+            What might those parts represent?
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="experiment-activities">
+
+        <form id="discover-form" class="assessment-form">
+
+          <label class="block-label">
+            Your observations
+
+            <textarea
+              name="discover_response"
+              rows="5"
+              placeholder="Write what you notice about the words..."
+              required
+            ></textarea>
+          </label>
+
+          <button class="primary-button" type="submit">
+            Save observations →
+          </button>
+
+        </form>
+
+        <p class="assessment-note">
+          This response is saved but not scored.
+        </p>
+
+        <div class="lesson-text" id="worked-example" hidden>
+
+          <h2>Prefixes, stems, and suffixes</h2>
+
+          <p>
+            Look at <strong>umdwebi</strong> and <strong>abadwebi</strong>.
+            Both mean painter, but one is singular and one is plural.
+            The part they share, <strong>dwebi</strong>, is the stem.
+            What comes before it changes:
+            <strong>um-</strong> for one painter,
+            <strong>aba-</strong> for several.
+          </p>
+
+          <p>
+            Now look at <strong>zingela</strong>, to hunt, next to
+            <strong>abazingeli</strong>, hunters.
+            The stem <strong>zingel</strong> is the same;
+            the noun ends in <strong>-i</strong>, the verb in <strong>-a</strong>.
+          </p>
+
+          <p>
+            So a Zulu word for a person who does something is built from three
+            pieces: a prefix that says one or many, a stem, and the ending
+            <strong>-i</strong>. Pieces that go before the stem are called
+            prefixes, pieces after it suffixes.
+          </p>
+
+          <p>
+            <strong>Try it:</strong> killer is <strong>umbulali</strong>,
+            so killers is <strong>aba + bulali = ababulali</strong>,
+            and to kill is <strong>bulal + a = bulala</strong>.
+          </p>
+
+        </div>
+
+        <div class="navigation">
+          <button class="primary-button" type="button" data-next="2">
+            Continue to Swahili →
+          </button>
+        </div>
+
+      </div>
+
     </div>
-    <form id="discover-form" class="assessment-form">
-      <label class="block-label">Your observations
-        <textarea name="discover_response" rows="7" placeholder="Write what you notice about the words..." required></textarea>
-      </label>
-      <button class="primary-button" type="submit">Save and continue →</button>
-    </form>
-    <p class="assessment-note">This response is saved but not scored.</p>
+
   </section>
 
-  <!-- SCREEN 2: WORKED EXAMPLE -->
+
+  <!-- =====================================================
+       SCREEN 2: SWAHILI
+       ===================================================== -->
+
   <section id="screen-2" class="experiment-step" data-screen="2">
-    <div class="intro">
-      <p class="eyebrow">SCREEN 2 · WORKED EXAMPLE</p>
-      <h1>Prefixes, stems, and suffixes</h1>
-    </div>
-    <div class="lesson-text">
-      <p>Look at <strong>umdwebi</strong> and <strong>abadwebi</strong>. Both mean painter, but one is singular and one is plural. The part they share, <strong>dwebi</strong>, is the stem. What comes before it changes: <strong>um-</strong> for one painter, <strong>aba-</strong> for several.</p>
-      <p>Now look at <strong>zingela</strong>, to hunt, next to <strong>abazingeli</strong>, hunters. The stem <strong>zingel</strong> is the same; the noun ends in <strong>-i</strong>, the verb in <strong>-a</strong>.</p>
-      <p>So a Zulu word for a person who does something is built from three pieces: a prefix that says one or many, a stem, and the ending <strong>-i</strong>. Pieces that go before the stem are called prefixes, pieces after it suffixes.</p>
-      <p><strong>Try it:</strong> killer is <strong>umbulali</strong>, so killers is <strong>aba + bulali = ababulali</strong>, and to kill is <strong>bulal + a = bulala</strong>.</p>
-    </div>
-    <div class="navigation">
-      <button class="primary-button" type="button" data-next="3">Continue to Swahili →</button>
-    </div>
-  </section>
 
-  <!-- SCREEN 3: APPLY -->
-  <section id="screen-3" class="experiment-step" data-screen="3">
     <div class="intro">
-      <p class="eyebrow">SCREEN 3 · APPLY</p>
+      <p class="eyebrow">SCREEN 2 · APPLY AND DISCOVER THE RULE</p>
+
       <h1>Swahili: fill in the missing forms</h1>
-      <p class="lead">Source: Neacșu 6.1 (Swahili, Sim). Printed solution removed.</p>
-    </div>
-    <div class="info-box">
-      <p>Here are some Swahili verb forms. Fill in the three missing ones.</p>
-      <p>ninasema = I speak · wunasema = you speak · anasema = she speaks · wanasema = they speak · ninaona = I see · niliona = I saw · ninawaona = I see them · niliwuona = I saw you · ananiona = she sees me · wutakaniona = you will see me</p>
-    </div>
-    <form id="swahili-form" class="assessment-form">
-      <div class="field-grid">
-        <label>(1) ______ = she saw them
-          <input name="swahili_1" autocomplete="off" required>
-          <span class="feedback" id="swahili-feedback-1" aria-live="polite"></span>
-        </label>
-        <label>(2) ______ = I will see you
-          <input name="swahili_2" autocomplete="off" required>
-          <span class="feedback" id="swahili-feedback-2" aria-live="polite"></span>
-        </label>
-        <label>(3) ______ = she saw me
-          <input name="swahili_3" autocomplete="off" required>
-          <span class="feedback" id="swahili-feedback-3" aria-live="polite"></span>
-        </label>
-      </div>
-      <button class="primary-button" type="submit">Submit answers →</button>
-    </form>
-    <p class="assessment-note">Right or wrong is shown for each blank. No explanation is provided.</p>
-  </section>
 
-  <!-- SCREEN 4: RULE + HINTS -->
-  <section id="screen-4" class="experiment-step" data-screen="4">
-    <div class="intro">
-      <p class="eyebrow">SCREEN 4 · WRITE THE RULE</p>
-      <h1>How is a Swahili verb built?</h1>
-      <p class="lead">In your own words, write the rule for how a Swahili verb is built from its parts.</p>
+      <p class="lead">
+        Source: Neacșu 6.1 (Swahili, Sim). Printed solution removed.
+      </p>
     </div>
-    <form id="rule-form" class="assessment-form">
-      <label class="block-label">Your rule
-        <textarea id="swahili-rule" name="swahili_rule" rows="6" placeholder="Explain the order and meaning of the parts..." required></textarea>
+
+    <div class="experiment-layout">
+
+      <div class="experiment-examples">
+
+        <div class="example-panel">
+
+          <div class="example-panel-header">
+            <strong>Swahili · Verb forms</strong>
+            <span>10 examples</span>
+          </div>
+
+          <div class="example-grid">
+
+            <div class="example-word-card">
+              <span class="example-word">ninasema</span>
+              <span class="example-meaning">I speak</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">wunasema</span>
+              <span class="example-meaning">You speak</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">anasema</span>
+              <span class="example-meaning">She speaks</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">wanasema</span>
+              <span class="example-meaning">They speak</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">ninaona</span>
+              <span class="example-meaning">I see</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">niliona</span>
+              <span class="example-meaning">I saw</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">ninawaona</span>
+              <span class="example-meaning">I see them</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">niliwuona</span>
+              <span class="example-meaning">I saw you</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">ananiona</span>
+              <span class="example-meaning">She sees me</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">wutakaniona</span>
+              <span class="example-meaning">You will see me</span>
+            </div>
+
+          </div>
+
+          <p class="example-instruction">
+            Use the examples to identify how the beginning and ending
+            of a verb relate to its meaning.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="experiment-activities">
+
+        <!-- STAGE 1: PATTERN MATCHING -->
+
+        <div id="pattern-stage">
+
+          <div class="timer-row">
+            <span>Time remaining for pattern matching</span>
+            <strong id="pattern-timer">01:00</strong>
+          </div>
+
+          <form id="swahili-form" class="assessment-form">
+
+            <div class="field-grid">
+
+              <label>
+                (1) ______ = she saw them
+
+                <input name="swahili_1" autocomplete="off" required>
+
+                <span class="feedback" id="swahili-feedback-1" aria-live="polite"></span>
+              </label>
+
+              <label>
+                (2) ______ = I will see you
+
+                <input name="swahili_2" autocomplete="off" required>
+
+                <span class="feedback" id="swahili-feedback-2" aria-live="polite"></span>
+              </label>
+
+              <label>
+                (3) ______ = she saw me
+
+                <input name="swahili_3" autocomplete="off" required>
+
+                <span class="feedback" id="swahili-feedback-3" aria-live="polite"></span>
+              </label>
+
+            </div>
+
+            <button class="primary-button" type="submit">
+              Submit answers →
+            </button>
+
+          </form>
+
+          <p class="assessment-note">
+            Right or wrong is shown for each blank. No explanation is provided.
+          </p>
+
+        </div>
+
+
+        <!-- STAGE 2: INITIAL RULE WRITING -->
+
+        <div id="lesson-text" class="lesson-text" hidden>
+
+          <h2>How is a Swahili verb built?</h2>
+
+          <p>
+            Now that you have worked with the examples, write in your own words
+            the rule for how a Swahili verb is built from its parts.
+          </p>
+
+          <div class="timer-row">
+            <span>Time remaining to formulate your rule</span>
+            <strong id="rule-timer">01:00</strong>
+          </div>
+
+          <form id="rule-form" class="assessment-form">
+
+            <label class="block-label">
+              Your rule
+
+              <textarea
+                id="swahili-rule"
+                name="swahili_rule"
+                rows="5"
+                placeholder="Explain the order and meaning of the parts..."
+                required
+              ></textarea>
+            </label>
+
+            <button class="primary-button" type="submit">
+              Save rule
+            </button>
+
+            <p id="rule-save-status" class="assessment-note" aria-live="polite"></p>
+
+          </form>
+
+        </div>
+
+
+        <!-- STAGE 3: HINTS AND RULE CORRECTION -->
+
+        <!-- STAGE 3: AI CHATBOT OR STATIC HINTS -->
+
+<div id="hint-panel" class="hint-panel" hidden>
+
+  <!-- AI CONDITION -->
+  <div id="ai-chat-panel" hidden>
+
+    <div class="hint-panel-header">
+      <div>
+        <h2>Discuss your rule with the tutor</h2>
+        <p>
+          Explain your reasoning, ask questions, and use the discussion
+          to improve your rule. The tutor will guide you rather than
+          simply give you the answers.
+        </p>
+      </div>
+
+      <span id="hint-timer" class="timer-pill">01:00</span>
+    </div>
+
+    <div
+      id="chat-messages"
+      class="chat-messages"
+      role="log"
+      aria-live="polite"
+      aria-label="Conversation with the morphology tutor"
+    >
+      <div class="chat-message assistant">
+        <strong>Rosetta tutor</strong>
+        <p>
+          Hi! Let's explore your rule together. What have you noticed
+          about the different parts of the Swahili verbs?
+        </p>
+      </div>
+    </div>
+
+    <form id="chat-form" class="chat-form">
+      <label class="block-label" for="chat-input">
+        Your message
+
+        <textarea
+          id="chat-input"
+          rows="2"
+          maxlength="1000"
+          placeholder="Tell the tutor what you think..."
+          required
+        ></textarea>
       </label>
-      <button class="primary-button" type="submit">Submit rule and open hints →</button>
+
+      <button id="chat-send-button" class="primary-button" type="submit">
+        Send message →
+      </button>
+
+      <p id="chat-status" class="assessment-note" aria-live="polite"></p>
     </form>
-    <div id="hint-panel" class="hint-panel" hidden>
-      <div class="hint-panel-header">
-        <div><h2>Hints</h2><p>Open one hint at a time. This panel closes after five minutes.</p></div>
-        <span id="hint-timer" class="timer-pill">05:00</span>
+
+  </div>
+
+
+  <!-- NON-AI CONDITION -->
+  <div id="static-hints-panel">
+
+    <div class="hint-panel-header">
+      <div>
+        <h2>Hints and rule correction</h2>
+
+        <p>
+          You can now use the hints to improve your rule.
+          A new hint becomes available every 20 seconds.
+          You can rewrite and resubmit your rule at any time.
+        </p>
       </div>
-      <div class="hint-list">
-        <button type="button" class="hint-toggle" data-hint="0" aria-expanded="false">Hint 1 <span>+</span></button>
-        <div class="hint-content" id="hint-content-0" hidden>Look at the very beginning of each word. What does it tell you about the English?</div>
-        <button type="button" class="hint-toggle" data-hint="1" aria-expanded="false">Hint 2 <span>+</span></button>
-        <div class="hint-content" id="hint-content-1" hidden>Compare ninaona and niliona. What changed in Swahili, and what changed in English?</div>
-        <button type="button" class="hint-toggle" data-hint="2" aria-expanded="false">Hint 3 <span>+</span></button>
-        <div class="hint-content" id="hint-content-2" hidden>The order is always: who does it, then when, then to whom, then the verb.</div>
+
+      <span class="timer-pill" id="static-hint-timer">01:00</span>
+    </div>
+
+    <div class="hint-list">
+
+      <button type="button" class="hint-toggle" data-hint="0" aria-expanded="false">
+        Hint 1 <span>+</span>
+      </button>
+
+      <div class="hint-content" id="hint-content-0" hidden>
+        Look at the very beginning of each word.
+        What does it tell you about the English?
       </div>
+
+      <button type="button" class="hint-toggle" data-hint="1" aria-expanded="false">
+        Hint 2 <span>+</span>
+      </button>
+
+      <div class="hint-content" id="hint-content-1" hidden>
+        Compare ninaona and niliona.
+        What changed in Swahili, and what changed in English?
+      </div>
+
+      <button type="button" class="hint-toggle" data-hint="2" aria-expanded="false">
+        Hint 3 <span>+</span>
+      </button>
+
+      <div class="hint-content" id="hint-content-2" hidden>
+        The order is always: who does it, then when,
+        then to whom, then the verb.
+      </div>
+
     </div>
-    <div class="navigation">
-      <button class="primary-button" type="button" data-next="5">Continue to post-test →</button>
+
+  </div>
+
+
+  <p class="assessment-note">
+    You can revise your rule in the text field above and click
+    "Save revised rule" to record each new version.
+  </p>
+
+  <p id="swahili-completion-message" hidden>
+    The activity is complete. You can now continue to the post-test.
+  </p>
+
+</div>
+
+
+        <!-- CONTINUE -->
+
+        <div class="navigation">
+          <button
+            id="swahili-continue-button"
+            class="primary-button"
+            type="button"
+            data-next="3"
+            disabled
+          >
+            Continue to post-test →
+          </button>
+        </div>
+
+      </div>
+
     </div>
+
   </section>
 
-  <!-- SCREEN 5: POST-TEST -->
-  <section id="screen-5" class="experiment-step" data-screen="5">
+
+  <!-- =====================================================
+       SCREEN 3: POST-TEST — LATVIAN
+       ===================================================== -->
+
+  <section id="screen-3" class="experiment-step" data-screen="3">
+
     <div class="intro">
-      <p class="eyebrow">SCREEN 5 · POST-TEST</p>
+      <p class="eyebrow">SCREEN 3 · POST-TEST</p>
+
       <h1>Test B: Latvian</h1>
-      <p class="lead">Source: Neacșu 5.14 (Rubinstein, MSK 1999), nouns only.</p>
-      <p>Here are some Latvian nouns and their English translations.</p>
+
+      <p class="lead">
+        Source: Neacșu 5.14 (Rubinstein, MSK 1999), nouns only.
+      </p>
+
+      <p>
+        Here are some Latvian nouns and their English translations.
+      </p>
     </div>
-    <div class="info-box">
-      <p>ozols = oak · galds = table · ābols = apple · bērns = child · veikala = of the shop · institūta = of the institute · ārsta = of the doctor · ozola = of the oak · autoru = of the authors · bruņinieku = of the knights</p>
+
+    <div class="experiment-layout">
+
+      <div class="experiment-examples">
+
+        <div class="example-panel">
+
+          <div class="example-panel-header">
+            <strong>Latvian · Nouns and forms</strong>
+            <span>10 examples</span>
+          </div>
+
+          <div class="example-grid">
+
+            <div class="example-word-card">
+              <span class="example-word">ozols</span>
+              <span class="example-meaning">Oak</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">galds</span>
+              <span class="example-meaning">Table</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">ābols</span>
+              <span class="example-meaning">Apple</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">bērns</span>
+              <span class="example-meaning">Child</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">veikala</span>
+              <span class="example-meaning">Of the shop</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">institūta</span>
+              <span class="example-meaning">Of the institute</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">ārsta</span>
+              <span class="example-meaning">Of the doctor</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">ozola</span>
+              <span class="example-meaning">Of the oak</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">autoru</span>
+              <span class="example-meaning">Of the authors</span>
+            </div>
+
+            <div class="example-word-card">
+              <span class="example-word">bruņinieku</span>
+              <span class="example-meaning">Of the knights</span>
+            </div>
+
+          </div>
+
+          <p class="example-instruction">
+            Compare the different forms and investigate how their endings
+            relate to their grammatical meaning.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="experiment-activities">
+
+        <div class="timer-row">
+          <span>Time remaining</span>
+          <strong id="post-timer">01:00</strong>
+        </div>
+
+        <form id="posttest-form" class="assessment-form">
+
+          <h2>Apply</h2>
+          <p>Write in Latvian:</p>
+
+          <div class="field-grid">
+
+            <label>
+              of the apple
+              <input name="post_apply_1" autocomplete="off">
+            </label>
+
+            <label>
+              of the child
+              <input name="post_apply_2" autocomplete="off">
+            </label>
+
+            <label>
+              of the table
+              <input name="post_apply_3" autocomplete="off">
+            </label>
+
+          </div>
+
+          <h2>Transfer</h2>
+
+          <p>
+            autors = author · bruņinieks = knight · institūts = institute.
+            Write in Latvian:
+          </p>
+
+          <div class="field-grid">
+
+            <label>
+              of the author
+              <input name="post_transfer_1" autocomplete="off">
+            </label>
+
+            <label>
+              of the institutes
+              <input name="post_transfer_2" autocomplete="off">
+            </label>
+
+          </div>
+
+          <h2>Formulate the rule</h2>
+
+          <p>
+            Explain how Latvian nouns change depending on their grammatical
+            form. What changes in the word, and what does this change represent?
+          </p>
+
+          <label class="block-label">
+            Your explanation
+
+            <textarea
+              name="post_rule"
+              rows="5"
+              placeholder="Explain the pattern you have identified..."
+            ></textarea>
+          </label>
+
+          <button class="primary-button" type="submit">
+            Submit post-test →
+          </button>
+
+        </form>
+
+        <p class="assessment-note">
+          The timer is visible. No answers or feedback are shown during this test.
+        </p>
+
+      </div>
+
     </div>
-    <div class="timer-row"><span>Time remaining</span><strong id="post-timer">15:00</strong></div>
-    <form id="posttest-form" class="assessment-form">
-      <h2>Recognise</h2>
-      <p>Match, then draw a line between the parts of each word.</p>
-      <div class="field-grid">
-        <label>ozols means
-          <input name="post_match_1" autocomplete="off">
-        </label>
-        <label>ozola means
-          <input name="post_match_2" autocomplete="off">
-        </label>
-        <label>ārsta means
-          <input name="post_match_3" autocomplete="off">
-        </label>
-        <label>ārstu means
-          <input name="post_match_4" autocomplete="off">
-        </label>
-      </div>
-      <p class="subprompt">Segment these forms:</p>
-      <div class="field-grid">
-        <label>ozola
-          <input name="post_seg_1" autocomplete="off" placeholder="Segment the word">
-        </label>
-        <label>ārstu
-          <input name="post_seg_2" autocomplete="off" placeholder="Segment the word">
-        </label>
-      </div>
-      <h2>Apply</h2>
-      <p>Write in Latvian:</p>
-      <div class="field-grid">
-        <label>of the apple
-          <input name="post_apply_1" autocomplete="off">
-        </label>
-        <label>of the child
-          <input name="post_apply_2" autocomplete="off">
-        </label>
-        <label>of the table
-          <input name="post_apply_3" autocomplete="off">
-        </label>
-      </div>
-      <h2>Transfer</h2>
-      <p>autors = author · bruņinieks = knight · institūts = institute. Write in Latvian:</p>
-      <div class="field-grid">
-        <label>of the author
-          <input name="post_transfer_1" autocomplete="off">
-        </label>
-        <label>of the institutes
-          <input name="post_transfer_2" autocomplete="off">
-        </label>
-      </div>
-      <label class="block-label">In your own words, write the rule for the endings.
-        <textarea name="post_rule" rows="5" placeholder="Describe what the endings mean..." ></textarea>
-      </label>
-      <button class="primary-button" type="submit">Submit post-test →</button>
-    </form>
-    <p class="assessment-note">The timer is visible. No answers or feedback are shown during this test.</p>
+
   </section>
 
-  <!-- SCREEN 6: COMPLETE -->
-  <section id="screen-6" class="experiment-step" data-screen="6">
+
+  <!-- =====================================================
+       SCREEN 4: COMPLETE
+       ===================================================== -->
+
+  <section id="screen-4" class="experiment-step" data-screen="4">
+
     <div class="intro completion">
-      <p class="eyebrow">SCREEN 6 · COMPLETE</p>
+
+      <p class="eyebrow">SCREEN 4 · COMPLETE</p>
+
       <h1>Unit 1 complete.</h1>
+
       <p class="lead">Thank you for taking part.</p>
-      <p>Your responses have been recorded in this browser session. Use the button below to download your response data.</p>
-      <button id="download-data" class="primary-button" type="button">Download my responses (JSON)</button>
+
+      <p>
+        Your responses have been recorded in this browser session.
+        Use the button below to download your response data.
+      </p>
+
+      <button id="download-data" class="primary-button" type="button">
+        Download my responses (JSON)
+      </button>
+
       <div class="navigation">
-        <button id="unit-2-button" class="primary-button" type="button">Continue to Unit 2 →</button>
+        <button id="unit-2-button" class="primary-button" type="button">
+          Continue to Unit 2 →
+        </button>
       </div>
+
     </div>
+
   </section>
+
 </main>
 
 <script src="script.js"></script>
+
 </body>
 </html>

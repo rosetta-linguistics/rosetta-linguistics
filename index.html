@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,37 +6,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Rosetta</title>
+    <meta name="description" content="Rosetta explores whether AI tutoring can help beginners discover how languages build words from meaningful parts.">
+
+    <title>Rosetta — Learning Languages with AI</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
     <!-- HEADER -->
 
     <header class="site-header">
-
         <div class="header-inner">
 
             <a href="index.html" class="logo">
                 Rosetta
             </a>
 
-            <a href="experiment.html" class="nav-link">
+            <a href="#experiment" class="nav-link">
                 The experiment →
             </a>
 
         </div>
-
     </header>
 
 
     <!-- MAIN -->
 
     <main>
-
 
         <!-- HERO -->
 
@@ -48,26 +47,72 @@
                 </p>
 
                 <h1>
-                    Can AI help us learn
+                    Can AI help us understand
                     how languages work?
                 </h1>
 
                 <p class="hero-text">
-                    We study whether an AI tutor helps complete beginners learn to analyse the structure of words in languages they have never seen. Learners solve short puzzles in several unfamiliar languages, in the style of Linguistics Olympiad problems. They learn a reasoning skill that transfers to any language: splitting words into pieces, working out what each piece means, and predicting new forms. 
+                    How do we make sense of a language we've never encountered
+                    before? Rosetta explores whether an AI tutor can help
+                    complete beginners discover the hidden structure of words
+                    through reasoning and experimentation.
                 </p>
 
-                <div class="experiment-choice-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 2rem;">
-                    <div class="info-box">
-                        <h3>AI tutor experiment</h3>
-                        <p>Explore the puzzle with an interactive AI tutor that responds to your ideas.</p>
-                        <a href="experiment.html?mode=ai" class="primary-button">Start with AI →</a>
+                <p class="hero-text">
+                    You'll solve short puzzles inspired by Linguistics Olympiads,
+                    learning to identify meaningful parts of words, infer their
+                    meanings, and predict unfamiliar forms. No previous
+                    knowledge of linguistics or foreign languages is required.
+                </p>
+
+                <div class="experiment-choice-grid" id="experiment">
+
+                    <div class="info-box experiment-card">
+
+                        <p class="eyebrow">VERSION 01</p>
+
+                        <h3>Learn with an AI tutor</h3>
+
+                        <p>
+                            Explore the puzzles with an interactive tutor
+                            that responds to your ideas, asks questions,
+                            and guides your reasoning through hints.
+                        </p>
+
+                        <a href="experiment.html?mode=ai"
+                           class="primary-button">
+                            Start with AI →
+                        </a>
+
                     </div>
-                    <div class="info-box">
-                        <h3>Non-AI experiment</h3>
-                        <p>Explore the same puzzle with static hints. Don't worry: the rule will be given after you explain your reasoning.</p>
-                        <a href="experiment.html?mode=non-ai" class="primary-button">Start without AI →</a>
+
+
+                    <div class="info-box experiment-card">
+
+                        <p class="eyebrow">VERSION 02</p>
+
+                        <h3>Learn with static hints</h3>
+
+                        <p>
+                            Work through the same puzzles using written
+                            hints instead of an interactive tutor.
+                            You'll still have guidance as you investigate
+                            the patterns.
+                        </p>
+
+                        <a href="experiment.html?mode=non-ai"
+                           class="primary-button">
+                            Start without AI →
+                        </a>
+
                     </div>
+
                 </div>
+
+                <p class="experiment-note">
+                    Both versions explore the same linguistic problems.
+                    Choose one to begin.
+                </p>
 
             </div>
 
@@ -85,16 +130,26 @@
                 </p>
 
                 <h2>
-                    What are we studying?
+                    Discover the structure of words
                 </h2>
 
                 <p>
-                    We study morphology: how do languages build words out of smaller meaningful pieces (morphemes) such as roots, prefixes, suffixes and infixes?
+                    Every language has its own way of building words.
+                    Many words are made up of smaller meaningful units
+                    called <strong>morphemes</strong>.
                 </p>
 
                 <p>
-                    You will solve short linguistics olympiads-style puzzles involving languages
-                    you have never seen before. The goal is not for you to learn a particular language, but to develop reasoning skills that can be applied to unfamiliar languages.
+                    These can be roots, prefixes, suffixes, or infixes.
+                    By identifying how these pieces combine, we can
+                    understand words we have never seen before.
+                </p>
+
+                <p>
+                    In this experiment, you'll investigate examples from
+                    unfamiliar languages. The goal is not to memorise
+                    vocabulary, but to develop a reasoning strategy that
+                    can be applied to entirely new linguistic systems.
                 </p>
 
             </div>
@@ -113,9 +168,13 @@
                 </p>
 
                 <h2>
-                    What will you do?
+                    From observation to discovery
                 </h2>
 
+                <p>
+                    The experiment guides you through a series of short
+                    linguistic challenges.
+                </p>
 
                 <div class="steps">
 
@@ -126,12 +185,13 @@
                         </div>
 
                         <h3>
-                            Explore
+                            Observe
                         </h3>
 
                         <p>
-                            Examine examples from an unfamiliar language
-                            and look for patterns in the words.
+                            Examine examples from an unfamiliar language.
+                            Look for recurring elements and patterns
+                            in the words.
                         </p>
 
                     </div>
@@ -144,12 +204,12 @@
                         </div>
 
                         <h3>
-                            Learn with an AI tutor
+                            Investigate
                         </h3>
 
                         <p>
-                            Discuss your ideas with an AI tutor that
-                            guides your reasoning through questions and hints.
+                            Form hypotheses about how words are built
+                            and use hints to refine your understanding.
                         </p>
 
                     </div>
@@ -162,12 +222,12 @@
                         </div>
 
                         <h3>
-                            Apply what you learned
+                            Apply
                         </h3>
 
                         <p>
-                            Use your newly developed strategy to solve
-                            a problem involving a different language.
+                            Use what you've discovered to solve new
+                            problems involving a different language.
                         </p>
 
                     </div>
@@ -179,9 +239,51 @@
         </section>
 
 
-        <!-- TECHNICAL INFORMATION -->
+        <!-- RESEARCH QUESTION -->
 
         <section class="content-section">
+
+            <div class="section-content">
+
+                <p class="eyebrow">
+                    THE RESEARCH QUESTION
+                </p>
+
+                <h2>
+                    What are we trying to find out?
+                </h2>
+
+                <p>
+                    We want to understand whether the way learners receive
+                    guidance influences how effectively they discover
+                    and apply new linguistic rules.
+                </p>
+
+                <div class="info-box">
+
+                    <strong>
+                        Interactive AI tutoring vs. static hints
+                    </strong>
+
+                    <p>
+                        We compare an interactive AI tutor with a version
+                        that provides written hints. Both versions are
+                        designed to cover the same underlying material.
+                        By comparing participants' answers, we can
+                        investigate whether interactive guidance helps
+                        learners develop stronger reasoning skills.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- THE AI TUTOR -->
+
+        <section class="content-section light">
 
             <div class="section-content">
 
@@ -190,20 +292,20 @@
                 </p>
 
                 <h2>
-                    How does the technology work?
+                    Learning through reasoning
                 </h2>
 
                 <p>
-                    The experiment uses an AI language model as an
-                    interactive tutor. The tutor is designed to help
-                    learners reason through the problems rather than
-                    simply giving them the answers.
+                    In the AI version, a language model acts as an
+                    interactive tutor. Rather than simply providing
+                    solutions, it is designed to help learners work
+                    through problems step by step.
                 </p>
 
                 <p>
-                    It can ask questions, respond to hypotheses and
-                    provide progressively stronger hints when a learner
-                    gets stuck.
+                    It can ask questions, respond to hypotheses,
+                    and provide progressively stronger hints when
+                    a learner gets stuck.
                 </p>
 
                 <div class="info-box">
@@ -213,7 +315,10 @@
                     </strong>
 
                     <p>
-                        Olympiad problems are designed to be solvable without prior knowledge of any foreign language or advanced linguistic concept, which makes them a clean test of what learners gained from our lesson.
+                        Linguistics Olympiad-style problems are designed
+                        to be solved through logical reasoning rather
+                        than prior knowledge of a particular language.
+                        Curiosity and careful observation are all you need.
                     </p>
 
                 </div>
@@ -228,17 +333,23 @@
         <section class="cta">
 
             <h2>
-                Ready to try it?
+                Ready to explore?
             </h2>
 
             <p>
-                Explore an unfamiliar language and see what you can discover.
+                Discover the patterns hidden inside unfamiliar words.
             </p>
 
-            <p>Choose the AI tutor or static-hint version from the options at the top of this page.</p>
+            <p>
+                Choose the AI tutor or static-hint version above to begin
+                the experiment.
+            </p>
+
+            <a href="#experiment" class="primary-button">
+                Choose your experiment ↑
+            </a>
 
         </section>
-
 
     </main>
 
@@ -252,7 +363,6 @@
         </p>
 
     </footer>
-
 
 </body>
 
