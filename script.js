@@ -46,7 +46,7 @@ let swahiliStage = "not_started";
 
 // Replace this with your Vercel deployment URL after deployment.
 const CHAT_API_URL =
-    "https://rosetta-linguistics-orbmlpnbz-rosetta7.vercel.app/api/chat";
+    "https://rosetta-linguistics.vercel.app/api/chat";
 
 let chatMessages = [];
 let chatRequestInProgress = false;
