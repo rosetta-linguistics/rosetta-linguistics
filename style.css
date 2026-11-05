@@ -2098,3 +2098,209 @@ tr:last-child td {
     }
 
 }
+
+/* =========================================================
+   EXPERIMENT SCREENS — CLEANER VISUAL HIERARCHY
+   ========================================================= */
+
+/* Make the screen introduction more compact */
+.intro {
+    margin-bottom: 20px;
+}
+
+.intro .lead {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* Make example words slightly less visually dominant */
+.example-word {
+    font-weight: 600;
+    color: #254879;
+    font-size: 1rem;
+}
+
+/* Give translations a little more contrast */
+.example-word-card .example-meaning {
+    color: #536174;
+    font-size: 0.86rem;
+}
+
+/* Make the example panel header cleaner */
+.example-panel-header {
+    background: #f8fafc;
+    padding: 13px 16px;
+}
+
+.example-panel-header strong {
+    font-size: 14px;
+}
+
+/* Make instructions stand out */
+.example-instruction {
+    padding: 14px 16px;
+    background: #edf3fb;
+    color: #354b6b;
+    border-top: 1px solid #dce6f4;
+    font-size: 13px;
+    line-height: 1.65;
+    font-weight: 500;
+}
+
+/* Improve task headings */
+.assessment-form h2 {
+    color: var(--navy);
+    font-size: 19px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Make questions more readable */
+.assessment-form label {
+    color: #253247;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.55;
+}
+
+/* Separate the activity from the examples */
+.experiment-activities {
+    padding-left: 5px;
+}
+
+/* Make explanatory notes less prominent */
+.assessment-note {
+    background: #f8fafc;
+    color: #687589;
+    font-size: 12px;
+    border-color: #e8edf3;
+}
+
+/* Keep the two columns visually balanced */
+@media (min-width: 900px) {
+    .experiment-layout {
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: 34px;
+    }
+
+    .experiment-examples {
+        top: 90px;
+    }
+}
+
+/* Give instructions a consistent appearance */
+.task-instruction {
+    margin: 0 0 18px;
+    padding: 14px 16px;
+    background: #edf3fb;
+    border: 1px solid #dce6f4;
+    border-radius: 9px;
+    color: #354b6b;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.task-instruction strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #254879;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+
+/* Original word on the left, translation beside it */
+.example-word-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+}
+
+.example-word {
+    margin: 0;
+    text-align: left;
+}
+
+.example-meaning {
+    margin: 0;
+    text-align: left;
+}
+
+
+/* =========================================================
+   LANGUAGE SPOTLIGHT
+   ========================================================= */
+
+.language-fun-fact {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 16px;
+    padding: 13px 16px;
+    background: #f3f7fc;
+    border: 1px solid #dce6f4;
+    border-radius: 10px;
+    color: #354b6b;
+}
+
+.language-flag {
+    font-size: 30px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.language-fun-fact p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.language-fun-fact strong {
+    display: block;
+    margin-bottom: 3px;
+    color: #254879;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   CENTER PAGE TITLES, SOURCES AND LANGUAGE SPOTLIGHTS
+   ========================================================= */
+
+.intro {
+    width: 100%;
+    max-width: none;
+    text-align: center;
+    margin: 0 auto 2rem;
+}
+
+.intro h1 {
+    text-align: center;
+    width: 100%;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.intro .assessment-note {
+    text-align: center;
+    margin: 0.75rem auto 1.25rem;
+}
+
+/* Language spotlight */
+.language-fun-fact {
+    width: 100%;
+    max-width: 850px;
+    margin: 1.5rem auto 0;
+    text-align: center;
+    justify-content: center;
+}
+
+.language-fun-fact p {
+    text-align: center;
+}

@@ -1,7 +1,6 @@
-
 /* =========================================================
    ROSETTA EXPERIMENT — UNIT 1
-   Main JavaScript
+   Timer-free, non-blocking version
    ========================================================= */
 
 
@@ -15,53 +14,16 @@ let currentScreen = 0;
 let participantId = null;
 let experimentData = {};
 
-
-// Pre/post-test timers
-let preTimerInterval = null;
-let postTimerInterval = null;
-
-let preTimeRemaining = 60;
-let postTimeRemaining = 60;
-
-
-// Swahili activity timers
-let patternTimerInterval = null;
-let ruleTimerInterval = null;
-let correctionTimerInterval = null;
-
-const PRETEST_DURATION = 60;
-const POSTTEST_DURATION = 60;
-
-const PATTERN_DURATION = 60;
-const RULE_DURATION = 60;
-const CORRECTION_DURATION = 60;
-
-let patternTimeRemaining = PATTERN_DURATION;
-let ruleTimeRemaining = RULE_DURATION;
-let correctionTimeRemaining = CORRECTION_DURATION;
-
-
-// Swahili activity stage
 let swahiliStage = "not_started";
 
-// Replace this with your Vercel deployment URL after deployment.
 const CHAT_API_URL =
     "https://rosetta-linguistics.vercel.app/api/chat";
 
 let chatMessages = [];
 let chatRequestInProgress = false;
 
-// Hint state
 let hintOpened = [false, false, false];
 let hintUnlocked = [false, false, false];
-
-const HINT_UNLOCK_TIMES = [
-    0,
-    20,
-    40
-];
-
-
 
 
 /* =========================================================
@@ -80,47 +42,28 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.dataset.experimentMode = experimentMode;
 
     experimentData = {
-
         participant_id: participantId,
-
         experiment_mode: experimentMode,
-
         unit: 1,
-
         started_at: new Date().toISOString(),
-
         completed_at: null,
-
         responses: {},
-
         events: [],
-
         scores: {}
-
     };
-
 
     recordEvent("experiment_started", {
         mode: experimentMode
     });
 
-
     initialiseNavigation();
-
     initialiseForms();
-
     initialiseHints();
+    initialiseAssessmentProgression();
     initialiseChat();
-
     initialiseDownload();
 
-    initialiseHintAvailability();
-
-
     showScreen(0);
-
-    startAssessmentTimer("pre-timer", PRETEST_DURATION, "pre");
-
 });
 
 
@@ -141,11 +84,9 @@ function getOrCreateParticipantId() {
             Math.random().toString(36).substring(2, 8).toUpperCase();
 
         localStorage.setItem("rosetta_participant_id", id);
-
     }
 
     return id;
-
 }
 
 
@@ -156,23 +97,16 @@ function getOrCreateParticipantId() {
 function recordEvent(eventName, details = {}) {
 
     if (!experimentData.events) {
-
         experimentData.events = [];
-
     }
 
     experimentData.events.push({
-
         event: eventName,
-
         timestamp: new Date().toISOString(),
-
         details: details
-
     });
 
     saveDataLocally();
-
 }
 
 
@@ -185,11 +119,8 @@ function saveDataLocally() {
     try {
 
         localStorage.setItem(
-
             "rosetta_unit1_" + participantId,
-
             JSON.stringify(experimentData)
-
         );
 
     } catch (error) {
@@ -198,9 +129,7 @@ function saveDataLocally() {
             "Could not save experiment data:",
             error
         );
-
     }
-
 }
 
 
@@ -212,32 +141,24 @@ function initialiseNavigation() {
 
     document.querySelectorAll("[data-next]").forEach(function (button) {
 
-        button.addEventListener("click", function (event) {
+        button.addEventListener("click", function () {
 
             const nextScreen = Number(button.dataset.next);
 
-
-            // Swahili activity must finish before continuing.
             if (
                 currentScreen === 2 &&
                 swahiliStage !== "complete"
             ) {
 
-                event.preventDefault();
-
                 alert(
-                    "Please complete the Swahili activity before continuing."
+                    "Please finish the Swahili activity or click 'Finish this activity' first."
                 );
 
                 return;
-
             }
 
-
             showScreen(nextScreen);
-
         });
-
     });
 
 
@@ -252,40 +173,24 @@ function initialiseNavigation() {
             alert(
                 "Unit 2 is not available yet. Thank you for completing Unit 1!"
             );
-
         });
-
     }
 
+
+    const finishSwahiliButton =
+        document.getElementById("finish-swahili-button");
+
+    if (finishSwahiliButton) {
+
+        finishSwahiliButton.addEventListener("click", function () {
+
+            finishSwahiliActivity();
+        });
+    }
 }
 
 
 function showScreen(screenNumber) {
-
-
-    // Do not leave the Swahili activity early.
-    if (
-        currentScreen === 2 &&
-        screenNumber !== 2 &&
-        swahiliStage !== "complete"
-    ) {
-
-        return;
-
-    }
-
-
-    // Do not leave the post-test early.
-    if (
-        currentScreen === 3 &&
-        screenNumber !== 3 &&
-        postTimeRemaining > 0
-    ) {
-
-        return;
-
-    }
-
 
     const target = document.getElementById(
         "screen-" + screenNumber
@@ -295,48 +200,34 @@ function showScreen(screenNumber) {
         return;
     }
 
-
     document.querySelectorAll(".experiment-step").forEach(function (screen) {
 
         screen.classList.remove("active");
-
     });
-
 
     target.classList.add("active");
 
     currentScreen = screenNumber;
 
-
     const stepNumber = document.getElementById("step-number");
 
     if (stepNumber) {
-
         stepNumber.textContent = screenNumber;
-
     }
 
-
     recordEvent("screen_opened", {
-
         screen: screenNumber
-
     });
 
-
     window.scrollTo({
-
         top: 0,
-
         behavior: "smooth"
-
     });
 
 
     if (screenNumber === 1) {
 
         recordEvent("zulu_discovery_and_worked_example_opened");
-
     }
 
 
@@ -345,26 +236,8 @@ function showScreen(screenNumber) {
         recordEvent("swahili_activity_opened");
 
         if (swahiliStage === "not_started") {
-
             startPatternStage();
-
         }
-
-    }
-
-
-    if (screenNumber === 3) {
-
-        if (!postTimerInterval && postTimeRemaining > 0) {
-
-            startAssessmentTimer(
-                "post-timer",
-                postTimeRemaining,
-                "post"
-            );
-
-        }
-
     }
 
 
@@ -373,9 +246,7 @@ function showScreen(screenNumber) {
         experimentData.completed_at = new Date().toISOString();
 
         saveDataLocally();
-
     }
-
 }
 
 
@@ -398,8 +269,6 @@ function initialiseForms() {
 
             event.preventDefault();
 
-
-            // Participants may now submit before the timer ends.
             const answers = getFormAnswers(pretestForm);
 
             experimentData.responses.pretest = answers;
@@ -413,17 +282,12 @@ function initialiseForms() {
                 maximum: experimentData.scores.pretest.maximum,
 
                 rule_response: answers.pre_rule || ""
-
             });
-
-            stopAssessmentTimer("pre");
 
             saveDataLocally();
 
             showScreen(1);
-
         });
-
     }
 
 
@@ -443,12 +307,12 @@ function initialiseForms() {
 
             experimentData.responses.discover = answers;
 
-            recordEvent("discover_response_saved");
+            recordEvent("discover_response_saved", {
+                response: answers.discover_response || ""
+            });
 
             saveDataLocally();
 
-
-            // Disable the form after submission.
             const button = discoverForm.querySelector(
                 "button[type='submit']"
             );
@@ -458,18 +322,13 @@ function initialiseForms() {
                 button.disabled = true;
 
                 button.textContent = "Observations saved";
-
             }
-
 
             discoverForm.querySelectorAll("textarea").forEach(function (input) {
 
                 input.disabled = true;
-
             });
-
         });
-
     }
 
 
@@ -486,9 +345,7 @@ function initialiseForms() {
             event.preventDefault();
 
             submitSwahiliPattern();
-
         });
-
     }
 
 
@@ -502,7 +359,6 @@ function initialiseForms() {
 
         const ruleInput = document.getElementById("swahili-rule");
 
-
         ruleForm.addEventListener("submit", function (event) {
 
             event.preventDefault();
@@ -511,27 +367,21 @@ function initialiseForms() {
                 swahiliStage !== "rule" &&
                 swahiliStage !== "correction"
             ) {
-
                 return;
-
             }
 
-
+            // Empty rules are allowed.
             const answer = ruleInput.value.trim();
-
-            if (!answer) {
-
-                alert("Please write your rule before submitting.");
-
-                return;
-
-            }
-
 
             saveSubmittedRule(answer);
 
-        });
 
+            // The first rule submission moves to correction.
+            if (swahiliStage === "rule") {
+
+                startCorrectionStage();
+            }
+        });
     }
 
 
@@ -547,16 +397,7 @@ function initialiseForms() {
 
             event.preventDefault();
 
-            if (postTimeRemaining > 0) {
-
-                alert(
-                    "You cannot submit the post-test before the timer reaches 00:00."
-                );
-
-                return;
-
-            }
-
+            // Empty answers are allowed.
             const answers = getFormAnswers(posttestForm);
 
             experimentData.responses.posttest = answers;
@@ -570,21 +411,15 @@ function initialiseForms() {
                 maximum: experimentData.scores.posttest.maximum,
 
                 rule_response: answers.post_rule || ""
-
             });
-
-            stopAssessmentTimer("post");
 
             experimentData.completed_at = new Date().toISOString();
 
             saveDataLocally();
 
             showScreen(4);
-
         });
-
     }
-
 }
 
 
@@ -601,11 +436,9 @@ function getFormAnswers(form) {
     formData.forEach(function (value, key) {
 
         answers[key] = String(value).trim();
-
     });
 
     return answers;
-
 }
 
 
@@ -628,7 +461,6 @@ function normalise(text) {
         .replace(/\s+/g, " ")
 
         .trim();
-
 }
 
 
@@ -639,29 +471,21 @@ function answerMatches(answer, acceptedAnswers) {
     return acceptedAnswers.some(function (accepted) {
 
         return cleaned === normalise(accepted);
-
     });
-
 }
 
 
 /* =========================================================
    PRE-TEST GRADING
-   Apply + Transfer only.
-   Rule formulation is saved separately and not scored.
-   Maximum score: 5.
+   Maximum score: 5
    ========================================================= */
 
 function gradePretest(a) {
 
     const applyKeys = [
-
         ["nichakukadha"],
-
         ["bhichakundana"],
-
         ["mucharashana"]
-
     ];
 
     let applyScore = 0;
@@ -674,20 +498,14 @@ function gradePretest(a) {
                 applyKeys[i - 1]
             )
         ) {
-
             applyScore++;
-
         }
-
     }
 
 
     const transferKeys = [
-
         ["kuchabhirasha"],
-
         ["dichamukunda"]
-
     ];
 
     let transferScore = 0;
@@ -700,11 +518,8 @@ function gradePretest(a) {
                 transferKeys[i - 1]
             )
         ) {
-
             transferScore++;
-
         }
-
     }
 
 
@@ -721,9 +536,7 @@ function gradePretest(a) {
         total: applyScore + transferScore,
 
         maximum: 5
-
     };
-
 }
 
 
@@ -734,13 +547,9 @@ function gradePretest(a) {
 function gradeSwahili(a) {
 
     const keys = [
-
         ["aliwaona"],
-
         ["nitakawuona"],
-
         ["aliniona"]
-
     ];
 
     const correct = [];
@@ -753,9 +562,7 @@ function gradeSwahili(a) {
                 a["swahili_" + i],
                 keys[i - 1]
             )
-
         );
-
     }
 
 
@@ -766,9 +573,7 @@ function gradeSwahili(a) {
         total: correct.filter(Boolean).length,
 
         maximum: 3
-
     };
-
 }
 
 
@@ -796,31 +601,22 @@ function displaySwahiliFeedback(results) {
             feedback.textContent = "Incorrect.";
 
             feedback.className = "feedback incorrect";
-
         }
-
     }
-
 }
 
 
 /* =========================================================
    POST-TEST GRADING
-   Apply + Transfer only.
-   Rule formulation is saved separately and not scored.
-   Maximum score: 5.
+   Maximum score: 5
    ========================================================= */
 
 function gradePosttest(a) {
 
     const applyKeys = [
-
         ["ābola", "abola"],
-
         ["bērna", "berna"],
-
         ["galda"]
-
     ];
 
     let applyScore = 0;
@@ -833,20 +629,14 @@ function gradePosttest(a) {
                 applyKeys[i - 1]
             )
         ) {
-
             applyScore++;
-
         }
-
     }
 
 
     const transferKeys = [
-
         ["autora"],
-
         ["institūtu", "institutu"]
-
     ];
 
     let transferScore = 0;
@@ -859,11 +649,8 @@ function gradePosttest(a) {
                 transferKeys[i - 1]
             )
         ) {
-
             transferScore++;
-
         }
-
     }
 
 
@@ -880,203 +667,7 @@ function gradePosttest(a) {
         total: applyScore + transferScore,
 
         maximum: 5
-
     };
-
-}
-
-
-/* =========================================================
-   ASSESSMENT COUNTDOWN TIMERS
-   Pre-test and post-test
-   ========================================================= */
-
-function startAssessmentTimer(elementId, seconds, timerType) {
-
-    const element = document.getElementById(elementId);
-
-    if (!element) {
-        return;
-    }
-
-
-    if (timerType === "pre" && preTimerInterval) {
-        return;
-    }
-
-    if (timerType === "post" && postTimerInterval) {
-        return;
-    }
-
-
-    function updateDisplay() {
-
-        const minutes = Math.floor(seconds / 60);
-
-        const remainingSeconds = seconds % 60;
-
-        element.textContent =
-
-            String(minutes).padStart(2, "0") +
-
-            ":" +
-
-            String(remainingSeconds).padStart(2, "0");
-
-    }
-
-
-    updateDisplay();
-
-
-    const interval = setInterval(function () {
-
-        seconds--;
-
-
-        if (timerType === "pre") {
-
-            preTimeRemaining = Math.max(0, seconds);
-
-        } else if (timerType === "post") {
-
-            postTimeRemaining = Math.max(0, seconds);
-
-        }
-
-
-        updateDisplay();
-
-
-        if (seconds <= 0) {
-
-            clearInterval(interval);
-
-
-            if (timerType === "pre") {
-
-                preTimerInterval = null;
-
-                autoSubmitAssessment("pretest-form", 1);
-
-            }
-
-
-            if (timerType === "post") {
-
-                postTimerInterval = null;
-
-                autoSubmitAssessment("posttest-form", 4);
-
-            }
-
-        }
-
-    }, 1000);
-
-
-    if (timerType === "pre") {
-
-        preTimerInterval = interval;
-
-    } else {
-
-        postTimerInterval = interval;
-
-    }
-
-}
-
-
-function stopAssessmentTimer(timerType) {
-
-    if (timerType === "pre" && preTimerInterval) {
-
-        clearInterval(preTimerInterval);
-
-        preTimerInterval = null;
-
-    }
-
-
-    if (timerType === "post" && postTimerInterval) {
-
-        clearInterval(postTimerInterval);
-
-        postTimerInterval = null;
-
-    }
-
-}
-
-
-/* =========================================================
-   AUTO-SUBMIT PRE-TEST AND POST-TEST
-   ========================================================= */
-
-function autoSubmitAssessment(formId, nextScreen) {
-
-    const form = document.getElementById(formId);
-
-    if (!form) {
-        return;
-    }
-
-
-    const answers = getFormAnswers(form);
-
-
-    if (formId === "pretest-form") {
-
-        experimentData.responses.pretest = answers;
-
-        experimentData.scores.pretest = gradePretest(answers);
-
-        recordEvent("pretest_time_expired", {
-
-            score: experimentData.scores.pretest.total,
-
-            maximum: experimentData.scores.pretest.maximum,
-
-            rule_response: answers.pre_rule || ""
-
-        });
-
-    } else {
-
-        experimentData.responses.posttest = answers;
-
-        experimentData.scores.posttest = gradePosttest(answers);
-
-        experimentData.completed_at = new Date().toISOString();
-
-        recordEvent("posttest_time_expired", {
-
-            score: experimentData.scores.posttest.total,
-
-            maximum: experimentData.scores.posttest.maximum,
-
-            rule_response: answers.post_rule || ""
-
-        });
-
-    }
-
-
-    saveDataLocally();
-
-
-    form.querySelectorAll("input, textarea, button").forEach(function (element) {
-
-        element.disabled = true;
-
-    });
-
-
-    alert("Time is up. Your answers have been saved.");
-
-    showScreen(nextScreen);
-
 }
 
 
@@ -1091,45 +682,9 @@ function startPatternStage() {
         return;
     }
 
-
     swahiliStage = "pattern";
 
-    patternTimeRemaining = PATTERN_DURATION;
-
-
     recordEvent("swahili_pattern_stage_started");
-
-
-    updateStageTimerDisplay(
-        "pattern-timer",
-        patternTimeRemaining
-    );
-
-
-    patternTimerInterval = setInterval(function () {
-
-        patternTimeRemaining--;
-
-        updateStageTimerDisplay(
-            "pattern-timer",
-            patternTimeRemaining
-        );
-
-
-        if (patternTimeRemaining <= 0) {
-
-            clearInterval(patternTimerInterval);
-
-            patternTimerInterval = null;
-
-
-            // Automatically submit the answers when time expires.
-            submitSwahiliPattern(true);
-
-        }
-
-    }, 1000);
-
 }
 
 
@@ -1137,19 +692,17 @@ function startPatternStage() {
    SWAHILI PATTERN MATCHING — SUBMISSION
    ========================================================= */
 
-function submitSwahiliPattern(timeExpired = false) {
+function submitSwahiliPattern() {
 
     if (swahiliStage !== "pattern") {
         return;
     }
-
 
     const form = document.getElementById("swahili-form");
 
     if (!form) {
         return;
     }
-
 
     const answers = getFormAnswers(form);
 
@@ -1168,34 +721,18 @@ function submitSwahiliPattern(timeExpired = false) {
 
         maximum: results.maximum,
 
-        time_expired: timeExpired
-
+        unanswered: Object.values(answers).filter(function (answer) {
+            return answer === "";
+        }).length
     });
 
 
     saveDataLocally();
 
 
-    // Stop the pattern-matching timer.
-    if (patternTimerInterval) {
-
-        clearInterval(patternTimerInterval);
-
-        patternTimerInterval = null;
-
-    }
-
-
-    patternTimeRemaining = 0;
-
-    updateStageTimerDisplay("pattern-timer", 0);
-
-
-    // Disable the pattern-matching inputs.
     form.querySelectorAll("input").forEach(function (input) {
 
         input.disabled = true;
-
     });
 
 
@@ -1208,13 +745,11 @@ function submitSwahiliPattern(timeExpired = false) {
         button.disabled = true;
 
         button.textContent = "Answers submitted";
-
     }
 
 
-    // Reveal the rule-writing stage.
+    // Proceed immediately to rule writing.
     startRuleWritingStage();
-
 }
 
 
@@ -1229,65 +764,21 @@ function startRuleWritingStage() {
         return;
     }
 
-
     swahiliStage = "rule";
-
-    ruleTimeRemaining = RULE_DURATION;
-
 
     const lesson = document.getElementById("lesson-text");
 
     if (lesson) {
 
         lesson.hidden = false;
-
     }
 
-
     recordEvent("swahili_rule_stage_started");
-
-
-    updateStageTimerDisplay(
-        "rule-timer",
-        ruleTimeRemaining
-    );
-
-
-    ruleTimerInterval = setInterval(function () {
-
-        ruleTimeRemaining--;
-
-        updateStageTimerDisplay(
-            "rule-timer",
-            ruleTimeRemaining
-        );
-
-
-        if (ruleTimeRemaining <= 0) {
-
-            clearInterval(ruleTimerInterval);
-
-            ruleTimerInterval = null;
-
-
-            // Capture the initial rule if the participant
-            // has not explicitly submitted one.
-            captureInitialRuleIfNeeded();
-
-
-            // Start the correction stage.
-            startCorrectionStage();
-
-        }
-
-    }, 1000);
-
 }
 
 
 /* =========================================================
    SWAHILI RULE — SAVE SUBMITTED VERSION
-   Every submitted version receives a timestamp.
    ========================================================= */
 
 function saveSubmittedRule(answer) {
@@ -1297,8 +788,6 @@ function saveSubmittedRule(answer) {
     const timestamp = new Date().toISOString();
 
 
-    // Use property existence rather than truthiness.
-    // This correctly handles an empty initial response.
     const isInitialRule = !Object.prototype.hasOwnProperty.call(
         responses,
         "swahili_rule_initial"
@@ -1308,7 +797,6 @@ function saveSubmittedRule(answer) {
     if (!responses.swahili_rule_history) {
 
         responses.swahili_rule_history = [];
-
     }
 
 
@@ -1323,7 +811,6 @@ function saveSubmittedRule(answer) {
             rule: answer,
 
             timestamp: timestamp
-
         });
 
     } else {
@@ -1331,9 +818,7 @@ function saveSubmittedRule(answer) {
         if (!responses.swahili_rule_revisions) {
 
             responses.swahili_rule_revisions = [];
-
         }
-
 
         const revisions = responses.swahili_rule_revisions;
 
@@ -1343,7 +828,6 @@ function saveSubmittedRule(answer) {
                 : responses.swahili_rule_initial;
 
 
-        // Only save a revision if the submitted text has changed.
         if (answer !== previousVersion) {
 
             const revision = {
@@ -1351,7 +835,6 @@ function saveSubmittedRule(answer) {
                 text: answer,
 
                 timestamp: timestamp
-
             };
 
             revisions.push(revision);
@@ -1364,19 +847,15 @@ function saveSubmittedRule(answer) {
                 revision_number: revisions.length,
 
                 timestamp: timestamp
-
             });
 
         } else {
 
             recordEvent("swahili_rule_resubmitted_without_change");
-
         }
-
     }
 
 
-    // Record every explicit submission in chronological order.
     const lastHistoryEntry =
         responses.swahili_rule_history.length > 0
             ? responses.swahili_rule_history[
@@ -1398,13 +877,10 @@ function saveSubmittedRule(answer) {
             stage: swahiliStage,
 
             timestamp: timestamp
-
         });
-
     }
 
 
-    // Always save the latest explicitly submitted version.
     responses.swahili_rule = answer;
 
     responses.swahili_rule_latest_timestamp = timestamp;
@@ -1420,7 +896,6 @@ function saveSubmittedRule(answer) {
     if (button) {
 
         button.textContent = "Save revised rule";
-
     }
 
 
@@ -1429,9 +904,7 @@ function saveSubmittedRule(answer) {
     if (status) {
 
         status.textContent = "Your rule has been saved.";
-
     }
-
 }
 
 
@@ -1452,7 +925,6 @@ function captureInitialRuleIfNeeded() {
     ) {
 
         return;
-
     }
 
 
@@ -1477,7 +949,6 @@ function captureInitialRuleIfNeeded() {
     if (!responses.swahili_rule_history) {
 
         responses.swahili_rule_history = [];
-
     }
 
 
@@ -1490,7 +961,6 @@ function captureInitialRuleIfNeeded() {
         timestamp: timestamp,
 
         automatically_captured: true
-
     });
 
 
@@ -1499,12 +969,10 @@ function captureInitialRuleIfNeeded() {
         rule: initialRule,
 
         timestamp: timestamp
-
     });
 
 
     saveDataLocally();
-
 }
 
 
@@ -1512,46 +980,59 @@ function captureInitialRuleIfNeeded() {
    SWAHILI ACTIVITY — STAGE 3
    HINTS AND RULE CORRECTION
    ========================================================= */
+
 function startCorrectionStage() {
 
     if (swahiliStage !== "rule") {
         return;
     }
 
+    // Capture the initial rule if not explicitly saved.
+    captureInitialRuleIfNeeded();
+
     swahiliStage = "correction";
 
-    correctionTimeRemaining = CORRECTION_DURATION;
-
     recordEvent("swahili_correction_stage_started");
+
 
     const panel = document.getElementById("hint-panel");
 
     if (panel) {
+
         panel.hidden = false;
     }
 
+
     const aiPanel = document.getElementById("ai-chat-panel");
 
-    const staticPanel = document.getElementById("static-hints-panel");
+    const staticPanel = document.getElementById(
+        "static-hints-panel"
+    );
+
 
     if (aiPanel) {
+
         aiPanel.hidden = experimentMode !== "ai";
     }
 
+
     if (staticPanel) {
+
         staticPanel.hidden = experimentMode === "ai";
     }
 
+
     if (experimentMode === "non-ai") {
 
-        hintUnlocked = [false, false, false];
+        hintUnlocked = [true, true, true];
 
         hintOpened = [false, false, false];
 
         initialiseHintAvailability();
 
-        // First static hint becomes available immediately.
         unlockHint(0);
+        unlockHint(1);
+        unlockHint(2);
 
     } else {
 
@@ -1560,58 +1041,7 @@ function startCorrectionStage() {
         experimentData.responses.swahili_chat = [];
 
         saveDataLocally();
-
     }
-
-    updateCorrectionTimerDisplay();
-
-    correctionTimerInterval = setInterval(function () {
-
-        correctionTimeRemaining--;
-
-        updateCorrectionTimerDisplay();
-
-        if (experimentMode === "non-ai") {
-
-            const elapsed =
-                CORRECTION_DURATION - correctionTimeRemaining;
-
-            for (let i = 1; i < HINT_UNLOCK_TIMES.length; i++) {
-
-                if (elapsed >= HINT_UNLOCK_TIMES[i]) {
-                    unlockHint(i);
-                }
-
-            }
-
-        }
-
-        if (correctionTimeRemaining <= 0) {
-
-            clearInterval(correctionTimerInterval);
-
-            correctionTimerInterval = null;
-
-            finishSwahiliActivity();
-
-        }
-
-    }, 1000);
-
-}
-
-
-function updateCorrectionTimerDisplay() {
-
-    const timerId = experimentMode === "ai"
-        ? "hint-timer"
-        : "static-hint-timer";
-
-    updateStageTimerDisplay(
-        timerId,
-        correctionTimeRemaining
-    );
-
 }
 
 
@@ -1621,83 +1051,90 @@ function updateCorrectionTimerDisplay() {
 
 function finishSwahiliActivity() {
 
+    if (swahiliStage === "complete") {
+        return;
+    }
+
     swahiliStage = "complete";
 
-    // Only the non-AI group has static hints to unlock.
+
+    recordEvent("swahili_activity_completed");
+
+
+    // Keep the latest rule in the data, even if empty.
+    const ruleInput = document.getElementById("swahili-rule");
+
+    if (ruleInput) {
+
+        experimentData.responses.swahili_rule_latest_unsubmitted =
+            ruleInput.value.trim();
+    }
+
+
+    // Make all static hints available.
     if (experimentMode === "non-ai") {
 
         unlockHint(0);
         unlockHint(1);
         unlockHint(2);
-
     }
 
-    recordEvent("swahili_activity_completed");
 
-    updateStageTimerDisplay("hint-timer", 0);
-
-    updateStageTimerDisplay("static-hint-timer", 0);
-
-    // Disable chatbot input when time is over.
     const chatInput = document.getElementById("chat-input");
 
     const chatButton = document.getElementById("chat-send-button");
 
+
     if (chatInput) {
+
         chatInput.disabled = true;
     }
 
+
     if (chatButton) {
+
         chatButton.disabled = true;
+
+        chatButton.textContent = "Activity finished";
     }
+
 
     const status = document.getElementById(
         "swahili-completion-message"
     );
 
     if (status) {
+
         status.hidden = false;
+
+        status.textContent =
+            "The activity is complete. You can now continue to the post-test.";
     }
+
 
     const continueButton = document.getElementById(
         "swahili-continue-button"
     );
 
     if (continueButton) {
+
         continueButton.disabled = false;
     }
 
-    saveDataLocally();
 
-}
+    const finishButton = document.getElementById(
+        "finish-swahili-button"
+    );
 
+    if (finishButton) {
 
-/* =========================================================
-   GENERIC STAGE TIMER DISPLAY
-   ========================================================= */
+        finishButton.disabled = true;
 
-function updateStageTimerDisplay(elementId, seconds) {
-
-    const timer = document.getElementById(elementId);
-
-    if (!timer) {
-        return;
+        finishButton.textContent = "Activity finished";
     }
 
 
-    const minutes = Math.floor(seconds / 60);
-
-    const remainingSeconds = seconds % 60;
-
-
-    timer.textContent =
-
-        String(minutes).padStart(2, "0") +
-
-        ":" +
-
-        String(remainingSeconds).padStart(2, "0");
-
+    saveDataLocally();
 }
 
 
@@ -1713,24 +1150,13 @@ function initialiseHints() {
 
             const hintIndex = Number(button.dataset.hint);
 
-
             if (!hintUnlocked[hintIndex]) {
-
-                alert(
-                    "This hint is not available yet. Please wait until the correction stage begins."
-                );
-
                 return;
-
             }
 
-
             openHint(hintIndex);
-
         });
-
     });
-
 }
 
 
@@ -1740,25 +1166,26 @@ function initialiseHints() {
 
 function initialiseHintAvailability() {
 
+    // Hide all hint contents initially.
     document.querySelectorAll(".hint-content").forEach(function (content) {
-
         content.hidden = true;
-
     });
 
-
+    // In the non-AI experiment, all hints are immediately available.
     document.querySelectorAll(".hint-toggle").forEach(function (button) {
 
-        button.disabled = true;
+        const index = Number(button.dataset.hint);
+
+        button.disabled = false;
 
         button.setAttribute("aria-expanded", "false");
 
-        button.style.opacity = "0.5";
+        button.style.opacity = "1";
 
-        button.style.cursor = "not-allowed";
+        button.style.cursor = "pointer";
 
+        hintUnlocked[index] = true;
     });
-
 }
 
 
@@ -1772,21 +1199,12 @@ function unlockHint(index) {
         return;
     }
 
-
-    if (hintUnlocked[index]) {
-        return;
-    }
-
-
+    // Mark the hint as available.
     hintUnlocked[index] = true;
 
-
     const button = document.querySelector(
-
         '.hint-toggle[data-hint="' + index + '"]'
-
     );
-
 
     if (button) {
 
@@ -1795,21 +1213,8 @@ function unlockHint(index) {
         button.style.opacity = "1";
 
         button.style.cursor = "pointer";
-
     }
-
-
-    recordEvent("hint_unlocked", {
-
-    hint_number: index + 1,
-
-    time_elapsed:
-        CORRECTION_DURATION - correctionTimeRemaining
-
-});
-
 }
-
 
 /* =========================================================
    HINT PANEL — OPEN INDIVIDUAL HINT
@@ -1821,18 +1226,14 @@ function openHint(index) {
         return;
     }
 
-
     if (!hintUnlocked[index]) {
         return;
     }
 
 
     const content = document.getElementById(
-
         "hint-content-" + index
-
     );
-
 
     if (!content) {
         return;
@@ -1840,9 +1241,7 @@ function openHint(index) {
 
 
     const selectedButton = document.querySelector(
-
         '.hint-toggle[data-hint="' + index + '"]'
-
     );
 
 
@@ -1859,27 +1258,21 @@ function openHint(index) {
                 "false"
             );
 
-
             const symbol = selectedButton.querySelector("span");
 
             if (symbol) {
 
                 symbol.textContent = "+";
-
             }
-
         }
 
 
         recordEvent("hint_closed", {
 
             hint_number: index + 1
-
         });
 
-
         return;
-
     }
 
 
@@ -1887,7 +1280,6 @@ function openHint(index) {
     document.querySelectorAll(".hint-content").forEach(function (item) {
 
         item.hidden = true;
-
     });
 
 
@@ -1895,15 +1287,12 @@ function openHint(index) {
 
         button.setAttribute("aria-expanded", "false");
 
-
         const symbol = button.querySelector("span");
 
         if (symbol) {
 
             symbol.textContent = "+";
-
         }
-
     });
 
 
@@ -1918,33 +1307,26 @@ function openHint(index) {
             "true"
         );
 
-
         const symbol = selectedButton.querySelector("span");
 
         if (symbol) {
 
             symbol.textContent = "−";
-
         }
-
     }
 
 
-    // Log first opening only.
     if (!hintOpened[index]) {
 
         hintOpened[index] = true;
 
-
         recordEvent("hint_opened", {
 
             hint_number: index + 1
-
         });
-
     }
-
 }
+
 
 /* =========================================================
    AI CHATBOT
@@ -1953,32 +1335,45 @@ function openHint(index) {
 function initialiseChat() {
 
     const form = document.getElementById("chat-form");
+
     const input = document.getElementById("chat-input");
 
-    if (!form || !input) return;
+    if (!form || !input) {
+        return;
+    }
+
 
     form.addEventListener("submit", async function (event) {
 
         event.preventDefault();
+
 
         if (
             experimentMode !== "ai" ||
             swahiliStage !== "correction" ||
             chatRequestInProgress
         ) {
+
             return;
         }
 
+
         const message = input.value.trim();
 
-        if (!message) return;
+        if (!message) {
+            return;
+        }
 
-        // Add the participant's message to the transcript.
+
         chatMessages.push({
+
             role: "user",
+
             content: message,
+
             timestamp: new Date().toISOString()
         });
+
 
         appendChatMessage("user", message);
 
@@ -1986,35 +1381,46 @@ function initialiseChat() {
 
         saveChatTranscript();
 
+
         recordEvent("chat_message_sent", {
+
             message_number: chatMessages.length
         });
 
+
         await requestChatbotReply();
     });
-
 }
 
+
+/* =========================================================
+   CHAT MESSAGE DISPLAY
+   ========================================================= */
 
 function appendChatMessage(role, message) {
 
     const container = document.getElementById("chat-messages");
 
-    if (!container) return;
+    if (!container) {
+        return;
+    }
+
 
     const bubble = document.createElement("div");
 
     bubble.className = "chat-message " + role;
+
 
     const heading = document.createElement("strong");
 
     heading.textContent =
         role === "user" ? "You" : "Rosetta tutor";
 
+
     const paragraph = document.createElement("p");
 
-    // textContent prevents messages from being interpreted as HTML.
     paragraph.textContent = message;
+
 
     bubble.appendChild(heading);
 
@@ -2026,6 +1432,10 @@ function appendChatMessage(role, message) {
 }
 
 
+/* =========================================================
+   SAVE CHAT TRANSCRIPT
+   ========================================================= */
+
 function saveChatTranscript() {
 
     experimentData.responses.swahili_chat = chatMessages;
@@ -2034,24 +1444,41 @@ function saveChatTranscript() {
 }
 
 
+/* =========================================================
+   REQUEST CHATBOT REPLY
+   ========================================================= */
+
 async function requestChatbotReply() {
 
     const input = document.getElementById("chat-input");
+
     const button = document.getElementById("chat-send-button");
+
     const status = document.getElementById("chat-status");
+
 
     chatRequestInProgress = true;
 
-    if (input) input.disabled = true;
+
+    if (input) {
+
+        input.disabled = true;
+    }
+
 
     if (button) {
+
         button.disabled = true;
+
         button.textContent = "Tutor is thinking...";
     }
 
+
     if (status) {
+
         status.textContent = "The tutor is thinking...";
     }
+
 
     try {
 
@@ -2061,19 +1488,24 @@ async function requestChatbotReply() {
             ? ruleInput.value.trim()
             : "";
 
+
         const response = await fetch(CHAT_API_URL, {
 
             method: "POST",
 
             headers: {
+
                 "Content-Type": "application/json"
             },
 
             body: JSON.stringify({
 
                 messages: chatMessages.map(function (message) {
+
                     return {
+
                         role: message.role,
+
                         content: message.content
                     };
                 }),
@@ -2081,26 +1513,26 @@ async function requestChatbotReply() {
                 currentRule: currentRule,
 
                 participantId: participantId
-
             })
-
         });
 
 
         const data = await response.json();
+
 
         if (!response.ok) {
 
             throw new Error(
                 data.error || "The chatbot could not respond."
             );
-
         }
+
 
         if (!data.reply) {
 
-            throw new Error("The chatbot returned an empty response.");
-
+            throw new Error(
+                "The chatbot returned an empty response."
+            );
         }
 
 
@@ -2111,55 +1543,66 @@ async function requestChatbotReply() {
             content: data.reply,
 
             timestamp: new Date().toISOString()
-
         });
+
 
         appendChatMessage("assistant", data.reply);
 
         saveChatTranscript();
 
+
         recordEvent("chat_reply_received", {
+
             message_number: chatMessages.length
         });
 
+
         if (status) {
+
             status.textContent = "";
         }
+
 
     } catch (error) {
 
         console.error("Chatbot error:", error);
 
+
         if (status) {
 
             status.textContent =
                 "Sorry, the tutor could not respond. Please try again.";
-
         }
 
+
         recordEvent("chat_request_failed", {
+
             error: String(error.message || error)
         });
+
 
     } finally {
 
         chatRequestInProgress = false;
 
-        // The correction timer may have expired while waiting.
+
         const activityStillOpen =
             swahiliStage === "correction";
 
+
         if (input) {
+
             input.disabled = !activityStillOpen;
         }
 
+
         if (button) {
+
             button.disabled = !activityStillOpen;
+
             button.textContent = "Send message →";
         }
-
     }
-
 }
 
 
@@ -2175,9 +1618,7 @@ function initialiseDownload() {
         return;
     }
 
-
     button.addEventListener("click", downloadResponses);
-
 }
 
 
@@ -2195,7 +1636,6 @@ function downloadResponses() {
         [json],
 
         { type: "application/json" }
-
     );
 
 
@@ -2207,7 +1647,6 @@ function downloadResponses() {
     link.href = url;
 
     link.download =
-
         "rosetta_unit1_" + participantId + ".json";
 
 
@@ -2221,7 +1660,6 @@ function downloadResponses() {
 
 
     recordEvent("responses_downloaded");
-
 }
 
 
@@ -2230,17 +1668,46 @@ function downloadResponses() {
    ========================================================= */
 
 const observationForm = document.getElementById("discover-form");
+
 const workedExample = document.getElementById("worked-example");
 
+
 if (observationForm && workedExample) {
+
     observationForm.addEventListener("submit", function () {
+
         workedExample.hidden = false;
     });
+}
+
+/* =========================================================
+   PROGRESSIVE ASSESSMENT BLOCKS
+   ========================================================= */
+
+function initialiseAssessmentProgression() {
+
+    document.querySelectorAll("[data-reveal]").forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const nextBlock = document.getElementById(
+                button.dataset.reveal
+            );
+
+            if (nextBlock) {
+                nextBlock.hidden = false;
+            }
+
+            // Hide the Continue button after it has been used.
+            button.hidden = true;
+
+        });
+
+    });
+
 }
 
 
 /* =========================================================
    END OF SCRIPT
    ========================================================= */
-
-

@@ -31,17 +31,21 @@
   <section id="screen-0" class="experiment-step active" data-screen="0">
 
     <div class="intro">
-      <p class="eyebrow">SCREEN 0 · PRE-TEST</p>
-      <h1>Test A: Dabida</h1>
+<h1>Pre-Test: Dabida. Study the examples and solve the translation tasks.</h1>
 
-      <p class="lead">
-        Source: Neacșu 6.2 (Gilyarova, TurLom 2006).
-        δ is written dh; β is written bh.
-      </p>
+<p class="assessment-note">
+  Source: Neacșu 6.2 (Gilyarova, TurLom 2006).
+  Orthography: δ is written dh; β is written bh.
+</p>
 
-      <p>
-        Here are some verb forms in Dabida and their English translations.
-      </p>
+      <div class="language-fun-fact">
+        <span class="language-flag" aria-hidden="true">🇰🇪</span>
+        <p>
+          <strong>Language spotlight</strong>
+          Dabida (also known as Dawida or Taita) is a Bantu language spoken
+          in the Taita Hills of southeastern Kenya.
+        </p>
+      </div>
     </div>
 
     <div class="experiment-layout">
@@ -52,7 +56,6 @@
 
           <div class="example-panel-header">
             <strong>Dabida · Verb forms</strong>
-            <span>8 examples</span>
           </div>
 
           <div class="example-grid">
@@ -99,90 +102,97 @@
 
           </div>
 
-          <p class="example-instruction">
-            Compare the Dabida words with their English translations.
-            Look for recurring parts and try to infer what each part means.
-          </p>
+          <div class="example-instruction">
+  <strong>Your task</strong>
+  Compare the Dabida words with their English translations.
+  Look for recurring parts and try to infer what each part means.
+</div>
 
         </div>
 
       </div>
 
       <div class="experiment-activities">
+<form id="pretest-form" class="assessment-form">
 
-        <div class="timer-row">
-          <span>Time remaining</span>
-          <strong id="pre-timer">01:00</strong>
-        </div>
+  <!-- BLOCK 1: APPLY -->
+  <div class="assessment-block">
 
-        <form id="pretest-form" class="assessment-form">
+    <h2>Apply: Write in Dabida (approx. 1 min)</h2>
 
-          <h2>Apply</h2>
-          <p>Write in Dabida:</p>
+    <div class="field-grid">
+      <label>
+        I will beat you (sg)
+        <input name="pre_apply_1" autocomplete="off">
+      </label>
 
-          <div class="field-grid">
+      <label>
+        They will fall in love
+        <input name="pre_apply_2" autocomplete="off">
+      </label>
 
-            <label>
-              I will beat you (sg)
-              <input name="pre_apply_1" autocomplete="off">
-            </label>
+      <label>
+        You (pl) will argue
+        <input name="pre_apply_3" autocomplete="off">
+      </label>
+    </div>
 
-            <label>
-              They will fall in love
-              <input name="pre_apply_2" autocomplete="off">
-            </label>
+    <button type="button" class="primary-button"
+            data-reveal="pre-transfer">
+      Continue to transfer →
+    </button>
 
-            <label>
-              You (pl) will argue
-              <input name="pre_apply_3" autocomplete="off">
-            </label>
+  </div>
 
-          </div>
 
-          <h2>Transfer</h2>
-          <p>Write in Dabida:</p>
+  <!-- BLOCK 2: TRANSFER -->
+  <div class="assessment-block" id="pre-transfer" hidden>
 
-          <div class="field-grid">
+    <h2>Transfer: Write in Dabida (approx. 1 min)</h2>
 
-            <label>
-              You (sg) will curse them
-              <input name="pre_transfer_1" autocomplete="off">
-            </label>
+    <div class="field-grid">
+      <label>
+        You (sg) will curse them
+        <input name="pre_transfer_1" autocomplete="off">
+      </label>
 
-            <label>
-              We will fall in love with you (pl)
-              <input name="pre_transfer_2" autocomplete="off">
-            </label>
+      <label>
+        We will fall in love with you (pl)
+        <input name="pre_transfer_2" autocomplete="off">
+      </label>
+    </div>
 
-          </div>
+    <button type="button" class="primary-button"
+            data-reveal="pre-rule">
+      Continue to the final question →
+    </button>
 
-          <h2>Formulate the rule</h2>
+  </div>
 
-          <p>
-            Based on the examples, explain how Dabida verbs are constructed.
-            What do the different parts of a verb represent, and in what order
-            do they appear?
-          </p>
 
-          <label class="block-label">
-            Your explanation
+  <!-- BLOCK 3: RULE -->
+  <div class="assessment-block" id="pre-rule" hidden>
 
-            <textarea
-              name="pre_rule"
-              rows="5"
-              placeholder="Explain how Dabida verbs are built..."
-            ></textarea>
-          </label>
+    <h2>Formulate the rule: How are Dabida verbs built? (approx. 1 min)</h2>
 
-          <button class="primary-button" type="submit">
-            Submit pre-test →
-          </button>
+    <label class="block-label">
+      Your explanation
+      <textarea
+        name="pre_rule"
+        rows="5"
+        placeholder="Explain how Dabida verbs are built..."
+      ></textarea>
+    </label>
 
-        </form>
+    <button class="primary-button" type="submit">
+      Submit pre-test
+    </button>
 
-        <p class="assessment-note">
-          The timer is visible. No answers or feedback are shown during this test.
-        </p>
+  </div>
+
+</form>
+
+        
 
       </div>
 
@@ -198,9 +208,17 @@
   <section id="screen-1" class="experiment-step" data-screen="1">
 
     <div class="intro">
-      <p class="eyebrow">SCREEN 1 · DISCOVER</p>
-      <h1>What do you notice?</h1>
-      <p class="lead">Source: Neacșu 5.1 (Zulu, original).</p>
+<h1>Discover Zulu. Identify recurring parts in the words.</h1>
+      <p class="assessment-note">Source: Neacșu 5.1 (Zulu, original).</p>
+
+      <div class="language-fun-fact">
+        <span class="language-flag" aria-hidden="true">🇿🇦</span>
+        <p>
+          <strong>Language spotlight</strong>
+          Zulu (isiZulu) is one of South Africa’s official languages and is
+          the country’s most widely spoken home language.
+        </p>
+      </div>
     </div>
 
     <div class="experiment-layout">
@@ -211,7 +229,6 @@
 
           <div class="example-panel-header">
             <strong>Zulu · Words and meanings</strong>
-            <span>6 examples</span>
           </div>
 
           <div class="example-grid">
@@ -248,10 +265,13 @@
 
           </div>
 
-          <p class="example-instruction">
-            Compare the words carefully. Which parts appear more than once?
+          <div class="example-instruction">
+  <strong>Your task</strong>
+  Compare the words carefully. Which parts appear more than once?
             What might those parts represent?
-          </p>
+</div>
+
+
 
         </div>
 
@@ -268,19 +288,14 @@
               name="discover_response"
               rows="5"
               placeholder="Write what you notice about the words..."
-              required
             ></textarea>
           </label>
 
           <button class="primary-button" type="submit">
-            Save observations →
+            Save observations 
           </button>
 
         </form>
-
-        <p class="assessment-note">
-          This response is saved but not scored.
-        </p>
 
         <div class="lesson-text" id="worked-example" hidden>
 
@@ -317,11 +332,11 @@
 
         </div>
 
-        <div class="navigation">
-          <button class="primary-button" type="button" data-next="2">
-            Continue to Swahili →
-          </button>
-        </div>
+        <div class="navigation" id="continue-to-swahili" hidden>
+  <button class="primary-button" type="button" data-next="2">
+    Continue to Swahili →
+  </button>
+</div>
 
       </div>
 
@@ -337,13 +352,21 @@
   <section id="screen-2" class="experiment-step" data-screen="2">
 
     <div class="intro">
-      <p class="eyebrow">SCREEN 2 · APPLY AND DISCOVER THE RULE</p>
+<h1>Swahili: Complete the missing forms and discover the rule.</h1>
 
-      <h1>Swahili: fill in the missing forms</h1>
-
-      <p class="lead">
+      <p class="assessment-note">
         Source: Neacșu 6.1 (Swahili, Sim). Printed solution removed.
       </p>
+
+      <div class="language-fun-fact">
+        <span class="language-flag" aria-hidden="true">🇰🇪 🇹🇿</span>
+        <p>
+          <strong>Language spotlight</strong>
+          Swahili (Kiswahili) is a Bantu language that grew along the East
+          African coast and is now widely used as a shared language across
+          several countries in the region.
+        </p>
+      </div>
     </div>
 
     <div class="experiment-layout">
@@ -354,7 +377,6 @@
 
           <div class="example-panel-header">
             <strong>Swahili · Verb forms</strong>
-            <span>10 examples</span>
           </div>
 
           <div class="example-grid">
@@ -411,10 +433,11 @@
 
           </div>
 
-          <p class="example-instruction">
-            Use the examples to identify how the beginning and ending
+          <div class="example-instruction">
+  <strong>Your task</strong>
+  Use the examples to identify how the beginning and ending
             of a verb relate to its meaning.
-          </p>
+</div>
 
         </div>
 
@@ -426,11 +449,6 @@
 
         <div id="pattern-stage">
 
-          <div class="timer-row">
-            <span>Time remaining for pattern matching</span>
-            <strong id="pattern-timer">01:00</strong>
-          </div>
-
           <form id="swahili-form" class="assessment-form">
 
             <div class="field-grid">
@@ -438,7 +456,7 @@
               <label>
                 (1) ______ = she saw them
 
-                <input name="swahili_1" autocomplete="off" required>
+                <input name="swahili_1" autocomplete="off">
 
                 <span class="feedback" id="swahili-feedback-1" aria-live="polite"></span>
               </label>
@@ -446,7 +464,7 @@
               <label>
                 (2) ______ = I will see you
 
-                <input name="swahili_2" autocomplete="off" required>
+                <input name="swahili_2" autocomplete="off">
 
                 <span class="feedback" id="swahili-feedback-2" aria-live="polite"></span>
               </label>
@@ -454,7 +472,7 @@
               <label>
                 (3) ______ = she saw me
 
-                <input name="swahili_3" autocomplete="off" required>
+                <input name="swahili_3" autocomplete="off">
 
                 <span class="feedback" id="swahili-feedback-3" aria-live="polite"></span>
               </label>
@@ -462,14 +480,10 @@
             </div>
 
             <button class="primary-button" type="submit">
-              Submit answers →
+              Submit answers 
             </button>
 
           </form>
-
-          <p class="assessment-note">
-            Right or wrong is shown for each blank. No explanation is provided.
-          </p>
 
         </div>
 
@@ -478,17 +492,7 @@
 
         <div id="lesson-text" class="lesson-text" hidden>
 
-          <h2>How is a Swahili verb built?</h2>
-
-          <p>
-            Now that you have worked with the examples, write in your own words
-            the rule for how a Swahili verb is built from its parts.
-          </p>
-
-          <div class="timer-row">
-            <span>Time remaining to formulate your rule</span>
-            <strong id="rule-timer">01:00</strong>
-          </div>
+          <h2>Write the rule: How is a Swahili verb built?</h2>
 
           <form id="rule-form" class="assessment-form">
 
@@ -500,7 +504,6 @@
                 name="swahili_rule"
                 rows="5"
                 placeholder="Explain the order and meaning of the parts..."
-                required
               ></textarea>
             </label>
 
@@ -526,15 +529,9 @@
 
     <div class="hint-panel-header">
       <div>
-        <h2>Discuss your rule with the tutor</h2>
-        <p>
-          Explain your reasoning, ask questions, and use the discussion
-          to improve your rule. The tutor will guide you rather than
-          simply give you the answers.
-        </p>
+        <h2>Discuss and improve your rule with the tutor</h2>
       </div>
 
-      <span id="hint-timer" class="timer-pill">01:00</span>
     </div>
 
     <div
@@ -562,12 +559,11 @@
           rows="2"
           maxlength="1000"
           placeholder="Tell the tutor what you think..."
-          required
         ></textarea>
       </label>
 
       <button id="chat-send-button" class="primary-button" type="submit">
-        Send message →
+        Send message 
       </button>
 
       <p id="chat-status" class="assessment-note" aria-live="polite"></p>
@@ -581,16 +577,9 @@
 
     <div class="hint-panel-header">
       <div>
-        <h2>Hints and rule correction</h2>
-
-        <p>
-          You can now use the hints to improve your rule.
-          A new hint becomes available every 20 seconds.
-          You can rewrite and resubmit your rule at any time.
-        </p>
+        <h2>Use hints to improve your rule</h2>
       </div>
 
-      <span class="timer-pill" id="static-hint-timer">01:00</span>
     </div>
 
     <div class="hint-list">
@@ -632,6 +621,16 @@
     "Save revised rule" to record each new version.
   </p>
 
+  <div class="navigation">
+  <button
+    id="finish-swahili-button"
+    class="primary-button"
+    type="button"
+  >
+    Finish this activity 
+  </button>
+</div>
+
   <p id="swahili-completion-message" hidden>
     The activity is complete. You can now continue to the post-test.
   </p>
@@ -643,14 +642,14 @@
 
         <div class="navigation">
           <button
-            id="swahili-continue-button"
-            class="primary-button"
-            type="button"
-            data-next="3"
-            disabled
-          >
-            Continue to post-test →
-          </button>
+  id="swahili-continue-button"
+  class="primary-button"
+  type="button"
+  data-next="3"
+  hidden
+>
+  Continue to post-test 
+</button>
         </div>
 
       </div>
@@ -667,17 +666,20 @@
   <section id="screen-3" class="experiment-step" data-screen="3">
 
     <div class="intro">
-      <p class="eyebrow">SCREEN 3 · POST-TEST</p>
+<h1>Post-Test: Latvian. Study the examples and solve the translation tasks.</h1>
 
-      <h1>Test B: Latvian</h1>
-
-      <p class="lead">
+      <p class="assessment-note">
         Source: Neacșu 5.14 (Rubinstein, MSK 1999), nouns only.
       </p>
 
-      <p>
-        Here are some Latvian nouns and their English translations.
-      </p>
+      <div class="language-fun-fact">
+        <span class="language-flag" aria-hidden="true">🇱🇻</span>
+        <p>
+          <strong>Language spotlight</strong>
+          Latvian belongs to the Baltic branch of the Indo-European language
+          family. Its closest living relative is Lithuanian.
+        </p>
+      </div>
     </div>
 
     <div class="experiment-layout">
@@ -688,7 +690,6 @@
 
           <div class="example-panel-header">
             <strong>Latvian · Nouns and forms</strong>
-            <span>10 examples</span>
           </div>
 
           <div class="example-grid">
@@ -745,10 +746,11 @@
 
           </div>
 
-          <p class="example-instruction">
-            Compare the different forms and investigate how their endings
+          <div class="example-instruction">
+  <strong>Your task</strong>
+  Compare the different forms and investigate how their endings
             relate to their grammatical meaning.
-          </p>
+</div>
 
         </div>
 
@@ -756,82 +758,90 @@
 
       <div class="experiment-activities">
 
-        <div class="timer-row">
-          <span>Time remaining</span>
-          <strong id="post-timer">01:00</strong>
-        </div>
-
         <form id="posttest-form" class="assessment-form">
 
-          <h2>Apply</h2>
-          <p>Write in Latvian:</p>
+  <!-- BLOCK 1: APPLY -->
+  <div class="assessment-block">
 
-          <div class="field-grid">
+    <h2>Apply: Write in Latvian (approx. 1 min)</h2>
 
-            <label>
-              of the apple
-              <input name="post_apply_1" autocomplete="off">
-            </label>
+    <div class="field-grid">
+      <label>
+        of the apple
+        <input name="post_apply_1" autocomplete="off">
+      </label>
 
-            <label>
-              of the child
-              <input name="post_apply_2" autocomplete="off">
-            </label>
+      <label>
+        of the child
+        <input name="post_apply_2" autocomplete="off">
+      </label>
 
-            <label>
-              of the table
-              <input name="post_apply_3" autocomplete="off">
-            </label>
+      <label>
+        of the table
+        <input name="post_apply_3" autocomplete="off">
+      </label>
+    </div>
 
-          </div>
+    <button type="button" class="primary-button"
+            data-reveal="post-transfer">
+      Continue to transfer →
+    </button>
 
-          <h2>Transfer</h2>
+  </div>
 
-          <p>
-            autors = author · bruņinieks = knight · institūts = institute.
-            Write in Latvian:
-          </p>
 
-          <div class="field-grid">
+  <!-- BLOCK 2: TRANSFER -->
+  <div class="assessment-block" id="post-transfer" hidden>
 
-            <label>
-              of the author
-              <input name="post_transfer_1" autocomplete="off">
-            </label>
+    <h2>Transfer: Write in Latvian (approx. 1 min)</h2>
 
-            <label>
-              of the institutes
-              <input name="post_transfer_2" autocomplete="off">
-            </label>
+    <p>
+      Vocabulary: autors = author · bruņinieks = knight · institūts = institute.
+    </p>
 
-          </div>
+    <div class="field-grid">
+      <label>
+        of the author
+        <input name="post_transfer_1" autocomplete="off">
+      </label>
 
-          <h2>Formulate the rule</h2>
+      <label>
+        of the institutes
+        <input name="post_transfer_2" autocomplete="off">
+      </label>
+    </div>
 
-          <p>
-            Explain how Latvian nouns change depending on their grammatical
-            form. What changes in the word, and what does this change represent?
-          </p>
+    <button type="button" class="primary-button"
+            data-reveal="post-rule">
+      Continue to the final question →
+    </button>
 
-          <label class="block-label">
-            Your explanation
+  </div>
 
-            <textarea
-              name="post_rule"
-              rows="5"
-              placeholder="Explain the pattern you have identified..."
-            ></textarea>
-          </label>
 
-          <button class="primary-button" type="submit">
-            Submit post-test →
-          </button>
+  <!-- BLOCK 3: RULE -->
+  <div class="assessment-block" id="post-rule" hidden>
 
-        </form>
+    <h2>Formulate the rule: How do Latvian nouns change? (approx. 1 min)</h2>
 
-        <p class="assessment-note">
-          The timer is visible. No answers or feedback are shown during this test.
-        </p>
+    <label class="block-label">
+      Your explanation
+      <textarea
+        name="post_rule"
+        rows="5"
+        placeholder="Explain the pattern you have identified..."
+      ></textarea>
+    </label>
+
+    <button class="primary-button" type="submit">
+      Submit post-test
+    </button>
+
+  </div>
+
+</form>
+
+        
 
       </div>
 
@@ -847,12 +857,7 @@
   <section id="screen-4" class="experiment-step" data-screen="4">
 
     <div class="intro completion">
-
-      <p class="eyebrow">SCREEN 4 · COMPLETE</p>
-
-      <h1>Unit 1 complete.</h1>
-
-      <p class="lead">Thank you for taking part.</p>
+<h1>Unit 1 complete. Thank you for taking part.</h1>
 
       <p>
         Your responses have been recorded in this browser session.
@@ -865,7 +870,7 @@
 
       <div class="navigation">
         <button id="unit-2-button" class="primary-button" type="button">
-          Continue to Unit 2 →
+          Continue to Unit 2 
         </button>
       </div>
 
@@ -876,6 +881,19 @@
 </main>
 
 <script src="script.js"></script>
+
+<script>
+  // SCREEN 1: Reveal Continue to Swahili after saving observations
+  document.getElementById("discover-form").addEventListener("submit", function () {
+    document.getElementById("continue-to-swahili").hidden = false;
+  });
+
+  // SCREEN 2: Reveal Continue to post-test after finishing the activity
+  document.getElementById("finish-swahili-button").addEventListener("click", function () {
+    document.getElementById("swahili-completion-message").hidden = false;
+    document.getElementById("swahili-continue-button").hidden = false;
+  });
+</script>
 
 </body>
 </html>
