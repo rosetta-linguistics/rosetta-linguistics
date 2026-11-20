@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rosetta — Unit 1</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">Rosetta</a>
+    <span class="progress-label" id="progress-label" aria-live="polite"></span>
+  </div>
+  <div class="progress-bar"><div id="progress-fill"></div></div>
+</header>
+
+<main class="container">
+
+  <p class="unit-label">Unit 1 · Morphology</p>
+
+  <!-- =====================================================
+       SCREEN 0 — PRE-TEST (Dabida)
+       ===================================================== -->
+  <section id="screen-0" class="step">
+
+    <div class="intro">
+      <h1>Pre-test: Dabida. Study the examples and solve the translation tasks.</h1>
+      <p class="source">Source: Neacșu 6.2 (Gilyarova, TurLom 2006). Orthography: δ is written dh; β is written bh.</p>
+      <p class="spotlight">
+        <span class="flag" aria-hidden="true">🇰🇪</span>
+        <span><strong>Language spotlight</strong>
+          Dabida (also known as Dawida or Taita) is a Bantu language spoken in the Taita Hills of southeastern Kenya.</span>
+      </p>
+    </div>
+
+    <div class="layout">
+      <aside class="examples">
+        <div class="panel">
+          <h2 class="panel-title">Dabida · Verb forms</h2>
+          <div data-examples="dabida"></div>
+          <p class="task"><strong>Your task</strong>
+            Compare the Dabida words with their English translations. Look for recurring parts and try to infer what each part means.</p>
+        </div>
+      </aside>
+
+      <div class="activity">
+        <form id="pretest-form">
+
+          <div class="block">
+            <h2>Apply: write in Dabida (approx. 1 min)</h2>
+            <div class="fields">
+              <label>I will beat you (sg) <input name="pre_apply_1" autocomplete="off"></label>
+              <label>They will fall in love <input name="pre_apply_2" autocomplete="off"></label>
+              <label>You (pl) will argue <input name="pre_apply_3" autocomplete="off"></label>
+            </div>
+            <button type="button" class="btn" data-reveal="pre-transfer">Continue to transfer →</button>
+          </div>
+
+          <div class="block" id="pre-transfer" hidden>
+            <h2>Transfer: write in Dabida (approx. 1 min)</h2>
+            <div class="fields">
+              <label>You (sg) will curse them <input name="pre_transfer_1" autocomplete="off"></label>
+              <label>We will fall in love with you (pl) <input name="pre_transfer_2" autocomplete="off"></label>
+            </div>
+            <button type="button" class="btn" data-reveal="pre-rule">Continue to the final question →</button>
+          </div>
+
+          <div class="block" id="pre-rule" hidden>
+            <h2>Formulate the rule: how are Dabida verbs built? (approx. 1 min)</h2>
+            <label>Your explanation
+              <textarea name="pre_rule" placeholder="Explain how Dabida verbs are built..."></textarea>
+            </label>
+            <button class="btn" type="submit">Submit pre-test</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =====================================================
+       SCREEN 1 — ZULU DISCOVERY + WORKED EXAMPLE
+       ===================================================== -->
+  <section id="screen-1" class="step">
+
+    <div class="intro">
+      <h1>Discover Zulu. Identify recurring parts in the words.</h1>
+      <p class="source">Source: Neacșu 5.1 (Zulu, original).</p>
+      <p class="spotlight">
+        <span class="flag" aria-hidden="true">🇿🇦</span>
+        <span><strong>Language spotlight</strong>
+          Zulu (isiZulu) is one of South Africa’s official languages and is the country’s most widely spoken home language.</span>
+      </p>
+    </div>
+
+    <div class="layout">
+      <aside class="examples">
+        <div class="panel">
+          <h2 class="panel-title">Zulu · Words and meanings</h2>
+          <div data-examples="zulu"></div>
+          <p class="task"><strong>Your task</strong>
+            Compare the words carefully. Which parts appear more than once? What might those parts represent?</p>
+        </div>
+      </aside>
+
+      <div class="activity">
+        <form id="discover-form">
+          <label>Your observations
+            <textarea name="discover_response" placeholder="Write what you notice about the words..."></textarea>
+          </label>
+          <button class="btn" type="submit">Save observations</button>
+        </form>
+
+        <div class="lesson" id="worked-example" hidden>
+          <h2>Prefixes, stems, and suffixes</h2>
+          <p>
+            Look at <strong>umdwebi</strong> and <strong>abadwebi</strong>. Both mean painter, but one is singular
+            and one is plural. The part they share, <strong>dwebi</strong>, is the stem. What comes before it changes:
+            <strong>um-</strong> for one painter, <strong>aba-</strong> for several.
+          </p>
+          <p>
+            Now look at <strong>zingela</strong>, to hunt, next to <strong>abazingeli</strong>, hunters. The stem
+            <strong>zingel</strong> is the same; the noun ends in <strong>-i</strong>, the verb in <strong>-a</strong>.
+          </p>
+          <p>
+            So a Zulu word for a person who does something is built from three pieces: a prefix that says one or many,
+            a stem, and the ending <strong>-i</strong>. Pieces that go before the stem are called prefixes, pieces after
+            it suffixes.
+          </p>
+          <p>
+            <strong>Try it:</strong> killer is <strong>umbulali</strong>, so killers is
+            <strong>aba + bulali = ababulali</strong>, and to kill is <strong>bulal + a = bulala</strong>.
+          </p>
+        </div>
+
+        <div class="nav" id="continue-to-swahili" hidden>
+          <button class="btn" type="button" data-next="2">Continue to Swahili →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =====================================================
+       SCREEN 2 — SWAHILI
+       ===================================================== -->
+  <section id="screen-2" class="step">
+
+    <div class="intro">
+      <h1>Swahili: complete the missing forms and discover the rule.</h1>
+      <p class="source">Source: Neacșu 6.1 (Swahili, Sim). Printed solution removed.</p>
+      <p class="spotlight">
+        <span class="flag" aria-hidden="true">🇰🇪 🇹🇿</span>
+        <span><strong>Language spotlight</strong>
+          Swahili (Kiswahili) is a Bantu language that grew along the East African coast and is now widely used as a
+          shared language across several countries in the region.</span>
+      </p>
+    </div>
+
+    <div class="layout">
+      <aside class="examples">
+        <div class="panel">
+          <h2 class="panel-title">Swahili · Verb forms</h2>
+          <div data-examples="swahili"></div>
+          <p class="task"><strong>Your task</strong>
+            Use the examples to identify how the beginning and ending of a verb relate to its meaning.</p>
+        </div>
+      </aside>
+
+      <div class="activity">
+
+        <!-- Stage 1: fill in the blanks -->
+        <form id="swahili-form">
+          <div class="fields">
+            <label>(1) ______ = she saw them
+              <input name="swahili_1" autocomplete="off">
+              <span class="feedback" id="swahili-feedback-1" aria-live="polite"></span></label>
+            <label>(2) ______ = I will see you
+              <input name="swahili_2" autocomplete="off">
+              <span class="feedback" id="swahili-feedback-2" aria-live="polite"></span></label>
+            <label>(3) ______ = she saw me
+              <input name="swahili_3" autocomplete="off">
+              <span class="feedback" id="swahili-feedback-3" aria-live="polite"></span></label>
+          </div>
+          <button class="btn" type="submit">Submit answers</button>
+        </form>
+
+        <!-- Stage 2: write the rule -->
+        <div class="lesson" id="rule-section" hidden>
+          <h2>Write the rule: how is a Swahili verb built?</h2>
+          <form id="rule-form">
+            <label>Your rule
+              <textarea id="swahili-rule" name="swahili_rule" placeholder="Explain the order and meaning of the parts..."></textarea>
+            </label>
+            <button class="btn" type="submit">Save rule</button>
+            <p id="rule-save-status" class="note" aria-live="polite" hidden></p>
+          </form>
+        </div>
+
+        <!-- Stage 3: tutor (AI) or hints (non-AI) -->
+        <div class="helper" id="hint-panel" hidden>
+
+          <div id="ai-chat-panel" hidden>
+            <h2>Discuss and improve your rule with the tutor</h2>
+            <div id="chat-messages" class="chat-log" role="log" aria-live="polite" aria-label="Conversation with the morphology tutor">
+              <div class="chat-message assistant">
+                <strong>Rosetta tutor</strong>
+                <p>Hi! Let's explore your rule together. What have you noticed about the different parts of the Swahili verbs?</p>
+              </div>
+            </div>
+            <form id="chat-form" class="chat-form">
+              <label for="chat-input">Your message
+                <textarea id="chat-input" maxlength="1000" placeholder="Tell the tutor what you think... (Enter to send)"></textarea>
+              </label>
+              <button id="chat-send-button" class="btn" type="submit">Send message →</button>
+              <p id="chat-status" class="note" aria-live="polite" hidden></p>
+            </form>
+          </div>
+
+          <div id="static-hints-panel" hidden>
+            <h2>Use hints to improve your rule</h2>
+            <details class="hint" data-hint="1">
+              <summary>Hint 1</summary>
+              <p>Look at the very beginning of each word. What does it tell you about the English?</p>
+            </details>
+            <details class="hint" data-hint="2">
+              <summary>Hint 2</summary>
+              <p>Compare ninaona and niliona. What changed in Swahili, and what changed in English?</p>
+            </details>
+            <details class="hint" data-hint="3">
+              <summary>Hint 3</summary>
+              <p>The order is always: who does it, then when, then to whom, then the verb.</p>
+            </details>
+          </div>
+
+          <p class="note" style="margin-top:14px">
+            You can revise your rule in the text field above and click “Save revised rule” to record each new version.
+          </p>
+
+          <div class="nav">
+            <button id="finish-swahili-button" class="btn" type="button">Finish this activity</button>
+          </div>
+        </div>
+
+        <p id="swahili-completion-message" class="note" hidden>
+          The activity is complete. You can now continue to the post-test.
+        </p>
+
+        <div class="nav" id="swahili-continue" hidden>
+          <button class="btn" type="button" data-next="3">Continue to post-test →</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =====================================================
+       SCREEN 3 — POST-TEST (Latvian)
+       ===================================================== -->
+  <section id="screen-3" class="step">
+
+    <div class="intro">
+      <h1>Post-test: Latvian. Study the examples and solve the translation tasks.</h1>
+      <p class="source">Source: Neacșu 5.14 (Rubinstein, MSK 1999), nouns only.</p>
+      <p class="spotlight">
+        <span class="flag" aria-hidden="true">🇱🇻</span>
+        <span><strong>Language spotlight</strong>
+          Latvian belongs to the Baltic branch of the Indo-European language family. Its closest living relative is Lithuanian.</span>
+      </p>
+    </div>
+
+    <div class="layout">
+      <aside class="examples">
+        <div class="panel">
+          <h2 class="panel-title">Latvian · Nouns and forms</h2>
+          <div data-examples="latvian"></div>
+          <p class="task"><strong>Your task</strong>
+            Compare the different forms and investigate how their endings relate to their grammatical meaning.</p>
+        </div>
+      </aside>
+
+      <div class="activity">
+        <form id="posttest-form">
+
+          <div class="block">
+            <h2>Apply: write in Latvian (approx. 1 min)</h2>
+            <div class="fields">
+              <label>of the apple <input name="post_apply_1" autocomplete="off"></label>
+              <label>of the child <input name="post_apply_2" autocomplete="off"></label>
+              <label>of the table <input name="post_apply_3" autocomplete="off"></label>
+            </div>
+            <button type="button" class="btn" data-reveal="post-transfer">Continue to transfer →</button>
+          </div>
+
+          <div class="block" id="post-transfer" hidden>
+            <h2>Transfer: write in Latvian (approx. 1 min)</h2>
+            <p class="note" style="margin-bottom:14px">Vocabulary: autors = author · bruņinieks = knight · institūts = institute.</p>
+            <div class="fields">
+              <label>of the author <input name="post_transfer_1" autocomplete="off"></label>
+              <label>of the institutes <input name="post_transfer_2" autocomplete="off"></label>
+            </div>
+            <button type="button" class="btn" data-reveal="post-rule">Continue to the final question →</button>
+          </div>
+
+          <div class="block" id="post-rule" hidden>
+            <h2>Formulate the rule: how do Latvian nouns change? (approx. 1 min)</h2>
+            <label>Your explanation
+              <textarea name="post_rule" placeholder="Explain the pattern you have identified..."></textarea>
+            </label>
+            <button class="btn" type="submit">Submit post-test</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =====================================================
+       SCREEN 4 — COMPLETE
+       ===================================================== -->
+  <section id="screen-4" class="step">
+    <div class="complete">
+      <h1>Unit 1 complete. Thank you for taking part.</h1>
+      <p>Your responses have been recorded in this browser session. Use the button below to download your response data.</p>
+      <button id="download-data" class="btn" type="button">Download my responses (JSON)</button>
+      <button id="unit-2-button" class="btn" type="button">Continue to Unit 2</button>
+    </div>
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

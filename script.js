@@ -1,1713 +1,834 @@
 /* =========================================================
-   ROSETTA EXPERIMENT — UNIT 1
-   Timer-free, non-blocking version
+   ROSETTA EXPERIMENT ENGINE
+   Texts, examples and answer keys live in units.js.
+   Open:  experiment.html?mode=ai|non-ai&unit=1|2
+          (unit 2 only: &order=AB|BA to force the test order)
    ========================================================= */
 
+"use strict";
 
-/* =========================================================
-   EXPERIMENT STATE
-   ========================================================= */
+const CHAT_API_URL = "https://rosetta-linguistics.vercel.app/api/chat";
+const GRADE_API_URL = "https://rosetta-linguistics.vercel.app/api/grade";
+const STEP_NAMES = ["Pre-test", "Discover", "Practise", "Post-test"];
 
-let experimentMode = "ai";
-let currentScreen = 0;
-
-let participantId = null;
-let experimentData = {};
-
-let swahiliStage = "not_started";
-
-const CHAT_API_URL =
-    "https://rosetta-linguistics.vercel.app/api/chat";
-
-let chatMessages = [];
-let chatRequestInProgress = false;
-
-let hintOpened = [false, false, false];
-let hintUnlocked = [false, false, false];
+const $ = (id) => document.getElementById(id);
+const esc = (text) =>
+  String(text).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
 
-/* =========================================================
-   INITIALISATION
-   ========================================================= */
+/* ---------- Setup ---------- */
 
-document.addEventListener("DOMContentLoaded", function () {
+const params = new URLSearchParams(location.search);
+const mode = params.get("mode") === "non-ai" ? "non-ai" : "ai";
+const unitNumber = UNITS[params.get("unit")] ? Number(params.get("unit")) : 1;
+const unit = UNITS[unitNumber];
+const practice = unit.practice;
+const P = practice.prefix;                       // prefix for data keys, e.g. "swahili"
+const participantId = getParticipantId();
+const { pre: preTest, post: postTest, order } = pickTests();
 
-    const params = new URLSearchParams(window.location.search);
+const data = {
+  participant_id: participantId,
+  experiment_mode: mode,
+  unit: unitNumber,
+  pre_test: preTest.name,
+  post_test: postTest.name,
+  ...(order && { test_order: order }),
+  started_at: new Date().toISOString(),
+  completed_at: null,
+  responses: {},
+  events: [],
+  scores: {}
+};
 
-    experimentMode =
-        params.get("mode") === "non-ai" ? "non-ai" : "ai";
-
-    participantId = getOrCreateParticipantId();
-
-    document.body.dataset.experimentMode = experimentMode;
-
-    experimentData = {
-        participant_id: participantId,
-        experiment_mode: experimentMode,
-        unit: 1,
-        started_at: new Date().toISOString(),
-        completed_at: null,
-        responses: {},
-        events: [],
-        scores: {}
-    };
-
-    recordEvent("experiment_started", {
-        mode: experimentMode
-    });
-
-    initialiseNavigation();
-    initialiseForms();
-    initialiseHints();
-    initialiseAssessmentProgression();
-    initialiseChat();
-    initialiseDownload();
-
-    showScreen(0);
-});
+let stage = "not_started";      // not_started → pattern → rule → correction → complete
+let chat = [];
+let chatBusy = false;
+let lastField = null;           // last text field the participant used (for the character bar)
+const grading = {};             // AI grading requests in progress, by "pre" / "post"
 
 
-/* =========================================================
-   PARTICIPANT ID
-   ========================================================= */
+/* ---------- Helpers ---------- */
 
-function getOrCreateParticipantId() {
+function getParticipantId() {
+  let id = localStorage.getItem("rosetta_participant_id");
+  if (!id) {
+    id = "P-" + Date.now().toString(36).toUpperCase() + "-" +
+         Math.random().toString(36).slice(2, 8).toUpperCase();
+    localStorage.setItem("rosetta_participant_id", id);
+  }
+  return id;
+}
 
-    let id = localStorage.getItem("rosetta_participant_id");
+// Units with `tests` (A/B) counterbalance which test is the pre-test, based on the participant ID.
+function pickTests() {
+  if (!unit.tests) return { pre: unit.pre, post: unit.post, order: null };
+  const forced = params.get("order");
+  const order = forced === "AB" || forced === "BA"
+    ? forced
+    : ([...participantId].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % 2 ? "BA" : "AB");
+  const [first, second] = order.split("");
+  return { pre: unit.tests[first], post: unit.tests[second], order };
+}
 
-    if (!id) {
+function saveUnit(n, unitData) {
+  try {
+    localStorage.setItem(`rosetta_unit${n}_${participantId}`, JSON.stringify(unitData));
+  } catch (error) {
+    console.error(`Could not save Unit ${n} data:`, error);
+  }
+}
 
-        id =
-            "P-" +
-            Date.now().toString(36).toUpperCase() +
-            "-" +
-            Math.random().toString(36).substring(2, 8).toUpperCase();
+const save = () => saveUnit(unitNumber, data);
 
-        localStorage.setItem("rosetta_participant_id", id);
-    }
+function log(event, details = {}) {
+  data.events.push({ event, timestamp: new Date().toISOString(), details });
+  save();
+}
 
-    return id;
+function answersOf(form) {
+  const answers = {};
+  new FormData(form).forEach((value, key) => { answers[key] = String(value).trim(); });
+  return answers;
+}
+
+// Accents are ignored unless `keepAccents` is set; apostrophe variants count as the same letter.
+function normalise(text, keepAccents) {
+  let t = String(text || "").toLowerCase().normalize(keepAccents ? "NFC" : "NFD");
+  if (!keepAccents) t = t.replace(/[̀-ͯ]/g, "");
+  return t
+    .replace(/[’‘ʼʔ`]/g, "'")
+    .replace(/[.,!?;:]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isCorrect(answer, keys, keepAccents) {
+  const given = normalise(answer, keepAccents);
+  return [].concat(keys).some((key) => normalise(key, keepAccents) === given);
+}
+
+function gradeTest(test, prefix, answers) {
+  const result = {};
+  let total = 0;
+  let maximum = 0;
+
+  ["apply", "transfer"].forEach((part) => {
+    const items = test[part]?.items;
+    if (!items) return;
+
+    const score = items.filter((item, i) =>
+      isCorrect(answers[`${prefix}_${part}_${i + 1}`], item.key, test.strict)).length;
+
+    result[`${part}_score`] = score;
+    result[`${part}_maximum`] = items.length;
+    total += score;
+    maximum += items.length;
+  });
+
+  return { ...result, total, maximum };
+}
+
+function onSubmit(id, handler) {
+  const form = $(id);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    handler(form);
+  });
+}
+
+function lock(form, buttonText) {
+  form.querySelectorAll("input, textarea").forEach((el) => { el.disabled = true; });
+  const button = form.querySelector("button[type='submit']");
+  button.disabled = true;
+  button.textContent = buttonText;
 }
 
 
-/* =========================================================
-   EVENT LOGGING
-   ========================================================= */
+/* ---------- Screen templates ---------- */
 
-function recordEvent(eventName, details = {}) {
+const introHtml = (heading, s) => `
+  <div class="intro">
+    <h1>${heading}</h1>
+    <p class="source">${s.source}</p>
+    <p class="spotlight">
+      <span class="flag" aria-hidden="true">${s.flag}</span>
+      <span><strong>Language spotlight</strong> ${s.spotlight}</span>
+    </p>
+  </div>`;
 
-    if (!experimentData.events) {
-        experimentData.events = [];
-    }
-
-    experimentData.events.push({
-        event: eventName,
-        timestamp: new Date().toISOString(),
-        details: details
-    });
-
-    saveDataLocally();
+function exampleHtml([word, meaning]) {
+  const cells = [].concat(word);
+  const multi = cells.length > 1;
+  return `<div class="example${multi ? " multi" : ""}" style="--n:${cells.length}">` +
+    cells.map((c) => `<span class="word${c.startsWith("_") ? " blank" : ""}">${esc(c)}</span>`).join("") +
+    `<span class="meaning">${esc(meaning)}</span></div>`;
 }
 
-
-/* =========================================================
-   LOCAL STORAGE
-   ========================================================= */
-
-function saveDataLocally() {
-
-    try {
-
-        localStorage.setItem(
-            "rosetta_unit1_" + participantId,
-            JSON.stringify(experimentData)
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Could not save experiment data:",
-            error
-        );
-    }
-}
-
-
-/* =========================================================
-   SCREEN NAVIGATION
-   ========================================================= */
-
-function initialiseNavigation() {
-
-    document.querySelectorAll("[data-next]").forEach(function (button) {
-
-        button.addEventListener("click", function () {
-
-            const nextScreen = Number(button.dataset.next);
-
-            if (
-                currentScreen === 2 &&
-                swahiliStage !== "complete"
-            ) {
-
-                alert(
-                    "Please finish the Swahili activity or click 'Finish this activity' first."
-                );
-
-                return;
-            }
-
-            showScreen(nextScreen);
-        });
-    });
-
-
-    const unit2Button = document.getElementById("unit-2-button");
-
-    if (unit2Button) {
-
-        unit2Button.addEventListener("click", function () {
-
-            recordEvent("unit_2_requested");
-
-            alert(
-                "Unit 2 is not available yet. Thank you for completing Unit 1!"
-            );
-        });
-    }
-
-
-    const finishSwahiliButton =
-        document.getElementById("finish-swahili-button");
-
-    if (finishSwahiliButton) {
-
-        finishSwahiliButton.addEventListener("click", function () {
-
-            finishSwahiliActivity();
-        });
-    }
-}
-
-
-function showScreen(screenNumber) {
-
-    const target = document.getElementById(
-        "screen-" + screenNumber
-    );
-
-    if (!target) {
-        return;
-    }
-
-    document.querySelectorAll(".experiment-step").forEach(function (screen) {
-
-        screen.classList.remove("active");
-    });
-
-    target.classList.add("active");
-
-    currentScreen = screenNumber;
-
-    const stepNumber = document.getElementById("step-number");
-
-    if (stepNumber) {
-        stepNumber.textContent = screenNumber;
-    }
-
-    recordEvent("screen_opened", {
-        screen: screenNumber
-    });
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
-
-    if (screenNumber === 1) {
-
-        recordEvent("zulu_discovery_and_worked_example_opened");
-    }
-
-
-    if (screenNumber === 2) {
-
-        recordEvent("swahili_activity_opened");
-
-        if (swahiliStage === "not_started") {
-            startPatternStage();
-        }
-    }
-
-
-    if (screenNumber === 4) {
-
-        experimentData.completed_at = new Date().toISOString();
-
-        saveDataLocally();
-    }
-}
-
-
-/* =========================================================
-   FORM INITIALISATION
-   ========================================================= */
-
-function initialiseForms() {
-
-
-    /* -----------------------------------------------------
-       PRE-TEST
-       ----------------------------------------------------- */
-
-    const pretestForm = document.getElementById("pretest-form");
-
-    if (pretestForm) {
-
-        pretestForm.addEventListener("submit", function (event) {
-
-            event.preventDefault();
-
-            const answers = getFormAnswers(pretestForm);
-
-            experimentData.responses.pretest = answers;
-
-            experimentData.scores.pretest = gradePretest(answers);
-
-            recordEvent("pretest_submitted", {
-
-                score: experimentData.scores.pretest.total,
-
-                maximum: experimentData.scores.pretest.maximum,
-
-                rule_response: answers.pre_rule || ""
-            });
-
-            saveDataLocally();
-
-            showScreen(1);
-        });
-    }
-
-
-    /* -----------------------------------------------------
-       ZULU DISCOVERY
-       ----------------------------------------------------- */
-
-    const discoverForm = document.getElementById("discover-form");
-
-    if (discoverForm) {
-
-        discoverForm.addEventListener("submit", function (event) {
-
-            event.preventDefault();
-
-            const answers = getFormAnswers(discoverForm);
-
-            experimentData.responses.discover = answers;
-
-            recordEvent("discover_response_saved", {
-                response: answers.discover_response || ""
-            });
-
-            saveDataLocally();
-
-            const button = discoverForm.querySelector(
-                "button[type='submit']"
-            );
-
-            if (button) {
-
-                button.disabled = true;
-
-                button.textContent = "Observations saved";
-            }
-
-            discoverForm.querySelectorAll("textarea").forEach(function (input) {
-
-                input.disabled = true;
-            });
-        });
-    }
-
-
-    /* -----------------------------------------------------
-       SWAHILI PATTERN MATCHING
-       ----------------------------------------------------- */
-
-    const swahiliForm = document.getElementById("swahili-form");
-
-    if (swahiliForm) {
-
-        swahiliForm.addEventListener("submit", function (event) {
-
-            event.preventDefault();
-
-            submitSwahiliPattern();
-        });
-    }
-
-
-    /* -----------------------------------------------------
-       SWAHILI RULE WRITING AND REVISIONS
-       ----------------------------------------------------- */
-
-    const ruleForm = document.getElementById("rule-form");
-
-    if (ruleForm) {
-
-        const ruleInput = document.getElementById("swahili-rule");
-
-        ruleForm.addEventListener("submit", function (event) {
-
-            event.preventDefault();
-
-            if (
-                swahiliStage !== "rule" &&
-                swahiliStage !== "correction"
-            ) {
-                return;
-            }
-
-            // Empty rules are allowed.
-            const answer = ruleInput.value.trim();
-
-            saveSubmittedRule(answer);
-
-
-            // The first rule submission moves to correction.
-            if (swahiliStage === "rule") {
-
-                startCorrectionStage();
-            }
-        });
-    }
-
-
-    /* -----------------------------------------------------
-       POST-TEST
-       ----------------------------------------------------- */
-
-    const posttestForm = document.getElementById("posttest-form");
-
-    if (posttestForm) {
-
-        posttestForm.addEventListener("submit", function (event) {
-
-            event.preventDefault();
-
-            // Empty answers are allowed.
-            const answers = getFormAnswers(posttestForm);
-
-            experimentData.responses.posttest = answers;
-
-            experimentData.scores.posttest = gradePosttest(answers);
-
-            recordEvent("posttest_submitted", {
-
-                score: experimentData.scores.posttest.total,
-
-                maximum: experimentData.scores.posttest.maximum,
-
-                rule_response: answers.post_rule || ""
-            });
-
-            experimentData.completed_at = new Date().toISOString();
-
-            saveDataLocally();
-
-            showScreen(4);
-        });
-    }
-}
-
-
-/* =========================================================
-   GET FORM ANSWERS
-   ========================================================= */
-
-function getFormAnswers(form) {
-
-    const answers = {};
-
-    const formData = new FormData(form);
-
-    formData.forEach(function (value, key) {
-
-        answers[key] = String(value).trim();
-    });
-
-    return answers;
-}
-
-
-/* =========================================================
-   ANSWER NORMALISATION
-   ========================================================= */
-
-function normalise(text) {
-
-    return String(text || "")
-
-        .toLowerCase()
-
-        .normalize("NFD")
-
-        .replace(/[\u0300-\u036f]/g, "")
-
-        .replace(/[.,!?;:]/g, "")
-
-        .replace(/\s+/g, " ")
-
-        .trim();
-}
-
-
-function answerMatches(answer, acceptedAnswers) {
-
-    const cleaned = normalise(answer);
-
-    return acceptedAnswers.some(function (accepted) {
-
-        return cleaned === normalise(accepted);
-    });
-}
-
-
-/* =========================================================
-   PRE-TEST GRADING
-   Maximum score: 5
-   ========================================================= */
-
-function gradePretest(a) {
-
-    const applyKeys = [
-        ["nichakukadha"],
-        ["bhichakundana"],
-        ["mucharashana"]
-    ];
-
-    let applyScore = 0;
-
-    for (let i = 1; i <= 3; i++) {
-
-        if (
-            answerMatches(
-                a["pre_apply_" + i],
-                applyKeys[i - 1]
-            )
-        ) {
-            applyScore++;
-        }
-    }
-
-
-    const transferKeys = [
-        ["kuchabhirasha"],
-        ["dichamukunda"]
-    ];
-
-    let transferScore = 0;
-
-    for (let i = 1; i <= 2; i++) {
-
-        if (
-            answerMatches(
-                a["pre_transfer_" + i],
-                transferKeys[i - 1]
-            )
-        ) {
-            transferScore++;
-        }
-    }
-
-
-    return {
-
-        apply_score: applyScore,
-
-        apply_maximum: 3,
-
-        transfer_score: transferScore,
-
-        transfer_maximum: 2,
-
-        total: applyScore + transferScore,
-
-        maximum: 5
-    };
-}
-
-
-/* =========================================================
-   SWAHILI GRADING
-   ========================================================= */
-
-function gradeSwahili(a) {
-
-    const keys = [
-        ["aliwaona"],
-        ["nitakawuona"],
-        ["aliniona"]
-    ];
-
-    const correct = [];
-
-    for (let i = 1; i <= 3; i++) {
-
-        correct.push(
-
-            answerMatches(
-                a["swahili_" + i],
-                keys[i - 1]
-            )
-        );
-    }
-
-
-    return {
-
-        correct: correct,
-
-        total: correct.filter(Boolean).length,
-
-        maximum: 3
-    };
-}
-
-
-function displaySwahiliFeedback(results) {
-
-    for (let i = 1; i <= 3; i++) {
-
-        const feedback = document.getElementById(
-            "swahili-feedback-" + i
-        );
-
-        if (!feedback) {
-            continue;
-        }
-
-
-        if (results.correct[i - 1]) {
-
-            feedback.textContent = "Correct!";
-
-            feedback.className = "feedback correct";
-
-        } else {
-
-            feedback.textContent = "Incorrect.";
-
-            feedback.className = "feedback incorrect";
-        }
-    }
-}
-
-
-/* =========================================================
-   POST-TEST GRADING
-   Maximum score: 5
-   ========================================================= */
-
-function gradePosttest(a) {
-
-    const applyKeys = [
-        ["ābola", "abola"],
-        ["bērna", "berna"],
-        ["galda"]
-    ];
-
-    let applyScore = 0;
-
-    for (let i = 1; i <= 3; i++) {
-
-        if (
-            answerMatches(
-                a["post_apply_" + i],
-                applyKeys[i - 1]
-            )
-        ) {
-            applyScore++;
-        }
-    }
-
-
-    const transferKeys = [
-        ["autora"],
-        ["institūtu", "institutu"]
-    ];
-
-    let transferScore = 0;
-
-    for (let i = 1; i <= 2; i++) {
-
-        if (
-            answerMatches(
-                a["post_transfer_" + i],
-                transferKeys[i - 1]
-            )
-        ) {
-            transferScore++;
-        }
-    }
-
-
-    return {
-
-        apply_score: applyScore,
-
-        apply_maximum: 3,
-
-        transfer_score: transferScore,
-
-        transfer_maximum: 2,
-
-        total: applyScore + transferScore,
-
-        maximum: 5
-    };
-}
-
-
-/* =========================================================
-   SWAHILI ACTIVITY — STAGE 1
-   PATTERN MATCHING
-   ========================================================= */
-
-function startPatternStage() {
-
-    if (swahiliStage !== "not_started") {
-        return;
-    }
-
-    swahiliStage = "pattern";
-
-    recordEvent("swahili_pattern_stage_started");
-}
-
-
-/* =========================================================
-   SWAHILI PATTERN MATCHING — SUBMISSION
-   ========================================================= */
-
-function submitSwahiliPattern() {
-
-    if (swahiliStage !== "pattern") {
-        return;
-    }
-
-    const form = document.getElementById("swahili-form");
-
-    if (!form) {
-        return;
-    }
-
-    const answers = getFormAnswers(form);
-
-    experimentData.responses.swahili = answers;
-
-    const results = gradeSwahili(answers);
-
-    experimentData.scores.swahili = results;
-
-    displaySwahiliFeedback(results);
-
-
-    recordEvent("swahili_answers_submitted", {
-
-        score: results.total,
-
-        maximum: results.maximum,
-
-        unanswered: Object.values(answers).filter(function (answer) {
-            return answer === "";
-        }).length
-    });
-
-
-    saveDataLocally();
-
-
-    form.querySelectorAll("input").forEach(function (input) {
-
-        input.disabled = true;
-    });
-
-
-    const button = form.querySelector(
-        "button[type='submit']"
-    );
-
-    if (button) {
-
-        button.disabled = true;
-
-        button.textContent = "Answers submitted";
-    }
-
-
-    // Proceed immediately to rule writing.
-    startRuleWritingStage();
-}
-
-
-/* =========================================================
-   SWAHILI ACTIVITY — STAGE 2
-   INITIAL RULE WRITING
-   ========================================================= */
-
-function startRuleWritingStage() {
-
-    if (swahiliStage !== "pattern") {
-        return;
-    }
-
-    swahiliStage = "rule";
-
-    const lesson = document.getElementById("lesson-text");
-
-    if (lesson) {
-
-        lesson.hidden = false;
-    }
-
-    recordEvent("swahili_rule_stage_started");
-}
-
-
-/* =========================================================
-   SWAHILI RULE — SAVE SUBMITTED VERSION
-   ========================================================= */
-
-function saveSubmittedRule(answer) {
-
-    const responses = experimentData.responses;
-
-    const timestamp = new Date().toISOString();
-
-
-    const isInitialRule = !Object.prototype.hasOwnProperty.call(
-        responses,
-        "swahili_rule_initial"
-    );
-
-
-    if (!responses.swahili_rule_history) {
-
-        responses.swahili_rule_history = [];
-    }
-
-
-    if (isInitialRule) {
-
-        responses.swahili_rule_initial = answer;
-
-        responses.swahili_rule_initial_timestamp = timestamp;
-
-        recordEvent("swahili_initial_rule_submitted", {
-
-            rule: answer,
-
-            timestamp: timestamp
-        });
-
+const panelHtml = (s) => `
+  <aside class="examples">
+    <div class="panel">
+      <h2 class="panel-title">${s.panelTitle}</h2>
+      <div>${s.examples.map(exampleHtml).join("")}</div>
+      <p class="task"><strong>Your task</strong> ${s.task}</p>
+    </div>
+  </aside>`;
+
+const charBarHtml = (chars) => chars?.length
+  ? `<div class="chars" aria-label="Special characters"><span>Insert:</span>` +
+    chars.map((c) => `<button type="button" data-char="${c}">${c}</button>`).join("") + `</div>`
+  : "";
+
+const inputAttrs = `autocomplete="off" autocapitalize="off" spellcheck="false"`;
+
+const fieldsHtml = (prefix, items) => `<div class="fields">` +
+  items.map((item, i) =>
+    `<label>${esc(item.label)} <input name="${prefix}_${i + 1}" ${inputAttrs}></label>`).join("") +
+  `</div>`;
+
+// Pre-test and post-test: apply → transfer → rule, revealed one block at a time.
+function testScreenHtml(test, prefix, screen) {
+  const label = prefix === "pre" ? "Pre-test" : "Post-test";
+  const blocks = ["apply", "transfer", "rule"].filter((name) => test[name]);
+  const nextLabel = { apply: "apply", transfer: "transfer", rule: "the final question" };
+
+  const body = blocks.map((name, i) => {
+    const next = blocks[i + 1];
+    let inner;
+    if (name === "rule") {
+      inner = `<label>Your explanation
+        <textarea name="${prefix}_rule" placeholder="${esc(test.rule.placeholder)}"></textarea></label>`;
     } else {
-
-        if (!responses.swahili_rule_revisions) {
-
-            responses.swahili_rule_revisions = [];
-        }
-
-        const revisions = responses.swahili_rule_revisions;
-
-        const previousVersion =
-            revisions.length > 0
-                ? revisions[revisions.length - 1].text
-                : responses.swahili_rule_initial;
-
-
-        if (answer !== previousVersion) {
-
-            const revision = {
-
-                text: answer,
-
-                timestamp: timestamp
-            };
-
-            revisions.push(revision);
-
-
-            recordEvent("swahili_rule_revised", {
-
-                rule: answer,
-
-                revision_number: revisions.length,
-
-                timestamp: timestamp
-            });
-
-        } else {
-
-            recordEvent("swahili_rule_resubmitted_without_change");
-        }
+      inner = (test[name].note ? `<p class="note">${test[name].note}</p>` : "") +
+              fieldsHtml(`${prefix}_${name}`, test[name].items);
     }
+    const button = next
+      ? `<button type="button" class="btn" data-reveal="${prefix}-${next}">Continue to ${nextLabel[next]} →</button>`
+      : `<button class="btn" type="submit">Submit ${label.toLowerCase()}</button>`;
+    return `<div class="block" id="${prefix}-${name}"${i ? " hidden" : ""}>
+      <h2>${test[name].title}</h2>${inner}${button}</div>`;
+  }).join("");
+
+  return `<section id="screen-${screen}" class="step">
+    ${introHtml(`${label}: ${test.heading}`, test)}
+    <div class="layout">${panelHtml(test)}
+      <div class="activity">${charBarHtml(test.chars)}<form id="${prefix}test-form">${body}</form></div>
+    </div></section>`;
+}
+
+function discoverHtml(d) {
+  return `<section id="screen-1" class="step">
+    ${introHtml(d.heading, d)}
+    <div class="layout">${panelHtml(d)}
+      <div class="activity">
+        <form id="discover-form">
+          <label>Your observations <textarea name="discover_response" placeholder="${esc(d.placeholder)}"></textarea></label>
+          <button class="btn" type="submit">Save observations</button>
+        </form>
+        <div class="lesson" id="worked-example" hidden><h2>${d.lessonTitle}</h2>${d.lesson}</div>
+        <div class="nav" id="continue-to-practice" hidden>
+          <button class="btn" type="button" data-next="2">Continue to ${practice.name} →</button>
+        </div>
+      </div>
+    </div></section>`;
+}
+
+function practiceHtml(p) {
+  const fields = p.items.map((item, i) => `
+    <label>${esc(item.label)}
+      <input name="${P}_${i + 1}" ${inputAttrs}>
+      <span class="feedback" id="feedback-${i + 1}" aria-live="polite"></span>
+    </label>`).join("");
+
+  const hints = p.hints.map((hint, i) => `
+    <details class="hint" data-hint="${i + 1}"><summary>Hint ${i + 1}</summary><p>${hint}</p></details>`).join("");
+
+  return `<section id="screen-2" class="step">
+    ${introHtml(p.heading, p)}
+    <div class="layout">${panelHtml(p)}
+      <div class="activity">
+        ${charBarHtml(p.chars)}
+
+        <form id="fill-form">
+          <div class="fields">${fields}</div>
+          <button class="btn" type="submit">Submit answers</button>
+        </form>
+
+        <div class="lesson" id="rule-section" hidden>
+          <h2>${p.ruleTitle}</h2>
+          <form id="rule-form">
+            <label>Your rule <textarea id="rule-input" name="${P}_rule" placeholder="${esc(p.rulePlaceholder)}"></textarea></label>
+            <button class="btn" type="submit">Save rule</button>
+            <p id="rule-save-status" class="note" aria-live="polite" hidden></p>
+          </form>
+        </div>
+
+        <div class="helper" id="hint-panel" hidden>
+
+          <div id="ai-chat-panel" hidden>
+            <h2>Discuss and improve your rule with the tutor</h2>
+            <div id="chat-messages" class="chat-log" role="log" aria-live="polite" aria-label="Conversation with the morphology tutor">
+              <div class="chat-message assistant"><strong>Rosetta tutor</strong><p>${esc(p.greeting)}</p></div>
+            </div>
+            <form id="chat-form" class="chat-form">
+              <label for="chat-input">Your message
+                <textarea id="chat-input" maxlength="1000" placeholder="Tell the tutor what you think... (Enter to send)"></textarea>
+              </label>
+              <button id="chat-send-button" class="btn" type="submit">Send message →</button>
+              <p id="chat-status" class="note" aria-live="polite" hidden></p>
+            </form>
+          </div>
+
+          <div id="static-hints-panel" hidden>
+            <h2>Use hints to improve your rule</h2>
+            ${hints}
+          </div>
+
+          <p class="note">
+            You can revise your rule in the text field above and click “Save revised rule” to record each new version.
+          </p>
+          <div class="nav"><button id="finish-button" class="btn" type="button">Finish this activity</button></div>
+        </div>
+
+        <p id="practice-done" class="note" hidden>The activity is complete. You can now continue to the post-test.</p>
+        <div class="nav" id="practice-continue" hidden>
+          <button class="btn" type="button" data-next="3">Continue to post-test →</button>
+        </div>
+      </div>
+    </div></section>`;
+}
+
+// Only the last unit (no `next`) offers the download, which bundles every unit into one file.
+const completeHtml = () => `
+  <section id="screen-4" class="step">
+    <div class="complete">
+      <h1>Unit ${unitNumber} complete. ${unit.next ? "Well done!" : "Thank you for taking part."}</h1>
+      ${unit.next
+        ? `<p>Your responses have been saved in this browser. Please continue to Unit ${unit.next} in this same browser.</p>
+           <button id="next-unit-button" class="btn" type="button">Continue to Unit ${unit.next}</button>`
+        : `<p id="complete-status" aria-live="polite">Grading your answers, this takes a few seconds…</p>
+           <div id="results" hidden></div>
+           <button id="download-data" class="btn" type="button" disabled>Download my responses (JSON)</button>
+           <a class="btn" href="index.html">Back to home</a>`}
+    </div>
+  </section>`;
 
 
-    const lastHistoryEntry =
-        responses.swahili_rule_history.length > 0
-            ? responses.swahili_rule_history[
-                responses.swahili_rule_history.length - 1
-              ]
-            : null;
+/* ---------- Screens ---------- */
 
+function showScreen(n) {
+  document.querySelectorAll(".step").forEach((el) => el.classList.toggle("active", el.id === `screen-${n}`));
+  lastField = null;
 
-    if (
-        !lastHistoryEntry ||
-        lastHistoryEntry.text !== answer ||
-        lastHistoryEntry.stage !== swahiliStage
-    ) {
+  $("progress-label").textContent = n < 4 ? `Step ${n + 1} of 4 · ${STEP_NAMES[n]}` : "Complete";
+  $("progress-fill").style.width = (n < 4 ? (n + 1) * 25 : 100) + "%";
 
-        responses.swahili_rule_history.push({
+  log("screen_opened", { screen: n });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 
-            text: answer,
+  if (n === 1) log(unit.discover.event);
 
-            stage: swahiliStage,
-
-            timestamp: timestamp
-        });
-    }
-
-
-    responses.swahili_rule = answer;
-
-    responses.swahili_rule_latest_timestamp = timestamp;
-
-
-    saveDataLocally();
-
-
-    const button = document.querySelector(
-        "#rule-form button[type='submit']"
-    );
-
-    if (button) {
-
-        button.textContent = "Save revised rule";
-    }
-
-
-    const status = document.getElementById("rule-save-status");
-
-    if (status) {
-
-        status.textContent = "Your rule has been saved.";
-    }
+  if (n === 2 && stage === "not_started") {
+    stage = "pattern";
+    log(`${P}_activity_opened`);
+    log(`${P}_pattern_stage_started`);
+  }
+  if (n === 4) {
+    data.completed_at = new Date().toISOString();
+    save();
+    if (!unit.next) finishExperiment();
+  }
 }
 
 
-/* =========================================================
-   CAPTURE INITIAL RULE IF NOT SUBMITTED
-   ========================================================= */
+/* ---------- Pre-test, discover, post-test ---------- */
 
-function captureInitialRuleIfNeeded() {
-
-    const responses = experimentData.responses;
-
-
-    if (
-        Object.prototype.hasOwnProperty.call(
-            responses,
-            "swahili_rule_initial"
-        )
-    ) {
-
-        return;
-    }
-
-
-    const ruleInput = document.getElementById("swahili-rule");
-
-    const initialRule = ruleInput
-        ? ruleInput.value.trim()
-        : "";
-
-    const timestamp = new Date().toISOString();
-
-
-    responses.swahili_rule_initial = initialRule;
-
-    responses.swahili_rule_initial_timestamp = timestamp;
-
-    responses.swahili_rule = initialRule;
-
-    responses.swahili_rule_latest_timestamp = timestamp;
-
-
-    if (!responses.swahili_rule_history) {
-
-        responses.swahili_rule_history = [];
-    }
-
-
-    responses.swahili_rule_history.push({
-
-        text: initialRule,
-
-        stage: "rule",
-
-        timestamp: timestamp,
-
-        automatically_captured: true
+function initTests() {
+  [["pre", preTest], ["post", postTest]].forEach(([prefix, test]) => {
+    onSubmit(`${prefix}test-form`, (form) => {
+      const answers = answersOf(form);
+      const score = gradeTest(test, prefix, answers);
+      data.responses[`${prefix}test`] = answers;
+      data.scores[`${prefix}test`] = score;
+      log(`${prefix}test_submitted`, {
+        score: score.total,
+        maximum: score.maximum,
+        rule_response: answers[`${prefix}_rule`] || ""
+      });
+      grading[prefix] = gradeAndStore(unitNumber, data, test, prefix);   // runs in the background
+      showScreen(prefix === "pre" ? 1 : 4);
     });
+  });
 
+  onSubmit("discover-form", (form) => {
+    const answers = answersOf(form);
+    data.responses.discover = answers;
+    log("discover_response_saved", { response: answers.discover_response || "" });
+    lock(form, "Observations saved");
+    $("worked-example").hidden = false;
+    $("continue-to-practice").hidden = false;
+  });
 
-    recordEvent("swahili_initial_rule_captured", {
-
-        rule: initialRule,
-
-        timestamp: timestamp
+  document.querySelectorAll("[data-reveal]").forEach((button) => {
+    button.addEventListener("click", () => {
+      $(button.dataset.reveal).hidden = false;
+      button.hidden = true;
     });
+  });
 
-
-    saveDataLocally();
+  document.querySelectorAll("[data-next]").forEach((button) => {
+    button.addEventListener("click", () => showScreen(Number(button.dataset.next)));
+  });
 }
 
 
-/* =========================================================
-   SWAHILI ACTIVITY — STAGE 3
-   HINTS AND RULE CORRECTION
-   ========================================================= */
+/* ---------- Practice activity (fill in → rule → hints or tutor) ---------- */
 
-function startCorrectionStage() {
+function initPractice() {
+  // Stage 1 — fill in the missing forms
+  onSubmit("fill-form", (form) => {
+    if (stage !== "pattern") return;
 
-    if (swahiliStage !== "rule") {
-        return;
-    }
+    const answers = answersOf(form);
+    const correct = practice.items.map((item, i) =>
+      isCorrect(answers[`${P}_${i + 1}`], item.key, practice.strict));
+    data.responses[P] = answers;
+    data.scores[P] = { correct, total: correct.filter(Boolean).length, maximum: correct.length };
 
-    // Capture the initial rule if not explicitly saved.
-    captureInitialRuleIfNeeded();
+    correct.forEach((ok, i) => {
+      const feedback = $(`feedback-${i + 1}`);
+      feedback.textContent = ok ? "Correct!" : "Incorrect.";
+      feedback.className = "feedback " + (ok ? "correct" : "incorrect");
+    });
 
-    swahiliStage = "correction";
+    log(`${P}_answers_submitted`, {
+      score: data.scores[P].total,
+      maximum: correct.length,
+      unanswered: Object.values(answers).filter((a) => a === "").length
+    });
 
-    recordEvent("swahili_correction_stage_started");
+    lock(form, "Answers submitted");
+    stage = "rule";
+    $("rule-section").hidden = false;
+    log(`${P}_rule_stage_started`);
+  });
 
+  // Stage 2 — write (and later revise) the rule
+  onSubmit("rule-form", () => {
+    if (stage !== "rule" && stage !== "correction") return;
 
-    const panel = document.getElementById("hint-panel");
+    saveRule($("rule-input").value.trim());
 
-    if (panel) {
+    $("rule-form").querySelector("button").textContent = "Save revised rule";
+    const status = $("rule-save-status");
+    status.textContent = "Your rule has been saved.";
+    status.hidden = false;
 
-        panel.hidden = false;
-    }
+    if (stage === "rule") startCorrection();
+  });
 
+  // Hints are native <details> elements
+  document.querySelectorAll(".hint").forEach((hint) => {
+    hint.addEventListener("toggle", () => {
+      log(hint.open ? "hint_opened" : "hint_closed", { hint_number: Number(hint.dataset.hint) });
+    });
+  });
 
-    const aiPanel = document.getElementById("ai-chat-panel");
+  $("finish-button").addEventListener("click", finishPractice);
+}
 
-    const staticPanel = document.getElementById(
-        "static-hints-panel"
-    );
+function saveRule(text) {
+  const r = data.responses;
+  const now = new Date().toISOString();
 
+  if (!(`${P}_rule_initial` in r)) {
+    r[`${P}_rule_initial`] = text;
+    r[`${P}_rule_initial_timestamp`] = now;
+    log(`${P}_initial_rule_submitted`, { rule: text, timestamp: now });
+  } else {
+    const revisions = (r[`${P}_rule_revisions`] ??= []);
+    const previous = revisions.at(-1)?.text ?? r[`${P}_rule_initial`];
 
-    if (aiPanel) {
-
-        aiPanel.hidden = experimentMode !== "ai";
-    }
-
-
-    if (staticPanel) {
-
-        staticPanel.hidden = experimentMode === "ai";
-    }
-
-
-    if (experimentMode === "non-ai") {
-
-        hintUnlocked = [true, true, true];
-
-        hintOpened = [false, false, false];
-
-        initialiseHintAvailability();
-
-        unlockHint(0);
-        unlockHint(1);
-        unlockHint(2);
-
+    if (text === previous) {
+      log(`${P}_rule_resubmitted_without_change`);
     } else {
-
-        chatMessages = [];
-
-        experimentData.responses.swahili_chat = [];
-
-        saveDataLocally();
+      revisions.push({ text, timestamp: now });
+      log(`${P}_rule_revised`, { rule: text, revision_number: revisions.length, timestamp: now });
     }
+  }
+
+  const history = (r[`${P}_rule_history`] ??= []);
+  const last = history.at(-1);
+  if (!last || last.text !== text || last.stage !== stage) history.push({ text, stage, timestamp: now });
+
+  r[`${P}_rule`] = text;
+  r[`${P}_rule_latest_timestamp`] = now;
+  save();
+}
+
+function startCorrection() {
+  stage = "correction";
+  log(`${P}_correction_stage_started`);
+
+  $("hint-panel").hidden = false;
+  $("ai-chat-panel").hidden = mode !== "ai";
+  $("static-hints-panel").hidden = mode === "ai";
+
+  if (mode === "ai") {
+    chat = [];
+    data.responses[`${P}_chat`] = [];
+    save();
+  }
+}
+
+function finishPractice() {
+  if (stage === "complete") return;
+  stage = "complete";
+  log(`${P}_activity_completed`);
+
+  data.responses[`${P}_rule_latest_unsubmitted`] = $("rule-input").value.trim();
+  save();
+
+  $("chat-input").disabled = true;
+  $("chat-send-button").disabled = true;
+  $("chat-send-button").textContent = "Activity finished";
+
+  const finish = $("finish-button");
+  finish.disabled = true;
+  finish.textContent = "Activity finished";
+
+  $("practice-done").hidden = false;
+  $("practice-continue").hidden = false;
 }
 
 
-/* =========================================================
-   SWAHILI ACTIVITY — FINISH
-   ========================================================= */
+/* ---------- AI tutor ---------- */
 
-function finishSwahiliActivity() {
+function initChat() {
+  const input = $("chat-input");
 
-    if (swahiliStage === "complete") {
-        return;
+  // Enter sends, Shift+Enter inserts a new line
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      $("chat-form").requestSubmit();
     }
+  });
 
-    swahiliStage = "complete";
+  onSubmit("chat-form", async () => {
+    const text = input.value.trim();
+    if (mode !== "ai" || stage !== "correction" || chatBusy || !text) return;
 
+    chat.push({ role: "user", content: text, timestamp: new Date().toISOString() });
+    addBubble("user", text);
+    input.value = "";
+    data.responses[`${P}_chat`] = chat;
+    log("chat_message_sent", { message_number: chat.length });
 
-    recordEvent("swahili_activity_completed");
-
-
-    // Keep the latest rule in the data, even if empty.
-    const ruleInput = document.getElementById("swahili-rule");
-
-    if (ruleInput) {
-
-        experimentData.responses.swahili_rule_latest_unsubmitted =
-            ruleInput.value.trim();
-    }
-
-
-    // Make all static hints available.
-    if (experimentMode === "non-ai") {
-
-        unlockHint(0);
-        unlockHint(1);
-        unlockHint(2);
-    }
-
-
-    const chatInput = document.getElementById("chat-input");
-
-    const chatButton = document.getElementById("chat-send-button");
-
-
-    if (chatInput) {
-
-        chatInput.disabled = true;
-    }
-
-
-    if (chatButton) {
-
-        chatButton.disabled = true;
-
-        chatButton.textContent = "Activity finished";
-    }
-
-
-    const status = document.getElementById(
-        "swahili-completion-message"
-    );
-
-    if (status) {
-
-        status.hidden = false;
-
-        status.textContent =
-            "The activity is complete. You can now continue to the post-test.";
-    }
-
-
-    const continueButton = document.getElementById(
-        "swahili-continue-button"
-    );
-
-    if (continueButton) {
-
-        continueButton.disabled = false;
-    }
-
-
-    const finishButton = document.getElementById(
-        "finish-swahili-button"
-    );
-
-    if (finishButton) {
-
-        finishButton.disabled = true;
-
-        finishButton.textContent = "Activity finished";
-    }
-
-
-    saveDataLocally();
+    await requestReply();
+  });
 }
 
+function addBubble(role, text) {
+  const bubble = document.createElement("div");
+  bubble.className = "chat-message " + role;
 
-/* =========================================================
-   HINT PANEL — INITIALISATION
-   ========================================================= */
+  const name = document.createElement("strong");
+  name.textContent = role === "user" ? "You" : "Rosetta tutor";
 
-function initialiseHints() {
+  const paragraph = document.createElement("p");
+  paragraph.textContent = text;
 
-    document.querySelectorAll(".hint-toggle").forEach(function (button) {
-
-        button.addEventListener("click", function () {
-
-            const hintIndex = Number(button.dataset.hint);
-
-            if (!hintUnlocked[hintIndex]) {
-                return;
-            }
-
-            openHint(hintIndex);
-        });
-    });
+  bubble.append(name, paragraph);
+  const box = $("chat-messages");
+  box.appendChild(bubble);
+  box.scrollTop = box.scrollHeight;
 }
 
+function setChatBusy(busy, message = "") {
+  chatBusy = busy;
+  const enabled = !busy && stage === "correction";
+  $("chat-input").disabled = !enabled;
+  $("chat-send-button").disabled = !enabled;
+  $("chat-send-button").textContent = busy ? "Tutor is thinking..." : "Send message →";
 
-/* =========================================================
-   HINT PANEL — INITIAL AVAILABILITY
-   ========================================================= */
+  const status = $("chat-status");
+  status.textContent = message;
+  status.hidden = !message;
+}
 
-function initialiseHintAvailability() {
+async function requestReply() {
+  setChatBusy(true, "The tutor is thinking...");
 
-    // Hide all hint contents initially.
-    document.querySelectorAll(".hint-content").forEach(function (content) {
-        content.hidden = true;
+  try {
+    const response = await fetch(CHAT_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: chat.map(({ role, content }) => ({ role, content })),
+        currentRule: $("rule-input").value.trim(),
+        participantId,
+        unit: unitNumber,
+        activity: P
+      })
     });
 
-    // In the non-AI experiment, all hints are immediately available.
-    document.querySelectorAll(".hint-toggle").forEach(function (button) {
+    const reply = await response.json();
+    if (!response.ok) throw new Error(reply.error || "The chatbot could not respond.");
+    if (!reply.reply) throw new Error("The chatbot returned an empty response.");
 
-        const index = Number(button.dataset.hint);
+    chat.push({ role: "assistant", content: reply.reply, timestamp: new Date().toISOString() });
+    addBubble("assistant", reply.reply);
+    data.responses[`${P}_chat`] = chat;
+    log("chat_reply_received", { message_number: chat.length });
+    setChatBusy(false);
 
-        button.disabled = false;
-
-        button.setAttribute("aria-expanded", "false");
-
-        button.style.opacity = "1";
-
-        button.style.cursor = "pointer";
-
-        hintUnlocked[index] = true;
-    });
+  } catch (error) {
+    console.error("Chatbot error:", error);
+    log("chat_request_failed", { error: String(error.message || error) });
+    setChatBusy(false, "Sorry, the tutor could not respond. Please try again.");
+  }
 }
 
 
-/* =========================================================
-   HINT PANEL — UNLOCK HINTS
-   ========================================================= */
+/* ---------- Special-character bar ---------- */
 
-function unlockHint(index) {
+function initCharBar() {
+  document.addEventListener("focusin", (event) => {
+    if (event.target.matches("input, textarea")) lastField = event.target;
+  });
 
-    if (index < 0 || index > 2) {
-        return;
-    }
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-char]");
+    if (!button || !lastField || lastField.disabled) return;
 
-    // Mark the hint as available.
-    hintUnlocked[index] = true;
-
-    const button = document.querySelector(
-        '.hint-toggle[data-hint="' + index + '"]'
-    );
-
-    if (button) {
-
-        button.disabled = false;
-
-        button.style.opacity = "1";
-
-        button.style.cursor = "pointer";
-    }
-}
-
-/* =========================================================
-   HINT PANEL — OPEN INDIVIDUAL HINT
-   ========================================================= */
-
-function openHint(index) {
-
-    if (index < 0 || index > 2) {
-        return;
-    }
-
-    if (!hintUnlocked[index]) {
-        return;
-    }
-
-
-    const content = document.getElementById(
-        "hint-content-" + index
-    );
-
-    if (!content) {
-        return;
-    }
-
-
-    const selectedButton = document.querySelector(
-        '.hint-toggle[data-hint="' + index + '"]'
-    );
-
-
-    // Clicking an already-open hint closes it.
-    if (content.hidden === false) {
-
-        content.hidden = true;
-
-
-        if (selectedButton) {
-
-            selectedButton.setAttribute(
-                "aria-expanded",
-                "false"
-            );
-
-            const symbol = selectedButton.querySelector("span");
-
-            if (symbol) {
-
-                symbol.textContent = "+";
-            }
-        }
-
-
-        recordEvent("hint_closed", {
-
-            hint_number: index + 1
-        });
-
-        return;
-    }
-
-
-    // Close all other hints.
-    document.querySelectorAll(".hint-content").forEach(function (item) {
-
-        item.hidden = true;
-    });
-
-
-    document.querySelectorAll(".hint-toggle").forEach(function (button) {
-
-        button.setAttribute("aria-expanded", "false");
-
-        const symbol = button.querySelector("span");
-
-        if (symbol) {
-
-            symbol.textContent = "+";
-        }
-    });
-
-
-    // Open selected hint.
-    content.hidden = false;
-
-
-    if (selectedButton) {
-
-        selectedButton.setAttribute(
-            "aria-expanded",
-            "true"
-        );
-
-        const symbol = selectedButton.querySelector("span");
-
-        if (symbol) {
-
-            symbol.textContent = "−";
-        }
-    }
-
-
-    if (!hintOpened[index]) {
-
-        hintOpened[index] = true;
-
-        recordEvent("hint_opened", {
-
-            hint_number: index + 1
-        });
-    }
+    const char = button.dataset.char;
+    const { selectionStart: start, selectionEnd: end, value } = lastField;
+    lastField.value = value.slice(0, start) + char + value.slice(end);
+    lastField.focus();
+    lastField.setSelectionRange(start + char.length, start + char.length);
+  });
 }
 
 
-/* =========================================================
-   AI CHATBOT
-   ========================================================= */
+/* ---------- AI grading of the pre-test and post-test ----------
+   Closed questions: 1 correct · 0.5 minor spelling slip · 0 wrong.
+   Exact answer-key matches always get 1; other answers are judged by the AI.
+   The rule is graded 0–5. */
 
-function initialiseChat() {
+function findTest(n, name) {
+  const u = UNITS[n];
+  return [u.pre, u.post, ...Object.values(u.tests || {})].find((t) => t && t.name === name);
+}
 
-    const form = document.getElementById("chat-form");
+async function gradeWithAI(unitData, test, prefix) {
+  const answers = unitData.responses[`${prefix}test`];
 
-    const input = document.getElementById("chat-input");
+  const written = ["apply", "transfer"].flatMap((part) => (test[part]?.items || []).map((item, i) => {
+    const id = `${prefix}_${part}_${i + 1}`;
+    const answer = answers[id] || "";
+    return { id, part, prompt: item.label, accepted: [].concat(item.key), answer,
+             exact: isCorrect(answer, item.key, test.strict) };
+  }));
 
-    if (!form || !input) {
-        return;
-    }
+  const response = await fetch(GRADE_API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    signal: AbortSignal.timeout(60000),
+    body: JSON.stringify({
+      language: test.name,
+      notes: [test.source, test.apply?.note, test.transfer?.note].filter(Boolean),
+      examples: test.examples.map(([word, meaning]) => `${[].concat(word).join(" · ")} = ${meaning}`),
+      items: written,
+      rule: { question: test.rule.title, reference: test.rule.answer, answer: answers[`${prefix}_rule`] || "" }
+    })
+  });
 
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || "The grader could not respond.");
 
-    form.addEventListener("submit", async function (event) {
+  const graded = new Map(result.items.map((g) => [g.id, g]));
+  const items = written.map(({ exact, ...item }) => {
+    const g = graded.get(item.id) || { points: 0, reason: "Not graded.", graded_by: "none" };
+    return { ...item, points: g.points, reason: g.reason, graded_by: g.graded_by };
+  });
+  const sum = (list) => list.reduce((total, item) => total + item.points, 0);
 
-        event.preventDefault();
+  return {
+    test: test.name,
+    closed: { total: sum(items), maximum: items.length, items },
+    rule: { answer: answers[`${prefix}_rule`] || "", score: result.rule.score, maximum: 5, feedback: result.rule.feedback },
+    model: result.model,
+    graded_at: new Date().toISOString()
+  };
+}
 
+// Never throws: a failure is stored as { error } so it can be retried at the end.
+async function gradeAndStore(n, unitData, test, prefix) {
+  const key = `${prefix}test`;
+  unitData.ai_scores ??= {};
+  try {
+    unitData.ai_scores[key] = await gradeWithAI(unitData, test, prefix);
+  } catch (error) {
+    console.error(`AI grading of Unit ${n} ${key} failed:`, error);
+    unitData.ai_scores[key] = { test: test.name, error: String(error.message || error), failed_at: new Date().toISOString() };
+  }
+  saveUnit(n, unitData);
+  if (n === unitNumber) log(`${key}_ai_graded`, { ok: !unitData.ai_scores[key].error });
+}
 
-        if (
-            experimentMode !== "ai" ||
-            swahiliStage !== "correction" ||
-            chatRequestInProgress
-        ) {
-
-            return;
-        }
-
-
-        const message = input.value.trim();
-
-        if (!message) {
-            return;
-        }
-
-
-        chatMessages.push({
-
-            role: "user",
-
-            content: message,
-
-            timestamp: new Date().toISOString()
-        });
-
-
-        appendChatMessage("user", message);
-
-        input.value = "";
-
-        saveChatTranscript();
-
-
-        recordEvent("chat_message_sent", {
-
-            message_number: chatMessages.length
-        });
-
-
-        await requestChatbotReply();
-    });
+// Grades every submitted test (all units) that has no AI score yet or whose grading failed.
+async function gradeMissing(units) {
+  await Promise.all(Object.values(grading));
+  await Promise.all(Object.entries(units).flatMap(([n, unitData]) => ["pre", "post"].map((prefix) => {
+    const key = `${prefix}test`;
+    const score = unitData.ai_scores?.[key];
+    if (!unitData.responses?.[key] || (score && !score.error)) return null;
+    const test = findTest(n, unitData[`${prefix}_test`]);
+    return test ? gradeAndStore(Number(n), unitData, test, prefix) : null;
+  })));
 }
 
 
-/* =========================================================
-   CHAT MESSAGE DISPLAY
-   ========================================================= */
+/* ---------- Results, download & next unit ---------- */
 
-function appendChatMessage(role, message) {
-
-    const container = document.getElementById("chat-messages");
-
-    if (!container) {
-        return;
-    }
-
-
-    const bubble = document.createElement("div");
-
-    bubble.className = "chat-message " + role;
-
-
-    const heading = document.createElement("strong");
-
-    heading.textContent =
-        role === "user" ? "You" : "Rosetta tutor";
-
-
-    const paragraph = document.createElement("p");
-
-    paragraph.textContent = message;
-
-
-    bubble.appendChild(heading);
-
-    bubble.appendChild(paragraph);
-
-    container.appendChild(bubble);
-
-    container.scrollTop = container.scrollHeight;
-}
-
-
-/* =========================================================
-   SAVE CHAT TRANSCRIPT
-   ========================================================= */
-
-function saveChatTranscript() {
-
-    experimentData.responses.swahili_chat = chatMessages;
-
-    saveDataLocally();
-}
-
-
-/* =========================================================
-   REQUEST CHATBOT REPLY
-   ========================================================= */
-
-async function requestChatbotReply() {
-
-    const input = document.getElementById("chat-input");
-
-    const button = document.getElementById("chat-send-button");
-
-    const status = document.getElementById("chat-status");
-
-
-    chatRequestInProgress = true;
-
-
-    if (input) {
-
-        input.disabled = true;
-    }
-
-
-    if (button) {
-
-        button.disabled = true;
-
-        button.textContent = "Tutor is thinking...";
-    }
-
-
-    if (status) {
-
-        status.textContent = "The tutor is thinking...";
-    }
-
-
+// Loads every unit's saved data for this participant (the current unit uses the live `data`).
+function loadUnits() {
+  const units = {};
+  const missing = [];
+  Object.keys(UNITS).forEach((n) => {
+    if (Number(n) === unitNumber) { units[n] = data; return; }
     try {
-
-        const ruleInput = document.getElementById("swahili-rule");
-
-        const currentRule = ruleInput
-            ? ruleInput.value.trim()
-            : "";
-
-
-        const response = await fetch(CHAT_API_URL, {
-
-            method: "POST",
-
-            headers: {
-
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-                messages: chatMessages.map(function (message) {
-
-                    return {
-
-                        role: message.role,
-
-                        content: message.content
-                    };
-                }),
-
-                currentRule: currentRule,
-
-                participantId: participantId
-            })
-        });
-
-
-        const data = await response.json();
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error || "The chatbot could not respond."
-            );
-        }
-
-
-        if (!data.reply) {
-
-            throw new Error(
-                "The chatbot returned an empty response."
-            );
-        }
-
-
-        chatMessages.push({
-
-            role: "assistant",
-
-            content: data.reply,
-
-            timestamp: new Date().toISOString()
-        });
-
-
-        appendChatMessage("assistant", data.reply);
-
-        saveChatTranscript();
-
-
-        recordEvent("chat_reply_received", {
-
-            message_number: chatMessages.length
-        });
-
-
-        if (status) {
-
-            status.textContent = "";
-        }
-
-
+      const saved = localStorage.getItem(`rosetta_unit${n}_${participantId}`);
+      if (saved) units[n] = JSON.parse(saved);
+      else missing.push(Number(n));
     } catch (error) {
-
-        console.error("Chatbot error:", error);
-
-
-        if (status) {
-
-            status.textContent =
-                "Sorry, the tutor could not respond. Please try again.";
-        }
-
-
-        recordEvent("chat_request_failed", {
-
-            error: String(error.message || error)
-        });
-
-
-    } finally {
-
-        chatRequestInProgress = false;
-
-
-        const activityStillOpen =
-            swahiliStage === "correction";
-
-
-        if (input) {
-
-            input.disabled = !activityStillOpen;
-        }
-
-
-        if (button) {
-
-            button.disabled = !activityStillOpen;
-
-            button.textContent = "Send message →";
-        }
+      console.error(`Could not read Unit ${n} data:`, error);
+      missing.push(Number(n));
     }
+  });
+  return { units, missing };
 }
 
+let allUnits = null;
 
-/* =========================================================
-   DOWNLOAD RESPONSE DATA
-   ========================================================= */
-
-function initialiseDownload() {
-
-    const button = document.getElementById("download-data");
-
-    if (!button) {
-        return;
-    }
-
-    button.addEventListener("click", downloadResponses);
+// One row per unit and test, used for the results screen and the file's summary.
+function scoreSummary(units) {
+  return Object.entries(units).flatMap(([n, unitData]) => ["pre", "post"].map((prefix) => {
+    const s = unitData.ai_scores?.[`${prefix}test`];
+    return {
+      unit: Number(n),
+      phase: `${prefix}test`,
+      test: unitData[`${prefix}_test`],
+      closed_score: s && !s.error ? s.closed.total : null,
+      closed_maximum: s && !s.error ? s.closed.maximum : null,
+      rule_score: s && !s.error ? s.rule.score : null,
+      rule_maximum: 5,
+      ...(s?.error && { error: s.error })
+    };
+  }));
 }
 
+function combinedData() {
+  const { units, missing } = allUnits || loadUnits();
+  return {
+    participant_id: participantId,
+    experiment_mode: mode,
+    exported_at: data.exported_at,
+    missing_units: missing,
+    ai_score_summary: scoreSummary(units),
+    units
+  };
+}
+
+function resultsHtml(units) {
+  const fmt = (x) => Number.isInteger(x) ? String(x) : `${Math.floor(x) || ""}½`;
+  const rows = scoreSummary(units).map((r) => {
+    const s = units[r.unit].ai_scores?.[r.phase];
+    const label = `Unit ${r.unit} · ${r.phase === "pretest" ? "Pre-test" : "Post-test"} · ${esc(r.test)}`;
+    if (!s || s.error) {
+      return `<tr><th scope="row">${label}</th><td colspan="2" class="muted">Could not be graded</td></tr>`;
+    }
+    const items = s.closed.items.map((item) =>
+      `<li><span>${esc(item.prompt)}: <strong>${esc(item.answer || "—")}</strong></span>
+           <span class="points">${fmt(item.points)} / 1</span></li>`).join("");
+    return `<tr><th scope="row">${label}</th>
+        <td>${fmt(r.closed_score)} / ${r.closed_maximum}</td>
+        <td>${r.rule_score} / 5</td></tr>
+      <tr class="detail"><td colspan="3"><details><summary>Details</summary>
+        <ul class="item-scores">${items}</ul>
+        <p><strong>Your rule:</strong> ${esc(s.rule.answer || "—")}</p>
+        <p><strong>Feedback:</strong> ${esc(s.rule.feedback)}</p>
+      </details></td></tr>`;
+  }).join("");
+
+  return `<div class="table-wrap"><table class="results">
+    <thead><tr><th scope="col">Test</th><th scope="col">Questions</th><th scope="col">Rule</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+// Final unit: make sure everything is graded, show the results, then download one file.
+async function finishExperiment() {
+  allUnits = loadUnits();
+  await gradeMissing(allUnits.units);
+
+  $("results").innerHTML = resultsHtml(allUnits.units);
+  $("results").hidden = false;
+  $("complete-status").textContent = allUnits.missing.length
+    ? `Your responses have been downloaded as a single file. Note: no saved data was found for Unit ${allUnits.missing.join(", ")} in this browser.`
+    : "Your responses for all units have been downloaded as a single file. If the download did not start, use the button below.";
+  $("download-data").disabled = false;
+  downloadResponses();
+}
 
 function downloadResponses() {
+  data.exported_at = new Date().toISOString();
+  save();
 
-    experimentData.exported_at = new Date().toISOString();
+  const url = URL.createObjectURL(new Blob([JSON.stringify(combinedData(), null, 2)], { type: "application/json" }));
+  const link = Object.assign(document.createElement("a"), {
+    href: url,
+    download: `rosetta_${participantId}.json`
+  });
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 
-    saveDataLocally();
-
-
-    const json = JSON.stringify(experimentData, null, 2);
-
-    const blob = new Blob(
-
-        [json],
-
-        { type: "application/json" }
-    );
-
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-
-
-    link.href = url;
-
-    link.download =
-        "rosetta_unit1_" + participantId + ".json";
-
-
-    document.body.appendChild(link);
-
-    link.click();
-
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
-
-
-    recordEvent("responses_downloaded");
+  log("responses_downloaded");
 }
 
 
-/* =========================================================
-   REVEAL WORKED EXAMPLE AFTER OBSERVATIONS ARE SUBMITTED
-   ========================================================= */
+/* ---------- Start ---------- */
 
-const observationForm = document.getElementById("discover-form");
+document.title = `Rosetta — Unit ${unitNumber}`;
+document.body.dataset.experimentMode = mode;
+$("unit-label").textContent = unit.label;
 
-const workedExample = document.getElementById("worked-example");
+$("screens").innerHTML = [
+  testScreenHtml(preTest, "pre", 0),
+  discoverHtml(unit.discover),
+  practiceHtml(practice),
+  testScreenHtml(postTest, "post", 3),
+  completeHtml()
+].join("");
 
-
-if (observationForm && workedExample) {
-
-    observationForm.addEventListener("submit", function () {
-
-        workedExample.hidden = false;
-    });
+if (!unit.next) {
+  $("download-data").addEventListener("click", downloadResponses);
+} else {
+  $("next-unit-button").addEventListener("click", async (event) => {
+    log(`unit_${unit.next}_requested`);
+    // Let the post-test grading finish first (anything missed is regraded at the end of the last unit).
+    event.currentTarget.disabled = true;
+    event.currentTarget.textContent = "Saving your responses…";
+    await Promise.all(Object.values(grading));
+    location.href = `experiment.html?mode=${mode}&unit=${unit.next}`;
+  });
 }
 
-/* =========================================================
-   PROGRESSIVE ASSESSMENT BLOCKS
-   ========================================================= */
-
-function initialiseAssessmentProgression() {
-
-    document.querySelectorAll("[data-reveal]").forEach(function (button) {
-
-        button.addEventListener("click", function () {
-
-            const nextBlock = document.getElementById(
-                button.dataset.reveal
-            );
-
-            if (nextBlock) {
-                nextBlock.hidden = false;
-            }
-
-            // Hide the Continue button after it has been used.
-            button.hidden = true;
-
-        });
-
-    });
-
-}
-
-
-/* =========================================================
-   END OF SCRIPT
-   ========================================================= */
+log("experiment_started", { mode });
+initTests();
+initPractice();
+initChat();
+initCharBar();
+showScreen(0);

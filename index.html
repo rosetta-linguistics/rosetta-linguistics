@@ -1,234 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta name="description"
-        content="Rosetta explores whether interactive AI tutoring can help beginners discover how languages build words from meaningful parts.">
-
-    <title>Rosetta — Learning Languages with AI</title>
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rosetta explores whether interactive AI tutoring can help beginners discover how languages build words from meaningful parts.">
+  <title>Rosetta — Learning Languages with AI</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- HEADER -->
-
 <header class="site-header">
-    <div class="header-inner">
-
-        <a href="index.html" class="logo">
-            Digital Education (CS411): Rosetta
-        </a>
-
-    </div>
+  <div class="header-inner">
+    <a href="index.html" class="logo">Digital Education (CS411): Rosetta</a>
+  </div>
 </header>
 
-
-
-    <!-- MAIN -->
-
-    <main>
-
-        <!-- HERO -->
-
-        <section class="landing-hero">
-
-            <div class="landing-grid">
-
-                <!-- LEFT COLUMN -->
-
-                <div class="landing-left">
-
-                    <div class="landing-intro">
-
-                        <h1>
-                            Can AI help us understand
-                            <span>how languages work?</span>
-                        </h1>
-
-                        <p class="landing-description">
-                            Discover the hidden structure of unfamiliar
-                            languages through logic, observation, and
-                            linguistic puzzles.
-                        </p>
-
-                    </div>
-
-
-                    <div class="experiment-selection" id="experiment">
-
-                        <p class="selection-label">
-                            CHOOSE YOUR LEARNING EXPERIENCE
-                        </p>
-
-                        <a href="experiment.html?mode=non-ai"
-                           class="experiment-button non-ai-button">
-
-                            <div class="button-content">
-
-                                <span class="button-title">
-                                    Learn without AI
-                                </span>
-
-                                <span class="button-description">
-                                    Explore the same puzzles with
-                                    written hints.
-                                </span>
-
-                            </div>
-
-                            <span class="button-arrow">
-                                →
-                            </span>
-
-                        </a>
-
-                        <a href="experiment.html?mode=ai"
-                           class="experiment-button ai-button">
-
-                            <div class="button-content">
-
-                                <span class="button-title">
-                                    Learn with AI
-                                </span>
-
-                                <span class="button-description">
-                                    An interactive tutor that guides
-                                    your reasoning.
-                                </span>
-
-                            </div>
-
-                            <span class="button-arrow">
-                                →
-                            </span>
-
-                        </a>
-
-
-                        <p class="selection-note">
-                            Both versions cover the same material.
-                            No prior linguistic knowledge is required.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- RIGHT COLUMN -->
-
-                <div class="landing-right">
-
-                    <div class="research-card">
-
-                        <h2>
-                            Every word tells a story.
-                        </h2>
-
-                        <p>
-                            Languages are built from meaningful pieces.
-                            By studying how these pieces combine, we can
-                            uncover the rules behind unfamiliar words.
-                        </p>
-
-                        <div class="research-divider"></div>
-
-                        <div class="research-section">
-
-                            <span class="research-number">
-                                01
-                            </span>
-
-                            <div>
-
-                                <h3>
-                                    Discover word structure
-                                </h3>
-
-                                <p>
-                                    Identify roots, prefixes, suffixes,
-                                    and other meaningful units in
-                                    unfamiliar languages.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="research-section">
-
-                            <span class="research-number">
-                                02
-                            </span>
-
-                            <div>
-
-                                <h3>
-                                    Learn through reasoning
-                                </h3>
-
-                                <p>
-                                    Form hypotheses, investigate patterns,
-                                    and use hints to solve Linguistics
-                                    Olympiad-style challenges.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="research-section">
-
-                            <span class="research-number">
-                                03
-                            </span>
-
-                            <div>
-
-                                <h3>
-                                    Put AI to the test
-                                </h3>
-
-                                <p>
-                                    Explore whether interactive AI guidance
-                                    helps beginners discover and apply
-                                    linguistic rules more effectively
-                                    than static hints.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-    </main>
-
-
-    <!-- FOOTER -->
-
-    <footer>
-
-        <p>
-            Rosetta · Learning Languages with AI
-        </p>
-
-    </footer>
+<main class="container hero">
+
+  <section>
+    <p class="eyebrow">Unit 1 · Morphology</p>
+    <h1>Can AI help us understand <span>how languages work?</span></h1>
+    <p class="lead">
+      Discover the hidden structure of unfamiliar languages through logic,
+      observation, and linguistic puzzles.
+    </p>
+
+    <p class="choose-label">Choose your learning experience</p>
+
+    <a class="choice" href="experiment.html?mode=non-ai">
+      <div>
+        <strong>Learn without AI</strong>
+        <span>Explore the same puzzles with written hints.</span>
+      </div>
+    </a>
+
+    <a class="choice choice-ai" href="experiment.html?mode=ai">
+      <div>
+        <strong>Learn with AI</strong>
+        <span>An interactive tutor that guides your reasoning.</span>
+      </div>
+    </a>
+
+    <p class="note">Both versions cover the same material. No prior linguistic knowledge is required.</p>
+  </section>
+
+  <aside class="card">
+    <h2>Every word tells a story.</h2>
+    <p>
+      Languages are built from meaningful pieces. By studying how these pieces
+      combine, we can uncover the rules behind unfamiliar words.
+    </p>
+
+    <ol class="features">
+      <li>
+        <b>01</b>
+        <div>
+          <h3>Discover word structure</h3>
+          <p>Identify roots, prefixes, suffixes, and other meaningful units in unfamiliar languages.</p>
+        </div>
+      </li>
+      <li>
+        <b>02</b>
+        <div>
+          <h3>Learn through reasoning</h3>
+          <p>Form hypotheses, investigate patterns, and use hints to solve Linguistics Olympiad-style challenges.</p>
+        </div>
+      </li>
+      <li>
+        <b>03</b>
+        <div>
+          <h3>Put AI to the test</h3>
+          <p>Explore whether interactive AI guidance helps beginners discover and apply linguistic rules more effectively than static hints.</p>
+        </div>
+      </li>
+    </ol>
+  </aside>
+
+</main>
+
+<footer>Rosetta · Learning Languages with AI</footer>
 
 </body>
-
 </html>
