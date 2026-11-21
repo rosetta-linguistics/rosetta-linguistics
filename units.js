@@ -122,6 +122,23 @@ const UNITS = {
         { label: "(3) ______ = she saw me", key: ["aliniona"] }
       ],
       ruleTitle: "Write the rule: how is a Swahili verb built?",
+      // Shown to the participant after they click "Finish this activity".
+      solution: `
+        <p>A Swahili verb is built from up to four pieces, always in the same order:
+          <strong>who does it + when + to whom + the verb</strong>.</p>
+        <ul>
+          <li><strong>Who does it:</strong> ni = I, wu = you, a = she, wa = they</li>
+          <li><strong>When:</strong> na = now, li = in the past, taka = in the future</li>
+          <li><strong>To whom</strong> (only if there is someone): ni = me, wu = you, wa = them</li>
+          <li><strong>The verb:</strong> sema = speak, ona = see</li>
+        </ul>
+        <p>So <strong>a + li + wa + ona = aliwaona</strong>, she saw them;
+          <strong>ni + taka + wu + ona = nitakawuona</strong>, I will see you;
+          <strong>a + li + ni + ona = aliniona</strong>, she saw me.</p>`,
+      // For the AI tutor only (never shown): lets it check the learner's rule.
+      ruleAnswer: "A Swahili verb is built as: subject + tense + (object) + verb stem. " +
+        "Subject: ni = I, wu = you, a = she, wa = they. Tense: na = present, li = past, taka = future. " +
+        "Object (optional): ni = me, wu = you, wa = them. Stems: sema = speak, ona = see.",
       rulePlaceholder: "Explain the order and meaning of the parts...",
       greeting: "Hi! Let's explore your rule together. What have you noticed about the different parts of the Swahili verbs?",
       hints: [
@@ -253,6 +270,7 @@ const UNITS = {
         flag: "🌄",
         spotlight: "Valley Yokuts is a Yokuts language of the San Joaquin Valley in California, historically spoken by Indigenous communities there.",
         panelTitle: "Valley Yokuts · Verb forms",
+        columns: ["Stem", "Now or past", "Meaning"],
         chars: ["’"],
         examples: [
           [["dos", "doshin"], "report"],
@@ -333,6 +351,7 @@ const UNITS = {
       flag: "🇷🇺 🇨🇳",
       spotlight: "Evenki is a Tungusic language spoken by small communities across Siberia and northern China. It builds words by adding endings to a stem.",
       panelTitle: "Evenki · Nouns in three forms",
+      columns: ["One", "Many", "Towards one", "Meaning"],
       chars: ["ë", "ö", "ü"],
       strict: true,
       examples: [
@@ -345,13 +364,31 @@ const UNITS = {
         [["iggë", "iggësël", "______ (2)"], "tail"],
         [["xë:m", "______ (3)", "xë:mlë"], "meal"]
       ],
-      task: "Each row shows one noun in three forms. Fill in the three missing forms (1), (2) and (3), then work out the rule.",
+      task: "Each row shows one noun in three forms: singular (bitëg = the book), plural (bitëgsël = the books) " +
+        "and directional-locative singular (bitëglë = to the book). Fill in the three missing forms (1), (2) and (3), then work out the rule.",
       items: [
         { label: "(1) udun · udunsul · ______ (rain)", key: ["udunlo"] },
         { label: "(2) iggë · iggësël · ______ (tail)", key: ["iggëlë"] },
         { label: "(3) xë:m · ______ · xë:mlë (meal)", key: ["xë:msël"] }
       ],
       ruleTitle: "Write the rule: how do the endings change in Evenki?",
+      // Shown to the participant after they click "Finish this activity".
+      solution: `
+        <p>Both endings change their vowel to match the <strong>last vowel of the noun</strong>.
+          This is called <strong>vowel harmony</strong>.</p>
+        <ul>
+          <li><strong>Plural (-s_l)</strong> copies that vowel exactly:
+            igga → iggasal, iggë → iggësël, oron → oronsol, udun → udunsul, nüxün → nüxünsül.</li>
+          <li><strong>Towards one (-l_)</strong> uses a after a, ë after ë, o after o or u, ö after ö or ü:
+            iggala, iggëlë, oronlo, udunlo, nüxünlö.</li>
+        </ul>
+        <p>So <strong>udun → udunlo</strong> (rain), <strong>iggë → iggëlë</strong> (tail) and
+          <strong>xë:m → xë:msël</strong> (meal).</p>`,
+      // For the AI tutor only (never shown): lets it check the learner's rule.
+      ruleAnswer: "The plural adds -s_l and the directional-locative adds -l_; the vowel of each ending depends on " +
+        "the last vowel of the stem (vowel harmony). The plural copies that vowel exactly: -sal after a, -sël after ë, " +
+        "-sol after o, -sul after u, -sül after ü. The directional-locative uses -la after a, -lë after ë, " +
+        "-lo after o or u, -lö after ö or ü.",
       rulePlaceholder: "Explain how the endings change...",
       greeting: "Hi! Let's explore your rule together. What have you noticed about the endings of the Evenki nouns?",
       hints: [
@@ -362,3 +399,6 @@ const UNITS = {
     }
   }
 };
+
+// Lets the server (api/chat.js) read the same content; ignored in the browser.
+if (typeof module !== "undefined" && module.exports) module.exports = UNITS;

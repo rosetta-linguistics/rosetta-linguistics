@@ -50,9 +50,16 @@ const grading = {};             // AI grading requests in progress, by "pre" / "
 
 /* ---------- Helpers ---------- */
 
+// A new ID for every run: starting Unit 1 is a new registration; later units
+// receive the ID in the link (?pid=…), falling back to the one saved in this browser.
 function getParticipantId() {
+  const fromLink = params.get("pid");
+  if (fromLink && /^P-[A-Z0-9-]+$/.test(fromLink)) {
+    localStorage.setItem("rosetta_participant_id", fromLink);
+    return fromLink;
+  }
   let id = localStorage.getItem("rosetta_participant_id");
-  if (!id) {
+  if (!id || unitNumber === 1) {
     id = "P-" + Date.now().toString(36).toUpperCase() + "-" +
          Math.random().toString(36).slice(2, 8).toUpperCase();
     localStorage.setItem("rosetta_participant_id", id);
@@ -165,11 +172,18 @@ function exampleHtml([word, meaning]) {
     `<span class="meaning">${esc(meaning)}</span></div>`;
 }
 
+// Optional `columns` names each column of the examples table, e.g. ["Stem", "Now or past", "Meaning"].
+const columnsHtml = (columns) => columns
+  ? `<div class="example multi head" style="--n:${columns.length - 1}" aria-hidden="true">` +
+    columns.map((c, i) => `<span${i === columns.length - 1 ? ' class="meaning-head"' : ""}>${esc(c)}</span>`).join("") +
+    `</div>`
+  : "";
+
 const panelHtml = (s) => `
   <aside class="examples">
     <div class="panel">
       <h2 class="panel-title">${s.panelTitle}</h2>
-      <div>${s.examples.map(exampleHtml).join("")}</div>
+      <div>${columnsHtml(s.columns)}${s.examples.map(exampleHtml).join("")}</div>
       <p class="task"><strong>Your task</strong> ${s.task}</p>
     </div>
   </aside>`;
@@ -267,16 +281,18 @@ function practiceHtml(p) {
 
           <div id="ai-chat-panel" hidden>
             <h2>Discuss and improve your rule with the tutor</h2>
-            <div id="chat-messages" class="chat-log" role="log" aria-live="polite" aria-label="Conversation with the morphology tutor">
-              <div class="chat-message assistant"><strong>Rosetta tutor</strong><p>${esc(p.greeting)}</p></div>
+            <div class="chat">
+              <div id="chat-messages" class="chat-log" role="log" aria-live="polite" aria-label="Conversation with the tutor">
+                <div class="chat-message assistant"><span class="sr-only">Tutor: </span>${formatMessage(p.greeting)}</div>
+              </div>
+              <form id="chat-form" class="chat-form">
+                <textarea id="chat-input" rows="1" maxlength="1000" placeholder="Message" aria-label="Message to the tutor (Enter to send, Shift+Enter for a new line)"></textarea>
+                <button id="chat-send-button" class="chat-send" type="submit" aria-label="Send">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </form>
             </div>
-            <form id="chat-form" class="chat-form">
-              <label for="chat-input">Your message
-                <textarea id="chat-input" maxlength="1000" placeholder="Tell the tutor what you think... (Enter to send)"></textarea>
-              </label>
-              <button id="chat-send-button" class="btn" type="submit">Send message →</button>
-              <p id="chat-status" class="note" aria-live="polite" hidden></p>
-            </form>
+            <p id="chat-status" class="chat-status" aria-live="polite" hidden></p>
           </div>
 
           <div id="static-hints-panel" hidden>
@@ -288,6 +304,11 @@ function practiceHtml(p) {
             You can revise your rule in the text field above and click “Save revised rule” to record each new version.
           </p>
           <div class="nav"><button id="finish-button" class="btn" type="button">Finish this activity</button></div>
+        </div>
+
+        <div class="lesson" id="practice-solution" hidden>
+          <h2>The rule</h2>
+          ${p.solution || ""}
         </div>
 
         <p id="practice-done" class="note" hidden>The activity is complete. You can now continue to the post-test.</p>
@@ -397,7 +418,7 @@ function initPractice() {
 
     correct.forEach((ok, i) => {
       const feedback = $(`feedback-${i + 1}`);
-      feedback.textContent = ok ? "Correct!" : "Incorrect.";
+      feedback.textContent = ok ? "Correct!" : `Incorrect. The answer is ${[].concat(practice.items[i].key)[0]}.`;
       feedback.className = "feedback " + (ok ? "correct" : "incorrect");
     });
 
@@ -490,19 +511,40 @@ function finishPractice() {
   save();
 
   $("chat-input").disabled = true;
+  $("chat-input").placeholder = "Activity finished";
   $("chat-send-button").disabled = true;
-  $("chat-send-button").textContent = "Activity finished";
 
   const finish = $("finish-button");
   finish.disabled = true;
   finish.textContent = "Activity finished";
 
+  if (practice.solution) {
+    $("practice-solution").hidden = false;
+    log(`${P}_solution_shown`);
+  }
   $("practice-done").hidden = false;
   $("practice-continue").hidden = false;
 }
 
 
 /* ---------- AI tutor ---------- */
+
+// Tutor replies use light Markdown: **bold**, *italic* / _italic_, line breaks. Everything else stays plain text.
+function formatMessage(text) {
+  return esc(String(text).trim())
+    .split(/\n\s*\n/)
+    .map((paragraph) => "<p>" + paragraph
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/(^|[\s(])[*_]([^*_\s][^*_]*?)[*_](?=[\s).,!?:;]|$)/g, "$1<em>$2</em>")
+      .replace(/\n/g, "<br>") + "</p>")
+    .join("");
+}
+
+// The message box grows with its text, up to a few lines.
+function fitInput(input) {
+  input.style.height = "auto";
+  input.style.height = Math.min(input.scrollHeight + 2, 140) + "px";
+}
 
 function initChat() {
   const input = $("chat-input");
@@ -514,6 +556,7 @@ function initChat() {
       $("chat-form").requestSubmit();
     }
   });
+  input.addEventListener("input", () => fitInput(input));
 
   onSubmit("chat-form", async () => {
     const text = input.value.trim();
@@ -522,6 +565,7 @@ function initChat() {
     chat.push({ role: "user", content: text, timestamp: new Date().toISOString() });
     addBubble("user", text);
     input.value = "";
+    fitInput(input);
     data.responses[`${P}_chat`] = chat;
     log("chat_message_sent", { message_number: chat.length });
 
@@ -532,33 +576,38 @@ function initChat() {
 function addBubble(role, text) {
   const bubble = document.createElement("div");
   bubble.className = "chat-message " + role;
+  const who = `<span class="sr-only">${role === "user" ? "You" : "Tutor"}: </span>`;
+  // Participant messages are shown exactly as typed; tutor replies get light formatting.
+  bubble.innerHTML = who + (role === "user" ? `<p>${esc(text).replace(/\n/g, "<br>")}</p>` : formatMessage(text));
 
-  const name = document.createElement("strong");
-  name.textContent = role === "user" ? "You" : "Rosetta tutor";
-
-  const paragraph = document.createElement("p");
-  paragraph.textContent = text;
-
-  bubble.append(name, paragraph);
   const box = $("chat-messages");
   box.appendChild(bubble);
   box.scrollTop = box.scrollHeight;
 }
 
-function setChatBusy(busy, message = "") {
+function setChatBusy(busy, error = "") {
   chatBusy = busy;
   const enabled = !busy && stage === "correction";
   $("chat-input").disabled = !enabled;
   $("chat-send-button").disabled = !enabled;
-  $("chat-send-button").textContent = busy ? "Tutor is thinking..." : "Send message →";
+  if (enabled) $("chat-input").focus();
+
+  // "Typing" dots while the tutor is answering
+  $("chat-typing")?.remove();
+  if (busy) {
+    const box = $("chat-messages");
+    box.insertAdjacentHTML("beforeend",
+      `<div id="chat-typing" class="chat-message assistant typing"><span class="sr-only">The tutor is typing</span><i></i><i></i><i></i></div>`);
+    box.scrollTop = box.scrollHeight;
+  }
 
   const status = $("chat-status");
-  status.textContent = message;
-  status.hidden = !message;
+  status.textContent = error;
+  status.hidden = !error;
 }
 
 async function requestReply() {
-  setChatBusy(true, "The tutor is thinking...");
+  setChatBusy(true);
 
   try {
     const response = await fetch(CHAT_API_URL, {
@@ -822,7 +871,7 @@ if (!unit.next) {
     event.currentTarget.disabled = true;
     event.currentTarget.textContent = "Saving your responses…";
     await Promise.all(Object.values(grading));
-    location.href = `experiment.html?mode=${mode}&unit=${unit.next}`;
+    location.href = `experiment.html?mode=${mode}&unit=${unit.next}&pid=${encodeURIComponent(participantId)}`;
   });
 }
 
