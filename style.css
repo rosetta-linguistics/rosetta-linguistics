@@ -162,6 +162,15 @@ h2 { color: var(--ink); font-size: 18px; line-height: 1.3; letter-spacing: -.01e
 .choice::after { content: "→"; font-size: 24px; transition: transform .2s; }
 .choice:hover::after { transform: translateX(5px); }
 .choice-ai { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+/* Home page: participant number */
+.start-form { max-width: 420px; margin-bottom: 18px; }
+.start-form .choose-label { display: block; }
+.start-row { display: flex; gap: 10px; }
+.start-row input { flex: 1; min-width: 0; font-size: 18px; }
+.start-row .btn { flex: none; }
+.start-error { margin-top: 8px; color: var(--bad); font-size: 14px; }
+#debug-choices { margin-top: 28px; }
 .choice-ai::after { color: var(--accent-light); }
 .choice:not(.choice-ai):hover { border-color: var(--accent); }
 .choice:not(.choice-ai):hover::after { color: var(--accent); }
@@ -248,8 +257,20 @@ footer { padding: 24px; border-top: 1px solid var(--line); color: var(--muted); 
 .example .word { font-family: var(--serif); font-size: 17px; font-weight: 700; color: var(--accent-dark); overflow-wrap: anywhere; }
 .example .meaning { color: var(--muted); font-size: 13.5px; line-height: 1.45; }
 
-.task { padding: 14px 18px; background: var(--paper); border-top: 1px solid var(--line); color: var(--text); font-size: 13px; line-height: 1.6; }
-.task strong { display: block; margin-bottom: 2px; color: var(--accent); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+/* "Your task" box at the top of the examples panel */
+.task {
+  margin: 14px 14px 6px;
+  padding: 12px 16px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-light);
+  border-left: 4px solid var(--accent);
+  border-radius: 10px;
+  color: var(--ink);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.task strong { display: block; margin-bottom: 4px; color: var(--accent); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.task p { margin: 0; }
 
 @media (min-width: 900px) {
   .layout { grid-template-columns: .9fr 1.1fr; gap: 36px; align-items: start; }
@@ -377,6 +398,38 @@ form > .btn { margin-top: 14px; }
 }
 .complete p { margin: 14px 0 22px; color: var(--muted); }
 .complete .btn { margin: 6px; }
+
+/* Questionnaire before Unit 1 */
+.intake { display: grid; gap: 24px; max-width: 680px; margin: 0 auto; }
+.intake fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+.intake legend { margin-bottom: 8px; padding: 0; color: var(--ink); font-size: 14px; font-weight: 600; line-height: 1.5; }
+.intake .hint-text { display: block; color: var(--muted); font-size: 13px; font-weight: 400; }
+.intake .options { display: flex; flex-wrap: wrap; gap: 8px; }
+.intake .option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.intake .option:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); }
+.intake input[type="radio"], .intake input[type="checkbox"] {
+  display: inline-block;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--accent);
+  box-shadow: none;
+}
+.intake .scale { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.intake .scale .end { color: var(--muted); font-size: 13px; }
+.intake .consent-text { margin-bottom: 10px; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; color: var(--text); font-size: 14px; line-height: 1.6; }
+.intake .field-error { margin-top: 6px; color: var(--bad); font-size: 13px; }
+.intake .btn { justify-self: start; }
 
 /* AI-graded results (end of the last unit) */
 .table-wrap { overflow-x: auto; margin: 0 0 22px; text-align: left; }

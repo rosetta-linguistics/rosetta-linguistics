@@ -44,7 +44,7 @@ IMPORTANT EXPERIMENT RULES:
 THE EXERCISE:
 
 ${practice.task}
-Notes on the letters: ${practice.source}
+${practice.letters ? `Note on the letters: ${practice.letters}` : ""}
 
 The participant has seen these examples:
 ${columns}

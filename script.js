@@ -1,8 +1,8 @@
 /* =========================================================
    ROSETTA EXPERIMENT ENGINE
    Texts, examples and answer keys live in units.js.
-   Open:  experiment.html?mode=ai|non-ai&unit=1|2
-          (unit 2 only: &order=AB|BA to force the test order)
+   Participants: experiment.html?p=7  (odd number = with AI, even = without AI)
+   Testing:      experiment.html?mode=ai|non-ai   (add &unit=2 to start at Unit 2)
    ========================================================= */
 
 "use strict";
@@ -19,21 +19,26 @@ const esc = (text) =>
 /* ---------- Setup ---------- */
 
 const params = new URLSearchParams(location.search);
-const mode = params.get("mode") === "non-ai" ? "non-ai" : "ai";
+// Participant number from the home page (?p=7). It decides the condition: odd = AI, even = non-AI.
+const participantNumber = /^[1-9][0-9]{0,2}$/.test(params.get("p") || "") ? Number(params.get("p")) : null;
+const mode = participantNumber
+  ? (participantNumber % 2 ? "ai" : "non-ai")
+  : (params.get("mode") === "non-ai" ? "non-ai" : "ai");      // testing links without a number
 const unitNumber = UNITS[params.get("unit")] ? Number(params.get("unit")) : 1;
 const unit = UNITS[unitNumber];
 const practice = unit.practice;
 const P = practice.prefix;                       // prefix for data keys, e.g. "swahili"
 const participantId = getParticipantId();
-const { pre: preTest, post: postTest, order } = pickTests();
+const preTest = unit.pre;                        // same order for every participant
+const postTest = unit.post;
 
 const data = {
   participant_id: participantId,
+  participant_number: participantNumber,          // null for testing runs
   experiment_mode: mode,
   unit: unitNumber,
   pre_test: preTest.name,
   post_test: postTest.name,
-  ...(order && { test_order: order }),
   started_at: new Date().toISOString(),
   completed_at: null,
   responses: {},
@@ -54,29 +59,21 @@ const grading = {};             // AI grading requests in progress, by "pre" / "
 // receive the ID in the link (?pid=…), falling back to the one saved in this browser.
 function getParticipantId() {
   const fromLink = params.get("pid");
-  if (fromLink && /^P-[A-Z0-9-]+$/.test(fromLink)) {
+  if (fromLink && /^P[0-9]*-[A-Z0-9-]+$/.test(fromLink)) {
     localStorage.setItem("rosetta_participant_id", fromLink);
     return fromLink;
   }
   let id = localStorage.getItem("rosetta_participant_id");
   if (!id || unitNumber === 1) {
-    id = "P-" + Date.now().toString(36).toUpperCase() + "-" +
+    // e.g. P07-MWPH682H-MMPBSA (participant 7); testing runs have no number: P-…
+    const number = participantNumber ? String(participantNumber).padStart(2, "0") : "";
+    id = `P${number}-` + Date.now().toString(36).toUpperCase() + "-" +
          Math.random().toString(36).slice(2, 8).toUpperCase();
     localStorage.setItem("rosetta_participant_id", id);
   }
   return id;
 }
 
-// Units with `tests` (A/B) counterbalance which test is the pre-test, based on the participant ID.
-function pickTests() {
-  if (!unit.tests) return { pre: unit.pre, post: unit.post, order: null };
-  const forced = params.get("order");
-  const order = forced === "AB" || forced === "BA"
-    ? forced
-    : ([...participantId].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % 2 ? "BA" : "AB");
-  const [first, second] = order.split("");
-  return { pre: unit.tests[first], post: unit.tests[second], order };
-}
 
 function saveUnit(n, unitData) {
   try {
@@ -157,7 +154,7 @@ function lock(form, buttonText) {
 const introHtml = (heading, s) => `
   <div class="intro">
     <h1>${heading}</h1>
-    <p class="source">${s.source}</p>
+    ${s.letters ? `<p class="source">${s.letters}</p>` : ""}
     <p class="spotlight">
       <span class="flag" aria-hidden="true">${s.flag}</span>
       <span><strong>Language spotlight</strong> ${s.spotlight}</span>
@@ -183,8 +180,8 @@ const panelHtml = (s) => `
   <aside class="examples">
     <div class="panel">
       <h2 class="panel-title">${s.panelTitle}</h2>
+      <div class="task"><strong>Your task</strong><p>${s.task}</p></div>
       <div>${columnsHtml(s.columns)}${s.examples.map(exampleHtml).join("")}</div>
-      <p class="task"><strong>Your task</strong> ${s.task}</p>
     </div>
   </aside>`;
 
@@ -320,6 +317,54 @@ function practiceHtml(p) {
 }
 
 // Only the last unit (no `next`) offers the download, which bundles every unit into one file.
+// Questionnaire before the Unit 1 pre-test (content in INTAKE, units.js).
+function intakeHtml() {
+  const option = (type, name, value, text = value, required = false) =>
+    `<label class="option"><input type="${type}" name="${name}" value="${esc(value)}"${required ? " required" : ""}> ${esc(text)}</label>`;
+
+  return `<section id="screen-intake" class="step">
+    <div class="intro"><h1>${INTAKE.heading}</h1><p class="source">${INTAKE.intro}</p></div>
+    <form id="intake-form" class="intake">
+      <label>Email
+        <input type="email" name="email" required autocomplete="email" placeholder="name@example.com">
+      </label>
+
+      <label>Which languages do you speak, and how well?
+        <span class="hint-text">One per line, for example “French – native, English – fluent, Spanish – basic”.</span>
+        <textarea name="languages_spoken" required></textarea>
+      </label>
+
+      <fieldset>
+        <legend>Have you ever taken a linguistics course or taken part in a Linguistics Olympiad?</legend>
+        <div class="options">${["Yes", "No"].map((o) => option("radio", "linguistics_background", o, o, true)).join("")}</div>
+      </fieldset>
+
+      <fieldset id="known-languages">
+        <legend>Do you know any of these languages, even a little?</legend>
+        <div class="options">${[...INTAKE.knownLanguages, "None of these"].map((o) => option("checkbox", "known_languages", o)).join("")}</div>
+        <p id="known-error" class="field-error" hidden>Please tick at least one option.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>How confident are you at learning grammar?</legend>
+        <div class="scale">
+          <span class="end">Not at all confident</span>
+          ${[1, 2, 3, 4, 5].map((n) => option("radio", "grammar_confidence", String(n), String(n), true)).join("")}
+          <span class="end">Very confident</span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Consent</legend>
+        <p class="consent-text">${INTAKE.consent}</p>
+        ${option("checkbox", "consent", "yes", "I have read the above and agree to take part.", true)}
+      </fieldset>
+
+      <button class="btn" type="submit">Start Unit 1 →</button>
+    </form>
+  </section>`;
+}
+
 const completeHtml = () => `
   <section id="screen-4" class="step">
     <div class="complete">
@@ -341,8 +386,13 @@ function showScreen(n) {
   document.querySelectorAll(".step").forEach((el) => el.classList.toggle("active", el.id === `screen-${n}`));
   lastField = null;
 
-  $("progress-label").textContent = n < 4 ? `Step ${n + 1} of 4 · ${STEP_NAMES[n]}` : "Complete";
-  $("progress-fill").style.width = (n < 4 ? (n + 1) * 25 : 100) + "%";
+  if (n === "intake") {
+    $("progress-label").textContent = "Before you start";
+    $("progress-fill").style.width = "0%";
+  } else {
+    $("progress-label").textContent = n < 4 ? `Step ${n + 1} of 4 · ${STEP_NAMES[n]}` : "Complete";
+    $("progress-fill").style.width = (n < 4 ? (n + 1) * 25 : 100) + "%";
+  }
 
   log("screen_opened", { screen: n });
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -359,6 +409,46 @@ function showScreen(n) {
     save();
     if (!unit.next) finishExperiment();
   }
+}
+
+
+/* ---------- Questionnaire ---------- */
+
+function initIntake() {
+  const form = $("intake-form");
+  const boxes = () => form.querySelectorAll('input[name="known_languages"]');
+
+  // "None of these" and the languages exclude each other
+  form.addEventListener("change", (event) => {
+    if (event.target.name !== "known_languages" || !event.target.checked) return;
+    const none = event.target.value === "None of these";
+    boxes().forEach((box) => {
+      if (box !== event.target && (none || box.value === "None of these")) box.checked = false;
+    });
+    $("known-error").hidden = true;
+  });
+
+  // The browser checks the required fields before this runs
+  onSubmit("intake-form", () => {
+    const answers = new FormData(form);
+    const known = answers.getAll("known_languages");
+    if (!known.length) {
+      $("known-error").hidden = false;
+      $("known-languages").scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    data.intake = {
+      email: String(answers.get("email")).trim().toLowerCase(),
+      languages_spoken: String(answers.get("languages_spoken")).trim(),
+      linguistics_background: answers.get("linguistics_background"),
+      known_languages: known,
+      grammar_confidence: Number(answers.get("grammar_confidence")),
+      consent: true,
+      submitted_at: new Date().toISOString()
+    };
+    log("intake_submitted");
+    showScreen(0);
+  });
 }
 
 
@@ -418,7 +508,8 @@ function initPractice() {
 
     correct.forEach((ok, i) => {
       const feedback = $(`feedback-${i + 1}`);
-      feedback.textContent = ok ? "Correct!" : `Incorrect. The answer is ${[].concat(practice.items[i].key)[0]}.`;
+      // The right answers are only revealed at the end of the activity (see finishPractice).
+      feedback.textContent = ok ? "Correct!" : "Incorrect.";
       feedback.className = "feedback " + (ok ? "correct" : "incorrect");
     });
 
@@ -518,10 +609,12 @@ function finishPractice() {
   finish.disabled = true;
   finish.textContent = "Activity finished";
 
-  if (practice.solution) {
-    $("practice-solution").hidden = false;
-    log(`${P}_solution_shown`);
-  }
+  // Reveal the right answer next to each wrong blank, then the full rule.
+  (data.scores[P]?.correct || []).forEach((ok, i) => {
+    if (!ok) $(`feedback-${i + 1}`).textContent = `Incorrect. The answer is ${[].concat(practice.items[i].key)[0]}.`;
+  });
+  if (practice.solution) $("practice-solution").hidden = false;
+  log(`${P}_solution_shown`);
   $("practice-done").hidden = false;
   $("practice-continue").hidden = false;
 }
@@ -667,7 +760,7 @@ function initCharBar() {
 
 function findTest(n, name) {
   const u = UNITS[n];
-  return [u.pre, u.post, ...Object.values(u.tests || {})].find((t) => t && t.name === name);
+  return [u.pre, u.post].find((t) => t && t.name === name);
 }
 
 async function gradeWithAI(unitData, test, prefix) {
@@ -686,10 +779,15 @@ async function gradeWithAI(unitData, test, prefix) {
     signal: AbortSignal.timeout(60000),
     body: JSON.stringify({
       language: test.name,
-      notes: [test.source, test.apply?.note, test.transfer?.note].filter(Boolean),
+      notes: [test.letters, test.apply?.note, test.transfer?.note].filter(Boolean),
       examples: test.examples.map(([word, meaning]) => `${[].concat(word).join(" · ")} = ${meaning}`),
       items: written,
-      rule: { question: test.rule.title, reference: test.rule.answer, answer: answers[`${prefix}_rule`] || "" }
+      rule: {
+        question: test.rule.title,
+        reference: test.rule.answer,
+        patterns: test.rule.patterns || [],
+        answer: answers[`${prefix}_rule`] || ""
+      }
     })
   });
 
@@ -782,9 +880,11 @@ function combinedData() {
   const { units, missing } = allUnits || loadUnits();
   return {
     participant_id: participantId,
+    participant_number: participantNumber,
     experiment_mode: mode,
     exported_at: data.exported_at,
     missing_units: missing,
+    intake: units[1]?.intake ?? null,               // the questionnaire (asked in Unit 1)
     ai_score_summary: scoreSummary(units),
     units
   };
@@ -854,7 +954,10 @@ document.title = `Rosetta — Unit ${unitNumber}`;
 document.body.dataset.experimentMode = mode;
 $("unit-label").textContent = unit.label;
 
+const hasIntake = unitNumber === 1;               // questionnaire once, before the first pre-test
+
 $("screens").innerHTML = [
+  hasIntake ? intakeHtml() : "",
   testScreenHtml(preTest, "pre", 0),
   discoverHtml(unit.discover),
   practiceHtml(practice),
@@ -871,13 +974,16 @@ if (!unit.next) {
     event.currentTarget.disabled = true;
     event.currentTarget.textContent = "Saving your responses…";
     await Promise.all(Object.values(grading));
-    location.href = `experiment.html?mode=${mode}&unit=${unit.next}&pid=${encodeURIComponent(participantId)}`;
+    // Participants keep ?p= (the condition stays hidden); testing runs keep ?mode=.
+    const who = participantNumber ? `p=${participantNumber}` : `mode=${mode}`;
+    location.href = `experiment.html?${who}&unit=${unit.next}&pid=${encodeURIComponent(participantId)}`;
   });
 }
 
 log("experiment_started", { mode });
+if (hasIntake) initIntake();
 initTests();
 initPractice();
 initChat();
 initCharBar();
-showScreen(0);
+showScreen(hasIntake ? "intake" : 0);

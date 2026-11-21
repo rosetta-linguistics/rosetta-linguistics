@@ -26,23 +26,35 @@
       observation, and linguistic puzzles.
     </p>
 
-    <p class="choose-label">Choose your learning experience</p>
-
-    <a class="choice" href="experiment.html?mode=non-ai">
-      <div>
-        <strong>Learn without AI</strong>
-        <span>Explore the same puzzles with written hints.</span>
+    <!-- Participants enter the number they were given; the experiment page picks
+         the condition from it (odd = with AI, even = without AI). -->
+    <form id="start-form" class="start-form" novalidate>
+      <label for="participant-number" class="choose-label">Your participant number</label>
+      <div class="start-row">
+        <input id="participant-number" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 7" required>
+        <button class="btn" type="submit">Start →</button>
       </div>
-    </a>
+      <p id="start-error" class="start-error" aria-live="polite" hidden>Please enter the number you were given.</p>
+    </form>
 
-    <a class="choice choice-ai" href="experiment.html?mode=ai">
-      <div>
-        <strong>Learn with AI</strong>
-        <span>An interactive tutor that guides your reasoning.</span>
-      </div>
-    </a>
+    <p class="note">No prior linguistic knowledge is required.</p>
 
-    <p class="note">Both versions cover the same material. No prior linguistic knowledge is required.</p>
+    <!-- Testing only: shown when the participant number is -1. -->
+    <div id="debug-choices" hidden>
+      <p class="choose-label">Testing: choose a condition</p>
+      <a class="choice" href="experiment.html?mode=non-ai">
+        <div>
+          <strong>Learn without AI</strong>
+          <span>Explore the same puzzles with written hints.</span>
+        </div>
+      </a>
+      <a class="choice choice-ai" href="experiment.html?mode=ai">
+        <div>
+          <strong>Learn with AI</strong>
+          <span>An interactive tutor that guides your reasoning.</span>
+        </div>
+      </a>
+    </div>
   </section>
 
   <aside class="card">
@@ -80,6 +92,25 @@
 </main>
 
 <footer>Rosetta · Learning Languages with AI</footer>
+
+<script>
+  document.getElementById("start-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const value = document.getElementById("participant-number").value.trim();
+    const error = document.getElementById("start-error");
+
+    if (value === "-1") {                         // testing: show both conditions
+      document.getElementById("debug-choices").hidden = false;
+      error.hidden = true;
+      return;
+    }
+    if (!/^[1-9][0-9]{0,2}$/.test(value)) {      // a positive whole number
+      error.hidden = false;
+      return;
+    }
+    location.href = `experiment.html?p=${value}`;
+  });
+</script>
 
 </body>
 </html>

@@ -8,7 +8,11 @@
    Accents/punctuation are ignored when grading, unless the test
    sets `strict: true` (then accents count, e.g. ë vs e).
    Each pre/post-test `rule.answer` is the reference rule the AI
-   grader compares the participant's explanation against (0–5).
+   grader compares the participant's explanation against (0–5), and
+   `rule.patterns` lists the key patterns it checks one by one
+   (never shown to the participant).
+   Add `chars: [...]` to a test or practice to show buttons for
+   letters that are hard to type (e.g. Latvian ā, ņ).
    ========================================================= */
 
 const UNITS = {
@@ -23,7 +27,7 @@ const UNITS = {
     pre: {
       name: "Dabida",
       heading: "Dabida. Study the examples and solve the translation tasks.",
-      source: "Source: Neacșu 6.2 (Gilyarova, TurLom 2006). Orthography: δ is written dh; β is written bh.",
+      // Source: Neacșu 6.2 (Gilyarova, TurLom 2006). Orthography: δ is written dh; β is written bh.
       flag: "🇰🇪",
       spotlight: "Dabida (also known as Dawida or Taita) is a Bantu language spoken in the Taita Hills of southeastern Kenya.",
       panelTitle: "Dabida · Verb forms",
@@ -41,33 +45,40 @@ const UNITS = {
       apply: {
         title: "Apply: write in Dabida (approx. 1 min)",
         items: [
-          { label: "I will beat you (sg)", key: ["nichakukadha"] },
+          { label: "I will beat you (singular)", key: ["nichakukadha"] },
           { label: "They will fall in love", key: ["bhichakundana"] },
-          { label: "You (pl) will argue", key: ["mucharashana"] }
+          { label: "You (plural) will argue", key: ["mucharashana"] }
         ]
       },
       transfer: {
         title: "Transfer: write in Dabida (approx. 1 min)",
         items: [
-          { label: "You (sg) will curse them", key: ["kuchabhirasha"] },
-          { label: "We will fall in love with you (pl)", key: ["dichamukunda"] }
+          { label: "You (singular) will curse them", key: ["kuchabhirasha"] },
+          { label: "We will fall in love with you (plural)", key: ["dichamukunda"] }
         ]
       },
       rule: {
-        title: "Formulate the rule: how are Dabida verbs built? (approx. 1 min)",
+        title: "Explain the rule: how are Dabida verbs built? (approx. 1 min)",
         placeholder: "Explain how Dabida verbs are built...",
         answer: "A Dabida verb is built as: subject prefix + future marker cha + (object prefix) + verb stem. " +
-          "Subject prefixes: ni- = I, ku- = you (sg), di- = we, mu- = you (pl), bhi- = they. " +
-          "Object prefixes use the same forms: ni = me, ku = you (sg), di = us, mu = you (pl), bhi = them. " +
+          "Subject prefixes: ni- = I, ku- = you (singular), di- = we, mu- = you (plural), bhi- = they. " +
+          "Object prefixes use the same forms: ni = me, ku = you (singular), di = us, mu = you (plural), bhi = them. " +
           "Stems: kadha = beat, rasha = curse, kunda = love. When there is no object, the verb takes the ending -na " +
-          "(each other): kadhana = fight, rashana = argue, kundana = fall in love."
+          "(each other): kadhana = fight, rashana = argue, kundana = fall in love.",
+        // The patterns the AI grader looks for in the participant's explanation.
+        patterns: [
+          "Who does the action comes first: ni = I, ku = you (singular), di = we, mu = you (plural), bhi = they.",
+          "cha comes next and marks the future.",
+          "Who receives the action comes after cha, with the same forms (ni = me, ku = you (singular), di = us, mu = you (plural), bhi = them), followed by the verb.",
+          "When nobody receives the action, the verb ends in -na (kadhana = fight, rashana = argue, kundana = fall in love)."
+        ]
       }
     },
 
     discover: {
       event: "zulu_discovery_and_worked_example_opened",
       heading: "Discover Zulu. Identify recurring parts in the words.",
-      source: "Source: Neacșu 5.1 (Zulu, original).",
+      // Source: Neacșu 5.1 (Zulu, original).
       flag: "🇿🇦",
       spotlight: "Zulu (isiZulu) is one of South Africa’s official languages and is the country’s most widely spoken home language.",
       panelTitle: "Zulu · Words and meanings",
@@ -99,7 +110,7 @@ const UNITS = {
       prefix: "swahili",
       name: "Swahili",
       heading: "Swahili: complete the missing forms and discover the rule.",
-      source: "Source: Neacșu 6.1 (Swahili, Sim). Printed solution removed.",
+      // Source: Neacșu 6.1 (Swahili, Sim). Printed solution removed.
       flag: "🇰🇪 🇹🇿",
       spotlight: "Swahili (Kiswahili) is a Bantu language that grew along the East African coast and is now widely used as a shared language across several countries in the region.",
       panelTitle: "Swahili · Verb forms",
@@ -121,7 +132,7 @@ const UNITS = {
         { label: "(2) ______ = I will see you", key: ["nitakawuona"] },
         { label: "(3) ______ = she saw me", key: ["aliniona"] }
       ],
-      ruleTitle: "Write the rule: how is a Swahili verb built?",
+      ruleTitle: "Explain the rule: how is a Swahili verb built?",
       // Shown to the participant after they click "Finish this activity".
       solution: `
         <p>A Swahili verb is built from up to four pieces, always in the same order:
@@ -151,10 +162,11 @@ const UNITS = {
     post: {
       name: "Latvian",
       heading: "Latvian. Study the examples and solve the translation tasks.",
-      source: "Source: Neacșu 5.14 (Rubinstein, MSK 1999), nouns only.",
+      // Source: Neacșu 5.14 (Rubinstein, MSK 1999), nouns only.
       flag: "🇱🇻",
       spotlight: "Latvian belongs to the Baltic branch of the Indo-European language family. Its closest living relative is Lithuanian.",
       panelTitle: "Latvian · Nouns and forms",
+      chars: ["ā", "ē", "ī", "ū", "ņ", "š", "ž", "č", "ģ", "ķ", "ļ"],
       examples: [
         ["ozols", "Oak"],
         ["galds", "Table"],
@@ -185,133 +197,146 @@ const UNITS = {
         ]
       },
       rule: {
-        title: "Formulate the rule: how do Latvian nouns change? (approx. 1 min)",
+        title: "Explain the rule: how do Latvian noun endings change? (approx. 1 min)",
         placeholder: "Explain the pattern you have identified...",
         answer: "The basic (singular) form of these Latvian nouns ends in -s. To say 'of the ...', the -s is replaced: " +
           "by -a for one (ozols → ozola, ārsts → ārsta) and by -u for more than one (autors → autoru, " +
-          "bruņinieks → bruņinieku). The stem before the ending stays the same."
+          "bruņinieks → bruņinieku). The stem before the ending stays the same.",
+        // The patterns the AI grader looks for in the participant's explanation.
+        patterns: [
+          "The plain form of the noun ends in -s.",
+          "'Of the' for one replaces -s with -a (ozols → ozola).",
+          "'Of the' for several replaces -s with -u (autors → autoru)."
+        ]
       }
     }
   },
 
 
   /* =======================================================
-     UNIT 2 — Irish / Valley Yokuts (pre + post, order is
-     counterbalanced) · Swedish · Evenki
+     UNIT 2 — Valley Yokuts (pre) · Swedish · Evenki · Irish (post)
      ======================================================= */
   2: {
     label: "Unit 2 · Morphology",
     next: null,
 
-    // Which test comes first is decided per participant (see pickTests in script.js).
-    // To use a fixed order instead, replace `tests` with `pre: …, post: …`.
-    tests: {
+    // Same order for everyone: Valley Yokuts as pre-test, Irish as post-test.
 
-      /* ---------- Test A · Irish ---------- */
-      A: {
-        name: "Irish",
-        heading: "Irish. Study the examples and solve the translation tasks.",
-        source: "Source: Neacșu 4.1 (Kukhto, Elementy).",
-        flag: "🇮🇪",
-        spotlight: "Irish (Gaeilge) is a Celtic language of the Indo-European family. It is the first official language of Ireland and is still spoken every day in the Gaeltacht regions.",
-        panelTitle: "Irish · Command and present tense",
-        chars: ["á", "é", "í", "ó", "ú"],
-        examples: [
-          ["fan", "Stay!"],
-          ["fanaim", "I stay"],
-          ["cuir", "Put!"],
-          ["cuireann sé", "he puts"],
-          ["ceannaigh", "Buy!"],
-          ["ceannaíonn tú", "you buy"],
-          ["creid", "Believe!"],
-          ["creidim", "I believe"],
-          ["déan", "Do!"],
-          ["déanann sí", "she does"],
-          ["ól", "Drink!"],
-          ["lig", "Let!"],
-          ["ligeann tú", "you let"],
-          ["tosaigh", "Start!"],
-          ["tosaím", "I start"]
-        ],
-        task: "These are Irish verbs in the command form and in the present tense. Look for recurring parts and try to infer what each part means.",
-        apply: {
-          title: "Apply: write in Irish (approx. 1 min)",
-          items: [
-            { label: "I put", key: ["cuirim"] },
-            { label: "you (sg) stay", key: ["fanann tú", "fanann"] },
-            { label: "he drinks", key: ["ólann sé", "ólann"] }
-          ]
-        },
-        transfer: {
-          title: "Transfer: write in Irish (approx. 1 min)",
-          note: "Vocabulary: oibrigh = Work! · smaoinigh = Think!",
-          items: [
-            { label: "I work", key: ["oibrím"] },
-            { label: "I think", key: ["smaoiním"] }
-          ]
-        },
-        rule: {
-          title: "Formulate the rule: how is the Irish present-tense ending built? (approx. 1 min)",
-          placeholder: "Explain how the present-tense ending is formed...",
-          answer: "The present tense is the command form (the stem) plus an ending. 'I' is a single word ending in " +
-            "-(a)im with no pronoun; the other persons end in -(e)ann followed by the pronoun (sé = he, sí = she, " +
-            "tú = you). The spelling of the ending depends on the last vowel of the stem: after a broad vowel " +
-            "(a, o, u) it is -aim / -ann (fanaim, déanann, ólann); after a slender vowel (e, i) it is -im / -eann " +
-            "(creidim, cuireann, ligeann). Stems ending in -igh drop the -igh and take -ím / -aíonn instead " +
-            "(tosaigh → tosaím, ceannaigh → ceannaíonn)."
-        }
+    /* ---------- Post-test · Irish ---------- */
+    post: {
+      name: "Irish",
+      heading: "Irish. Study the examples and solve the translation tasks.",
+      // Source: Neacșu 4.1 (Kukhto, Elementy).
+      flag: "🇮🇪",
+      spotlight: "Irish (Gaeilge) is a Celtic language of the Indo-European family. It is the first official language of Ireland and is still spoken every day in the Gaeltacht regions.",
+      panelTitle: "Irish · Command and present tense",
+      chars: ["á", "é", "í", "ó", "ú"],
+      examples: [
+        ["fan", "Stay!"],
+        ["fanaim", "I stay"],
+        ["cuir", "Put!"],
+        ["cuireann sé", "he puts"],
+        ["ceannaigh", "Buy!"],
+        ["ceannaíonn tú", "you buy"],
+        ["creid", "Believe!"],
+        ["creidim", "I believe"],
+        ["déan", "Do!"],
+        ["déanann sí", "she does"],
+        ["ól", "Drink!"],
+        ["lig", "Let!"],
+        ["ligeann tú", "you let"],
+        ["tosaigh", "Start!"],
+        ["tosaím", "I start"]
+      ],
+      task: "These are Irish verbs in the command form and in the present tense. Look for recurring parts and try to infer what each part means.",
+      apply: {
+        title: "Apply: write in Irish (approx. 1 min)",
+        items: [
+          { label: "I put", key: ["cuirim"] },
+          { label: "you (singular) stay", key: ["fanann tú", "fanann"] },
+          { label: "he drinks", key: ["ólann sé", "ólann"] }
+        ]
       },
+      transfer: {
+        title: "Transfer: write in Irish (approx. 1 min)",
+        note: "Vocabulary: oibrigh = Work! · smaoinigh = Think!",
+        items: [
+          { label: "I work", key: ["oibrím"] },
+          { label: "I think", key: ["smaoiním"] }
+        ]
+      },
+      rule: {
+        title: "Explain the rule: how is the Irish present tense built? (approx. 1 min)",
+        placeholder: "Explain how the present-tense ending is formed...",
+        answer: "The present tense is the command form (the stem) plus an ending. 'I' is a single word ending in " +
+          "-(a)im with no pronoun; the other persons end in -(e)ann followed by the pronoun (sé = he, sí = she, " +
+          "tú = you). The spelling of the ending depends on the last vowel of the stem: after a broad vowel " +
+          "(a, o, u) it is -aim / -ann (fanaim, déanann, ólann); after a slender vowel (e, i) it is -im / -eann " +
+          "(creidim, cuireann, ligeann). Stems ending in -igh drop the -igh and take -ím / -aíonn instead " +
+          "(tosaigh → tosaím, ceannaigh → ceannaíonn).",
+        // The patterns the AI grader looks for in the participant's explanation.
+        patterns: [
+          "'I' is one word ending in -(a)im with no pronoun; the other persons end in -(e)ann followed by the pronoun (sé, sí, tú).",
+          "After a, o, u in the stem the ending is -aim / -ann; after e, i it is -im / -eann.",
+          "Verbs ending in -igh drop the -igh and take -ím / -aíonn (tosaigh → tosaím, ceannaigh → ceannaíonn)."
+        ]
+      }
+    },
 
-      /* ---------- Test B · Valley Yokuts ---------- */
-      B: {
-        name: "Valley Yokuts",
-        heading: "Valley Yokuts. Study the examples and solve the translation tasks.",
-        source: "Source: Neacșu 4.4 (Helmer, RoLO 2019), non-future forms only. ʔ is written as an apostrophe; k’ and ’ are consonants.",
-        flag: "🌄",
-        spotlight: "Valley Yokuts is a Yokuts language of the San Joaquin Valley in California, historically spoken by Indigenous communities there.",
-        panelTitle: "Valley Yokuts · Verb forms",
-        columns: ["Stem", "Now or past", "Meaning"],
-        chars: ["’"],
-        examples: [
-          [["dos", "doshin"], "report"],
-          [["dub", "dubhun"], "conduct"],
-          [["yawal", "yawalhin"], "follow"],
-          [["logiw", "logiwhin"], "pulverise"],
-          [["won", "wonhin"], "hide"],
-          [["xat", "xathin"], "eat"],
-          [["’ugun", "’ugunhun"], "drink"],
-          [["’opot", "’opothin"], "get out of bed"]
-        ],
-        task: "Each row shows a verb stem and its form with the ending that means the action happens now or in the past. Look for recurring parts and try to infer what each part means.",
-        apply: {
-          title: "Apply: write the now-or-past form (approx. 1 min)",
-          items: [
-            { label: "lihim (run)", key: ["lihimhin"] },
-            { label: "mek’ (swallow)", key: ["mek’hin"] },
-            { label: "t’oyix (treat)", key: ["t’oyixhin"] }
-          ]
-        },
-        transfer: {
-          title: "Transfer: write the now-or-past form (approx. 1 min)",
-          items: [
-            { label: "’ilik (sing)", key: ["’ilikhin"] },
-            { label: "luk’ul (bury)", key: ["luk’ulhun"] }
-          ]
-        },
-        rule: {
-          title: "Formulate the rule: how is the now-or-past ending built? (approx. 1 min)",
-          placeholder: "Explain how the ending is chosen...",
-          answer: "The now-or-past form is the stem plus the ending -hin or -hun. The choice depends on the vowel of " +
-            "the stem (vowel harmony): if the stem's vowel is u, the ending is -hun (dubhun, ’ugunhun); with any " +
-            "other vowel (a, i, o) it is -hin (doshin, xathin, wonhin, ’opothin)."
-        }
+    /* ---------- Pre-test · Valley Yokuts ---------- */
+    pre: {
+      name: "Valley Yokuts",
+      heading: "Valley Yokuts. Study the examples and solve the translation tasks.",
+      // Source: Neacșu 4.4 (Helmer, RoLO 2019), non-future forms only. ʔ is written as an apostrophe; k’ and ’ are consonants.
+      letters: "Note: ’ and k’ are consonants.",
+      flag: "🌄",
+      spotlight: "Valley Yokuts is a Yokuts language of the San Joaquin Valley in California, historically spoken by Indigenous communities there.",
+      panelTitle: "Valley Yokuts · Verb forms",
+      columns: ["Stem", "Now or past", "Meaning"],
+      chars: ["’"],
+      examples: [
+        [["dos", "doshin"], "report"],
+        [["dub", "dubhun"], "conduct"],
+        [["yawal", "yawalhin"], "follow"],
+        [["logiw", "logiwhin"], "pulverise"],
+        [["won", "wonhin"], "hide"],
+        [["xat", "xathin"], "eat"],
+        [["’ugun", "’ugunhun"], "drink"],
+        [["’opot", "’opothin"], "get out of bed"]
+      ],
+      task: "Each row shows a verb stem and its form with the ending that means the action happens now or in the past. Look for recurring parts and try to infer what each part means.",
+      apply: {
+        title: "Apply: write the now-or-past form (approx. 1 min)",
+        items: [
+          { label: "lihim (run)", key: ["lihimhin"] },
+          { label: "mek’ (swallow)", key: ["mek’hin"] },
+          { label: "t’oyix (treat)", key: ["t’oyixhin"] }
+        ]
+      },
+      transfer: {
+        title: "Transfer: write the now-or-past form (approx. 1 min)",
+        items: [
+          { label: "’ilik (sing)", key: ["’ilikhin"] },
+          { label: "luk’ul (bury)", key: ["luk’ulhun"] }
+        ]
+      },
+      rule: {
+        title: "Explain the rule: how is the Valley Yokuts now-or-past ending chosen? (approx. 1 min)",
+        placeholder: "Explain how the ending is chosen...",
+        answer: "The now-or-past form is the stem plus the ending -hin or -hun. The choice depends on the vowel of " +
+          "the stem (vowel harmony): if the stem's vowel is u, the ending is -hun (dubhun, ’ugunhun); with any " +
+          "other vowel (a, i, o) it is -hin (doshin, xathin, wonhin, ’opothin).",
+        // The patterns the AI grader looks for in the participant's explanation.
+        patterns: [
+          "The ending is -hun when the stem's vowel is u, and -hin otherwise (a, i, o)."
+        ]
       }
     },
 
     discover: {
       event: "swedish_discovery_and_worked_example_opened",
       heading: "Discover Swedish. What do you notice about the endings?",
-      source: "Source: Neacșu 5.2 (Swedish, original).",
+      // Source: Neacșu 5.2 (Swedish, original).
       flag: "🇸🇪",
       spotlight: "Swedish is a North Germanic language and the official language of Sweden. It is also one of the two national languages of Finland.",
       panelTitle: "Swedish · Nouns",
@@ -347,7 +372,8 @@ const UNITS = {
       prefix: "evenki",
       name: "Evenki",
       heading: "Evenki: complete the missing forms and discover the rule.",
-      source: "Source: Neacșu 4.5 (Evenki, original), part (a). Letters: ʋ is written ü, ɵ is written ö, ə is written ë, ŋ is written ng; the colon marks a long vowel.",
+      // Source: Neacșu 4.5 (Evenki, original), part (a). Letters: ʋ is written ü, ɵ is written ö, ə is written ë, ŋ is written ng; the colon marks a long vowel.
+      letters: "The colon (:) marks a long vowel, e.g. xë:m.",
       flag: "🇷🇺 🇨🇳",
       spotlight: "Evenki is a Tungusic language spoken by small communities across Siberia and northern China. It builds words by adding endings to a stem.",
       panelTitle: "Evenki · Nouns in three forms",
@@ -371,7 +397,7 @@ const UNITS = {
         { label: "(2) iggë · iggësël · ______ (tail)", key: ["iggëlë"] },
         { label: "(3) xë:m · ______ · xë:mlë (meal)", key: ["xë:msël"] }
       ],
-      ruleTitle: "Write the rule: how do the endings change in Evenki?",
+      ruleTitle: "Explain the rule: how do the Evenki endings change?",
       // Shown to the participant after they click "Finish this activity".
       solution: `
         <p>Both endings change their vowel to match the <strong>last vowel of the noun</strong>.
@@ -398,6 +424,21 @@ const UNITS = {
       ]
     }
   }
+};
+
+/* =========================================================
+   QUESTIONNAIRE — shown once, before the Unit 1 pre-test.
+   Answers are saved with the rest of the data, including the email.
+   ========================================================= */
+const INTAKE = {
+  heading: "Before you start",
+  intro: "A few questions about you and languages. They take about two minutes.",
+  // The languages that appear in the experiment
+  knownLanguages: ["Dabida", "Zulu", "Swahili", "Latvian", "Valley Yokuts", "Swedish", "Evenki", "Irish"],
+  consent: "This study looks at how people learn to analyse words in unfamiliar languages, with or without " +
+    "an AI tutor. It takes about 40 minutes online. We record your answers, the rules you write and any chat " +
+    "with the tutor. You can stop at any time without giving a reason. Your email is used only to contact you " +
+    "about the study and is removed from the data before analysis."
 };
 
 // Lets the server (api/chat.js) read the same content; ignored in the browser.
