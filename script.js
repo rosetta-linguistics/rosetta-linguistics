@@ -10,6 +10,8 @@
 const CHAT_API_URL = "https://rosetta-linguistics.vercel.app/api/chat";
 const GRADE_API_URL = "https://rosetta-linguistics.vercel.app/api/grade";
 const STEP_NAMES = ["Pre-test", "Discover", "Practise", "Post-test"];
+// Expected time shown next to a heading, in minutes.
+const TIME = { test: 5, practice: 3 };
 
 const $ = (id) => document.getElementById(id);
 const esc = (text) =>
@@ -151,6 +153,8 @@ function lock(form, buttonText) {
 
 /* ---------- Screen templates ---------- */
 
+const durationHtml = (minutes) => ` <span class="duration">(approx. ${minutes} minutes)</span>`;
+
 const introHtml = (heading, s) => `
   <div class="intro">
     <h1>${heading}</h1>
@@ -221,7 +225,7 @@ function testScreenHtml(test, prefix, screen) {
   }).join("");
 
   return `<section id="screen-${screen}" class="step">
-    ${introHtml(`${label}: ${test.heading}`, test)}
+    ${introHtml(`${label}: ${test.heading}${durationHtml(TIME.test)}`, test)}
     <div class="layout">${panelHtml(test)}
       <div class="activity">${charBarHtml(test.chars)}<form id="${prefix}test-form">${body}</form></div>
     </div></section>`;
@@ -255,7 +259,7 @@ function practiceHtml(p) {
     <details class="hint" data-hint="${i + 1}"><summary>Hint ${i + 1}</summary><p>${hint}</p></details>`).join("");
 
   return `<section id="screen-2" class="step">
-    ${introHtml(p.heading, p)}
+    ${introHtml(`${p.heading}${durationHtml(TIME.practice)}`, p)}
     <div class="layout">${panelHtml(p)}
       <div class="activity">
         ${charBarHtml(p.chars)}
