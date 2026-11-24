@@ -140,13 +140,13 @@ module.exports = async function handler(req, res) {
 
     const body = req.body || {};
 
-    const messages = body.messages;
+    // Only the most recent turns are sent to the model, so a long chat never gets blocked.
+    const messages = Array.isArray(body.messages) ? body.messages.slice(-30) : null;
     const currentRule = String(body.currentRule || "").slice(0, 2000);
 
     if (
         !Array.isArray(messages) ||
-        messages.length === 0 ||
-        messages.length > 20
+        messages.length === 0
     ) {
         return res.status(400).json({
             error: "Invalid conversation."
@@ -220,7 +220,10 @@ module.exports = async function handler(req, res) {
 
                     input: validMessages,
 
-                    max_output_tokens: 220,
+                    // The model thinks before answering and that thinking counts toward this limit.
+                    // At 220 it often ran out before writing anything, which produced an empty reply.
+                    // Replies stay short because the instructions ask for 1–3 sentences.
+                    max_output_tokens: 2000,
 
                     store: false
 
@@ -250,6 +253,8 @@ module.exports = async function handler(req, res) {
 
 
         if (!reply) {
+
+            console.error("Empty tutor reply:", result.status, result.incomplete_details);
 
             return res.status(502).json({
                 error: "The tutor did not generate a response."

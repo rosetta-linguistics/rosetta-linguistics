@@ -666,7 +666,7 @@ function initChat() {
     data.responses[`${P}_chat`] = chat;
     log("chat_message_sent", { message_number: chat.length });
 
-    await requestReply();
+    await requestReply(text);
   });
 }
 
@@ -703,13 +703,14 @@ function setChatBusy(busy, error = "") {
   status.hidden = !error;
 }
 
-async function requestReply() {
+async function requestReply(text) {
   setChatBusy(true);
 
   try {
     const response = await fetch(CHAT_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(45000),
       body: JSON.stringify({
         messages: chat.map(({ role, content }) => ({ role, content })),
         currentRule: $("rule-input").value.trim(),
@@ -731,8 +732,17 @@ async function requestReply() {
 
   } catch (error) {
     console.error("Chatbot error:", error);
-    log("chat_request_failed", { error: String(error.message || error) });
-    setChatBusy(false, "Sorry, the tutor could not respond. Please try again.");
+    log("chat_request_failed", { error: String(error.message || error), message: text });
+
+    // Take the unanswered message back out of the conversation and put it back in the box,
+    // so sending again does not stack up repeated messages.
+    chat.pop();
+    data.responses[`${P}_chat`] = chat;
+    [...$("chat-messages").querySelectorAll(".chat-message.user")].pop()?.remove();
+    const input = $("chat-input");
+    if (!input.value.trim()) { input.value = text; fitInput(input); }
+
+    setChatBusy(false, "Sorry, the tutor could not respond. Please press send again.");
   }
 }
 
